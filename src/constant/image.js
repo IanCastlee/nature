@@ -1,6 +1,11 @@
-import hero1 from "../assets/images/hero1.jpg";
-import hero2 from "../assets/images/hero2.jpg";
-import hero3 from "../assets/images/hero3.jpg";
+import hero1 from "../assets/images/hero1.png";
+import hero2 from "../assets/images/hero2.png";
+import hero3 from "../assets/images/hero3.png";
+
+import hero1_m from "../assets/images/hero1_m.png";
+import hero2_m from "../assets/images/hero2_m.png";
+import hero3_m from "../assets/images/hero3_m.png";
+
 import aboutbg from "../assets/images/about.jpg";
 
 //icons
@@ -26,6 +31,9 @@ export const images = {
   hero1,
   hero2,
   hero3,
+  hero1_m,
+  hero2_m,
+  hero3_m,
 
   aboutbg,
   messageIcons,

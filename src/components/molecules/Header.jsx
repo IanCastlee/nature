@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { images } from "../../constant/image";
 import { icons } from "../../constant/icon";
 import { motion } from "framer-motion";
 import useThemeStore from "../../store/themeStore";
 
 function Header() {
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const { darkMode, toggleDarkMode } = useThemeStore();
 
@@ -34,36 +35,57 @@ function Header() {
     >
       <div className="w-full h-full flex justify-between items-center relative">
         <img
+          onClick={() => navigate("/")}
           src={images.logo}
           alt="Logo"
           className={`absolute top-2 left-10 transition-all duration-300 ${
             scrolled ? "h-[70px]" : "h-[150px]"
-          }`}
+          } cursor-pointer`}
         />
         <span></span>
 
         <nav className="flex">
           <ul className="flex items-center gap-10">
-            <li
-              className={`${
-                scrolled ? "dark:text-white" : "dark:text-white text-white"
-              }`}
-            >
-              <Link to="/">Home</Link>
+            <li className="relative group">
+              <Link
+                to="/"
+                className={`text-black dark:text-white transition-colors duration-300 
+      group-hover:text-blue-400
+      before:content-[''] before:absolute before:bottom-0 before:left-1/2 
+      before:translate-x-[-50%] before:h-[2px] before:w-0 
+      before:bg-blue-400 before:transition-all before:duration-300 
+      group-hover:before:w-full ${scrolled ? "dark:text-white" : "text-white"}`}
+              >
+                Home
+              </Link>
             </li>
-            <li
-              className={`${
-                scrolled ? "dark:text-white" : "dark:text-white text-white"
-              }`}
-            >
-              <Link to="/">About</Link>
+
+            <li className="relative group">
+              <Link
+                to="/"
+                className={`text-black dark:text-white transition-colors duration-300 
+      group-hover:text-blue-400
+      before:content-[''] before:absolute before:bottom-0 before:left-1/2 
+      before:translate-x-[-50%] before:h-[2px] before:w-0 
+      before:bg-blue-400 before:transition-all before:duration-300 
+      group-hover:before:w-full ${scrolled ? "dark:text-white" : "text-white"}`}
+              >
+                About
+              </Link>
             </li>
-            <li
-              className={`${
-                scrolled ? "dark:text-white" : "dark:text-white text-white"
-              }`}
-            >
-              <Link to="/">Services</Link>
+
+            <li className="relative group">
+              <Link
+                to="/"
+                className={`text-black dark:text-white transition-colors duration-300 
+      group-hover:text-blue-400
+      before:content-[''] before:absolute before:bottom-0 before:left-1/2 
+      before:translate-x-[-50%] before:h-[2px] before:w-0 
+      before:bg-blue-400 before:transition-all before:duration-300 
+      group-hover:before:w-full ${scrolled ? "dark:text-white" : "text-white"}`}
+              >
+                Services
+              </Link>
             </li>
 
             <button onClick={toggleDarkMode}>

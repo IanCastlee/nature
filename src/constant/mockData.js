@@ -36,19 +36,59 @@ import img4 from "../assets/dummyImages/sasha-kaunas-67-sOi7mVIk-unsplash.jpg";
 
 export const dummyRooms = [
   {
+    id: 1,
     image: img1,
     name: "AIR-CONDITIONED ROOMS WITH MINI POOL",
   },
+  { id: 2, image: img2, name: "AIR-CONDITIONED SUITE ROOMS WITH SHARED BIG" },
+  { id: 3, image: img3, name: "AIR-CONDITIONED ROOMS WITHOUT MINI POOL" },
   {
-    image: img2,
-    name: "AIR-CONDITIONED SUITE ROOMS WITH SHARED BIG",
-  },
-  {
-    image: img3,
-    name: "AIR-CONDITIONED ROOMS WITHOUT MINI POOL",
-  },
-  {
+    id: 4,
     image: img4,
     name: "STANDARD AIR-CONDITIONED ROOMS WITHOUT MINI POOL",
+  },
+];
+
+//cottages
+export const dummyCottages = [
+  {
+    id: 1,
+    image: img1,
+    name: "Cottage 1",
+    price: "10,60.00",
+    capacity: "5-10 persons",
+    duration: "8 hours",
+  },
+  {
+    id: 2,
+    image: img1,
+    name: "Cottage 2",
+    price: "10,60.00",
+    capacity: "5-10 persons",
+    duration: "8 hours",
+  },
+  {
+    id: 3,
+    image: img1,
+    name: "Cottage 3",
+    price: "10,60.00",
+    capacity: "5-10 persons",
+    duration: "8 hours",
+  },
+  {
+    id: 4,
+    image: img1,
+    name: "Cottage 4",
+    price: "10,60.00",
+    capacity: "5-10 persons",
+    duration: "8 hours",
+  },
+  {
+    id: 5,
+    image: img1,
+    name: "Cottage 5",
+    price: "10,60.00",
+    capacity: "5-10 persons",
+    duration: "8 hours",
   },
 ];

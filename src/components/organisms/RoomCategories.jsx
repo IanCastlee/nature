@@ -1,13 +1,9 @@
-// import React from "react";
-// import { dummyRooms } from "../../constant/mockData";
-// import RoomCategoryCard from "../molecules/RoomCategoryCard";
+import React from "react";
+import { dummyRooms } from "../../constant/mockData";
+import RoomCategoryCard from "../molecules/RoomCategoryCard";
 
-// function RoomCategories() {
-//   return (
-//     <section>
+function RoomCategories() {
+  return <section></section>;
+}
 
-//     </section>
-//   );
-// }
-
-// export default RoomCategories;
+export default RoomCategories;

@@ -1,17 +1,26 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "../src/components/pages/Home";
 import useThemeStore from "./store/themeStore";
-import About from "./components/pages/About";
 import Header from "./components/molecules/Header";
 import Footer from "./components/molecules/Footer";
+import HomePage from "./components/pages/HomePage";
+import AboutPage from "./components/pages/AboutPage";
+import ViewRoomPage from "./components/pages/ViewRoomPage";
+import RoomCategoriesPage from "./components/pages/RoomCategoriesPage";
+import CottagesPage from "./components/pages/CottagesPage";
 const UserLayout = () => {
   return (
     <>
       <Header />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route
+          path="/room-category/:categoryId"
+          element={<RoomCategoriesPage />}
+        />
+        <Route path="/room-deatails/:roomId" element={<ViewRoomPage />} />
+        <Route path="/cottages" element={<CottagesPage />} />
       </Routes>
       <Footer />
     </>
