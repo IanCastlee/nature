@@ -20,6 +20,8 @@ import { IoPricetagsOutline } from "react-icons/io5";
 import { FaChevronCircleRight } from "react-icons/fa";
 import { GrNotes } from "react-icons/gr";
 import { MdOutlineClose } from "react-icons/md";
+import { FiArrowLeftCircle } from "react-icons/fi";
+import { PiSignIn } from "react-icons/pi";
 
 export const icons = {
   FaPhoneAlt,
@@ -44,4 +46,6 @@ export const icons = {
   FaChevronCircleRight,
   GrNotes,
   MdOutlineClose,
+  FiArrowLeftCircle,
+  PiSignIn,
 };

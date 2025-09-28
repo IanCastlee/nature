@@ -15,6 +15,9 @@ import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/autoplay";
 import { useNavigate } from "react-router-dom";
+import SubtTitle from "../molecules/SubtTitle";
+import Title from "../molecules/Title";
+import ReadMoreButton from "../atoms/ReadMoreButton";
 
 const About = lazy(() => import("../organisms/About"));
 const ChatBot = lazy(() => import("../molecules/ChatBot"));
@@ -52,12 +55,6 @@ function HomePage() {
             {imageKeys.map((key, idx) => (
               <SwiperSlide key={idx}>
                 <div className="relative w-full h-full">
-                  {/* <img
-                    src={images[key]}
-                    alt={`Slide ${idx + 1}`}
-                    className="absolute top-0 left-0 w-full h-full object-fill"
-                  /> */}
-
                   <LazyLoadImage
                     src={images[key]}
                     alt={`Slide ${idx + 1}`}
@@ -122,16 +119,11 @@ function HomePage() {
 
         <section className="w-full dark:bg-black">
           <div className="flex flex-col justify-center items-center">
-            <div className="flex flex-row justify-center items-center gap-2">
-              <div className="h-[1px] w-[50px] bg-blue-400"></div>
-              <span className="text-blue-400 font-medium text-sm md:text-sm lg:text-lg">
-                OUR ROOMS
-              </span>
-              <div className="h-[1px] w-[50px] bg-blue-400"></div>
-            </div>
-            <h3 className="mb-6 dark:text-white text-lg md:text-xl lg:text-2xl font-medium">
-              CHOOSE THE TYPE THAT SUITS YOU
-            </h3>
+            <SubtTitle title="OUR ROOMS" />
+            <Title
+              title=" 
+              CHOOSE THE TYPE THAT SUITS YOU"
+            />
           </div>
 
           <div className="w-full flex flex-row flex-wrap px-2 md:px-2 lg:px-[130px] justify-center gap-2">
@@ -153,15 +145,9 @@ function HomePage() {
         <section className="w-full flex flex-col dark:bg-black mt-10">
           <div className="flex flex-col justify-center items-center">
             <div className="flex flex-row justify-center items-center gap-2">
-              <div className="h-[1px] w-[50px] bg-blue-400"></div>
-              <span className="text-blue-400 font-medium text-sm md:text-sm lg:text-lg">
-                OUR CATTAGES
-              </span>
-              <div className="h-[1px] w-[50px] bg-blue-400"></div>
+              <SubtTitle title="OUR CATTAGES" />
             </div>
-            <h3 className="mb-6 dark:text-white text-lg text-center  md:text-xl lg:text-2xl font-medium">
-              FIND THE PERFECT COTTAGE FOR YOUR STAY
-            </h3>
+            <Title title="FIND THE PERFECT COTTAGE FOR YOUR STAY" />
           </div>
 
           <div className="w-full flex flex-row flex-wrap md:flex-nowrap lg:flex-nowrap px-2  md:px-2 lg:px-[130px] justify-center gap-2">
@@ -179,27 +165,24 @@ function HomePage() {
             ))}
           </div>
           <div className="px-2 lg:px-[130px] mt-4">
-            <button
+            <ReadMoreButton
+              label={
+                <>
+                  View More{" "}
+                  <icons.HiArrowSmallRight className="text-white inline" />
+                </>
+              }
               onClick={() => navigate("/cottages")}
-              className="flex flex-row dark:border dark:border-blue-400  bg-black items-center text-white text-sm font-medium rounded-sm h-[30px] px-2 self-end ml-auto hover:bg-gray-800 mt-auto "
-            >
-              View More <icons.HiArrowSmallRight className="text-white" />
-            </button>
+            />
           </div>
         </section>
 
         <section className="w-full flex flex-col dark:bg-black mt-10">
           <div className="flex flex-col justify-center items-center">
             <div className="flex flex-row justify-center items-center gap-2">
-              <div className="h-[1px] w-[50px] bg-blue-400"></div>
-              <span className="text-blue-400 font-medium text-sm md:text-sm lg:text-lg">
-                OUR FUNCTION HALLS
-              </span>
-              <div className="h-[1px] w-[50px] bg-blue-400"></div>
+              <SubtTitle title="OUR FUNCTION HALLS" />
             </div>
-            <h3 className="mb-6 dark:text-white text-lg text-center  md:text-xl lg:text-2xl font-medium">
-              SPACIOUS AND STYLISH FUNCTION HALLS FOR YOU
-            </h3>
+            <Title title="SPACIOUS AND STYLISH FUNCTION HALLS FOR YOU" />
           </div>
 
           <div className="w-full flex flex-row flex-wrap  px-2  md:px-2 lg:px-[130px] justify-center gap-2">
@@ -217,12 +200,15 @@ function HomePage() {
             ))}
           </div>
           <div className="px-2 lg:px-[130px] mt-4">
-            <button
+            <ReadMoreButton
+              label={
+                <>
+                  View More{" "}
+                  <icons.HiArrowSmallRight className="text-white inline" />
+                </>
+              }
               onClick={() => navigate("/cottages")}
-              className="flex flex-row dark:border dark:border-blue-400  bg-black items-center text-white text-sm font-medium rounded-sm h-[30px] px-2 self-end ml-auto hover:bg-gray-800 mt-auto "
-            >
-              View More <icons.HiArrowSmallRight className="text-white" />
-            </button>
+            />
           </div>
         </section>
       </main>
@@ -246,10 +232,11 @@ function HomePage() {
       )}
 
       <img
+        onClick={() => navigate("/test")}
         title="Street View"
         src={images.location}
         alt="Street View Icon"
-        className="h-[80px] w-[80px] fixed bottom-4 right-28 z-30"
+        className="h-[60px] w-[60px] fixed bottom-4 right-28 z-30"
       />
     </>
   );

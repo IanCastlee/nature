@@ -1,12 +1,12 @@
-import hero1 from "../assets/images/hero1.png";
+import hero1 from "../assets/images/hero1.webp";
 import hero2 from "../assets/images/hero2.png";
 import hero3 from "../assets/images/hero3.png";
 
 import hero1_m from "../assets/images/hero1_m.png";
 import hero2_m from "../assets/images/hero2_m.png";
 import hero3_m from "../assets/images/hero3_m.png";
-
-import aboutbg from "../assets/images/about.jpg";
+import signupbg from "../assets/images/signupbg.webp";
+import aboutbg from "../assets/images/aboutbg.webp";
 
 //icons
 import messageIcons from "../assets/icons/message.png";
@@ -51,4 +51,5 @@ export const images = {
   waterBike,
   service,
   location,
+  signupbg,
 };

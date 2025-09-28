@@ -5,7 +5,11 @@ import { useInView } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
+import { motion } from "framer-motion";
 import Blur from "../molecules/Blur";
+import ReadMoreButton from "../atoms/ReadMoreButton";
+import SubtTitle from "../molecules/SubtTitle";
+import Title from "../molecules/Title";
 function About() {
   const navigate = useNavigate();
   const ref = useRef(null);
@@ -13,7 +17,12 @@ function About() {
 
   return (
     <section className="flex flex-col md:flex-row items-start justify-between gap-8 px-2 lg:px-[130px] md:px-2 py-16 dark:bg-black relative">
-      <div className="w-full h-[200px] lg:h-[270px] md:h-[250px] md:w-1/2 ">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full h-[200px] lg:h-[270px] md:h-[250px] md:w-1/2 "
+      >
         <LazyLoadImage
           src={images.aboutbg}
           alt="About us"
@@ -21,14 +30,17 @@ function About() {
           wrapperClassName="w-full h-full"
           className="w-full h-full object-cover"
         />
-      </div>
+      </motion.div>
 
-      <article className="w-full md:w-1/2">
-        <div className="flex flex-row justify-start items-center gap-2">
-          <span className="text-blue-400 font-medium text-sm md:text-sm lg:text-lg">
-            ABOUT US
-          </span>
-          <div className="h-[1px] w-[50px] bg-blue-400"></div>
+      <motion.article
+        initial={{ opacity: 0, x: 20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full md:w-1/2"
+      >
+        <div className="flex flex-col justify-start items-start ">
+          <SubtTitle title="ABOUT US" hidden="hidden" />
+          <Title title="2JKLA Nature Hot Spring" />
         </div>
 
         <p className="text-sm text-gray-700 mb-4 leading-relaxed dark:text-white">
@@ -40,13 +52,16 @@ function About() {
           luxury, and authentic experiences powered by natural hot springs.
         </p>
 
-        <button
+        <ReadMoreButton
+          label={
+            <>
+              Read More{" "}
+              <icons.HiArrowSmallRight className="text-white inline" />
+            </>
+          }
           onClick={() => navigate("/about")}
-          className="flex flex-row dark:border dark:border-blue-400  bg-black items-center text-white text-sm font-medium rounded-sm h-[30px] px-2 self-end ml-auto hover:bg-gray-800 mt-auto "
-        >
-          Read More <icons.HiArrowSmallRight className="text-white" />
-        </button>
-      </article>
+        />
+      </motion.article>
 
       <Blur top="top-0" isReverse={false} blur="h-[150px] w-[150px]" />
     </section>

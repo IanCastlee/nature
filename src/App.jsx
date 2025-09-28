@@ -1,5 +1,10 @@
-import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import useThemeStore from "./store/themeStore";
 import Header from "./components/molecules/Header";
 import Footer from "./components/molecules/Footer";
@@ -9,10 +14,19 @@ import ViewRoomPage from "./components/pages/ViewRoomPage";
 import RoomCategoriesPage from "./components/pages/RoomCategoriesPage";
 import CottagesPage from "./components/pages/CottagesPage";
 import Test from "./components/pages/Test";
+import SignUp from "./components/pages/SignUp";
+import SignIn from "./components/pages/SignIn";
+import About from "./components/organisms/About";
+import Dashboard from "./admin_components/admin_pages/Dashboard";
+import AdminSideBar from "./admin_components/admin_molecules/AdminSideBar";
 const UserLayout = () => {
+  const location = useLocation();
+
+  const hideLayout = ["/signup", "/test", "/signin"];
+  const shouldHideLayout = hideLayout.includes(location.pathname);
   return (
     <>
-      <Header />
+      {/* {!shouldHideLayout && <Header />} */}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
@@ -22,18 +36,37 @@ const UserLayout = () => {
         />
         <Route path="/room-deatails/:roomId" element={<ViewRoomPage />} />
         <Route path="/cottages" element={<CottagesPage />} />
+        <Route path="/about" element={<About />} />
         <Route path="/test" element={<Test />} />
+
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signin" element={<SignIn />} />
       </Routes>
-      <Footer />
+      {/* {!shouldHideLayout && <Footer />} */}
     </>
   );
 };
 
 const AdminLayout = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   return (
-    <Routes>
-      <Route path="/" element={<div>Admin Dashboard Placeholder</div>} />
-    </Routes>
+    <div>
+      <AdminSideBar
+        isCollapsed={isCollapsed}
+        toggleCollapse={() => setIsCollapsed(!isCollapsed)}
+      />
+
+      <main
+        className={`min-h-screen transition-all duration-300 p-6 bg-white dark:bg-black ${
+          isCollapsed ? "ml-20" : "ml-64"
+        }`}
+      >
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+        </Routes>
+      </main>
+    </div>
   );
 };
 

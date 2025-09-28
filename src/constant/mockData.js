@@ -28,23 +28,20 @@ export const freebies = [
 ];
 
 // mockData.js or dummyRooms.js
-
-import img1 from "../assets/dummyImages/frames-for-your-heart-FqqiAvJejto-unsplash.jpg";
-import img2 from "../assets/dummyImages/ikhbale-xMbzmWROWxE-unsplash.jpg";
-import img3 from "../assets/dummyImages/mky-moody-AUF6Gl4wwzA-unsplash.jpg";
-import img4 from "../assets/dummyImages/sasha-kaunas-67-sOi7mVIk-unsplash.jpg";
+import img1 from "../assets/images/aboutbg.webp";
+import img2 from "../assets/images/signupbg.webp";
 
 export const dummyRooms = [
   {
     id: 1,
-    image: img1,
+    image: img2,
     name: "AIR-CONDITIONED ROOMS WITH MINI POOL",
   },
   { id: 2, image: img2, name: "AIR-CONDITIONED SUITE ROOMS WITH SHARED BIG" },
-  { id: 3, image: img3, name: "AIR-CONDITIONED ROOMS WITHOUT MINI POOL" },
+  { id: 3, image: img2, name: "AIR-CONDITIONED ROOMS WITHOUT MINI POOL" },
   {
     id: 4,
-    image: img4,
+    image: img2,
     name: "STANDARD AIR-CONDITIONED ROOMS WITHOUT MINI POOL",
   },
 ];
