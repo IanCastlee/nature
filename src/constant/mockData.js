@@ -92,3 +92,23 @@ export const dummyCottages = [
     duration: "8 hours",
   },
 ];
+
+//function Hall
+export const dummyFunctionHall = [
+  {
+    id: 1,
+    image: img1,
+    name: "Function Hall 1 with Videoke",
+    price: "4,240.00",
+    capacity: "60-80 persons",
+    duration: "8 hours",
+  },
+  {
+    id: 2,
+    image: img1,
+    name: "Function Hall 2 with Videoke",
+    price: "4,240.00",
+    capacity: "60-80 persons",
+    duration: "8 hours",
+  },
+];

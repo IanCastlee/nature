@@ -72,6 +72,17 @@ function Header() {
               >
                 About
               </Link>
+              <Link
+                to="/test"
+                className={`text-black dark:text-white transition-colors duration-300 
+      group-hover:text-blue-400
+      before:content-[''] before:absolute before:bottom-0 before:left-1/2 
+      before:translate-x-[-50%] before:h-[2px] before:w-0 
+      before:bg-blue-400 before:transition-all before:duration-300 
+      group-hover:before:w-full ${scrolled ? "dark:text-white" : "text-white"}`}
+              >
+                Test
+              </Link>
             </li>
 
             <li className="relative group">

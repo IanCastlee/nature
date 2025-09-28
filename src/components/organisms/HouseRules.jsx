@@ -5,7 +5,7 @@ function HouseRules({ close }) {
   return (
     <div className="w-full h-screen bg-black/50 fixed top-0 left-0 z-50 flex justify-center items-center">
       <motion.div
-        initial={{ opacity: 0, y: -300 }}
+        initial={{ opacity: 0, y: -10 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-[500px] max-h-[80%] bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 overflow-y-auto"

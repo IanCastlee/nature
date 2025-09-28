@@ -8,6 +8,7 @@ import AboutPage from "./components/pages/AboutPage";
 import ViewRoomPage from "./components/pages/ViewRoomPage";
 import RoomCategoriesPage from "./components/pages/RoomCategoriesPage";
 import CottagesPage from "./components/pages/CottagesPage";
+import Test from "./components/pages/Test";
 const UserLayout = () => {
   return (
     <>
@@ -21,6 +22,7 @@ const UserLayout = () => {
         />
         <Route path="/room-deatails/:roomId" element={<ViewRoomPage />} />
         <Route path="/cottages" element={<CottagesPage />} />
+        <Route path="/test" element={<Test />} />
       </Routes>
       <Footer />
     </>

@@ -20,7 +20,7 @@ function CattageCard({ item }) {
         initial={{ opacity: 0, x: -100 }}
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.9 }}
-        className="min-w-[60%] flex flex-col p-2 bg-black/60 absolute bottom-0 left-0"
+        className="min-w-[60%] flex flex-col p-2 bg-black/50 absolute bottom-0 left-0 gap-2"
         style={{
           clipPath: "polygon(0 0, 75% 0, 100% 100%, 0% 100%)",
         }}
@@ -40,9 +40,13 @@ function CattageCard({ item }) {
         </span>
       </motion.div>
 
+      <button className="text-sm hover:text-blue-400 text-white cursor-pointer absolute right-12 bottom-2 bg-black/60 rounded-full py-1 px-2">
+        More Details
+      </button>
+
       <icons.FaStreetView
         title="View Room"
-        className="text-3xl text-white cursor-pointer transform transition-transform duration-300 hover:scale-125 absolute right-2 bottom-2 bg-black/60 rounded-full p-1"
+        className="text-3xl hover:text-blue-400 text-white cursor-pointer transform transition-transform duration-300 hover:scale-125 absolute right-2 bottom-2 bg-black/60 rounded-full p-1"
       />
     </article>
   );

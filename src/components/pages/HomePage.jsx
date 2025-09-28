@@ -1,6 +1,11 @@
 import React, { useEffect, Suspense, lazy } from "react";
 import { images } from "../../constant/image";
-import { dummyCottages, dummyRooms, freebies } from "../../constant/mockData";
+import {
+  dummyCottages,
+  dummyFunctionHall,
+  dummyRooms,
+  freebies,
+} from "../../constant/mockData";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { icons } from "../../constant/icon";
@@ -16,6 +21,7 @@ const ChatBot = lazy(() => import("../molecules/ChatBot"));
 const Freebie = lazy(() => import("../molecules/Freebie"));
 const RoomCategoryCard = lazy(() => import("../molecules/RoomCategoryCard"));
 const CattageCard = lazy(() => import("../molecules/CattageCard"));
+const FunctionHallCard = lazy(() => import("../molecules/FunctionHallCard"));
 
 const imageKeys = ["hero1", "hero1_m", "hero2", "hero2_m", "hero3", "hero3_m"];
 
@@ -61,7 +67,7 @@ function HomePage() {
                   />
 
                   {/* Overlay & caption */}
-                  <div className="absolute inset-0 bg-black bg-opacity-50" />
+                  <div className="absolute inset-0 bg-black bg-opacity-40" />
                   <figcaption className="absolute inset-0 flex flex-col justify-center items-start text-white pl-4 lg:pl-20 z-20">
                     <h1 className="text-5xl font-playfair max-w-2xl mb-6">
                       Experience the Serenity of{" "}
@@ -169,6 +175,44 @@ function HomePage() {
                 }
               >
                 <CattageCard item={item} />
+              </Suspense>
+            ))}
+          </div>
+          <div className="px-2 lg:px-[130px] mt-4">
+            <button
+              onClick={() => navigate("/cottages")}
+              className="flex flex-row dark:border dark:border-blue-400  bg-black items-center text-white text-sm font-medium rounded-sm h-[30px] px-2 self-end ml-auto hover:bg-gray-800 mt-auto "
+            >
+              View More <icons.HiArrowSmallRight className="text-white" />
+            </button>
+          </div>
+        </section>
+
+        <section className="w-full flex flex-col dark:bg-black mt-10">
+          <div className="flex flex-col justify-center items-center">
+            <div className="flex flex-row justify-center items-center gap-2">
+              <div className="h-[1px] w-[50px] bg-blue-400"></div>
+              <span className="text-blue-400 font-medium text-sm md:text-sm lg:text-lg">
+                OUR FUNCTION HALLS
+              </span>
+              <div className="h-[1px] w-[50px] bg-blue-400"></div>
+            </div>
+            <h3 className="mb-6 dark:text-white text-lg text-center  md:text-xl lg:text-2xl font-medium">
+              SPACIOUS AND STYLISH FUNCTION HALLS FOR YOU
+            </h3>
+          </div>
+
+          <div className="w-full flex flex-row flex-wrap  px-2  md:px-2 lg:px-[130px] justify-center gap-2">
+            {dummyFunctionHall.map((item, index) => (
+              <Suspense
+                key={index}
+                fallback={
+                  <div className="fixed bottom-4 right-10 text-white">
+                    Loading...
+                  </div>
+                }
+              >
+                <FunctionHallCard item={item} key={index} index={index} />
               </Suspense>
             ))}
           </div>
