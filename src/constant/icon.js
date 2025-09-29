@@ -12,7 +12,6 @@ import { IoIosTimer } from "react-icons/io";
 import { RiMenuAddFill } from "react-icons/ri";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { PiTowel } from "react-icons/pi";
-import { IoBedOutline } from "react-icons/io5";
 import { HiOutlineRectangleStack } from "react-icons/hi2";
 import { BiBlanket } from "react-icons/bi";
 import { FiArrowUpRight } from "react-icons/fi";
@@ -22,6 +21,13 @@ import { GrNotes } from "react-icons/gr";
 import { MdOutlineClose } from "react-icons/md";
 import { FiArrowLeftCircle } from "react-icons/fi";
 import { PiSignIn } from "react-icons/pi";
+import { IoAddOutline } from "react-icons/io5";
+
+//admin sidebar
+import { LuLayoutDashboard } from "react-icons/lu";
+import { IoBedOutline } from "react-icons/io5";
+import { IoSettingsOutline } from "react-icons/io5";
+import { GrAnalytics } from "react-icons/gr";
 
 export const icons = {
   FaPhoneAlt,
@@ -48,4 +54,8 @@ export const icons = {
   MdOutlineClose,
   FiArrowLeftCircle,
   PiSignIn,
+  IoAddOutline,
+  LuLayoutDashboard,
+  IoSettingsOutline,
+  GrAnalytics,
 };

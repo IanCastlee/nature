@@ -1,0 +1,59 @@
+import { icons } from "./icon";
+
+// Admin Sidebar Menu
+export const menuItems = [
+  {
+    name: "Dashboard",
+    to: "/admin/dashboard",
+    icon: icons.LuLayoutDashboard,
+  },
+  {
+    name: "Rooms",
+    icon: icons.IoBedOutline,
+    children: [
+      {
+        name: "Active Rooms",
+        to: "/admin/room",
+      },
+      {
+        name: "Inactive Rooms",
+        to: "/admin/rooms5",
+      },
+    ],
+  },
+  {
+    name: "Reports",
+    to: "/admin/reports",
+    icon: icons.BiBlanket,
+    children: [
+      {
+        name: "Active Reports",
+        to: "/admin/room4",
+      },
+      {
+        name: "Inactive Reports",
+        to: "/admin/rooms4",
+      },
+    ],
+  },
+  {
+    name: "Analytics",
+    to: "/admin/analytics",
+    icon: icons.GrAnalytics,
+  },
+  {
+    name: "Settings",
+    to: "/admin/settings",
+    icon: icons.IoSettingsOutline,
+    children: [
+      {
+        name: "Active Rooms",
+        to: "/admin/room3",
+      },
+      {
+        name: "Inactive Rooms",
+        to: "/admin/rooms33",
+      },
+    ],
+  },
+];

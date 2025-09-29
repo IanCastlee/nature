@@ -19,6 +19,7 @@ import SignIn from "./components/pages/SignIn";
 import About from "./components/organisms/About";
 import Dashboard from "./admin_components/admin_pages/Dashboard";
 import AdminSideBar from "./admin_components/admin_molecules/AdminSideBar";
+import RoomPage from "./admin_components/admin_pages/RoomPage";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -58,12 +59,13 @@ const AdminLayout = () => {
       />
 
       <main
-        className={`min-h-screen transition-all duration-300 p-6 bg-white dark:bg-black ${
+        className={`min-h-screen transition-all duration-300 p-6 bg-gray-100 dark:bg-gray-800 ${
           isCollapsed ? "ml-20" : "ml-64"
         }`}
       >
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/room" element={<RoomPage />} />
         </Routes>
       </main>
     </div>
