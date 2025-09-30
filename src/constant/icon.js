@@ -28,6 +28,8 @@ import { LuLayoutDashboard } from "react-icons/lu";
 import { IoBedOutline } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
 import { GrAnalytics } from "react-icons/gr";
+import { MdDeleteOutline } from "react-icons/md";
+import { FaRegEdit } from "react-icons/fa";
 
 export const icons = {
   FaPhoneAlt,
@@ -58,4 +60,6 @@ export const icons = {
   LuLayoutDashboard,
   IoSettingsOutline,
   GrAnalytics,
+  MdDeleteOutline,
+  FaRegEdit,
 };

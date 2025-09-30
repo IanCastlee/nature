@@ -12,12 +12,16 @@ export const menuItems = [
     icon: icons.IoBedOutline,
     children: [
       {
-        name: "Active Rooms",
+        name: "Available Rooms",
         to: "/admin/room",
       },
       {
-        name: "Inactive Rooms",
-        to: "/admin/rooms5",
+        name: "Not Available Rooms",
+        to: "/admin/not-available-room",
+      },
+      {
+        name: "Room Categories",
+        to: "/admin/room-categories",
       },
     ],
   },

@@ -2,15 +2,15 @@ import React, { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
-import { motion } from "framer-motion";
+import { uploadUrl } from "../../utils/fileURL";
 function RoomCategoryCard({ item }) {
   const navigate = useNavigate();
   return (
     <article className="w-full md:w-[49%] lg:w-[49%] h-[200px] relative group overflow-hidden rounded-md cursor-pointer">
       <div className="w-full h-full transition-transform duration-300 group-hover:scale-105">
         <LazyLoadImage
-          src={item.image}
-          alt={item.name}
+          src={`${uploadUrl.uploadurl}/room_categories/${item.image}`}
+          alt={item.category}
           effect="blur"
           wrapperClassName="w-full h-full"
           className="w-full h-full object-cover"
@@ -31,11 +31,11 @@ function RoomCategoryCard({ item }) {
         `}
       >
         <h4 className="text-white text-center text-lg md:text-lg lg:text-xl font-semibold px-2 max-w-[400px]">
-          {item.name}
+          {item.category}
         </h4>
         <button
           className="text-blue-400 text-sm font-medium border-b-2 border-blue-500"
-          onClick={() => navigate(`/room-category/${item.name}`)}
+          onClick={() => navigate(`/room-category/${item.category}`)}
         >
           View Rooms
         </button>

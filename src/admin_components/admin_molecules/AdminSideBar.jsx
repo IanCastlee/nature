@@ -43,7 +43,7 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
       } fixed top-0 left-0 h-screen bg-white dark:bg-gray-900 text-gray-100 flex flex-col transition-all duration-300 z-50`}
     >
       {/* Top controls */}
-      <div className="flex flex-row items-center gap-1 justify-between dark:bg-gray-950 p-1">
+      <div className="flex flex-row items-center gap-1 justify-between dark:bg-gray-800 mb-4 p-1">
         <button onClick={toggleDarkMode}>
           {darkMode ? (
             <icons.IoSunnySharp className="text-yellow-500 text-lg" />
@@ -131,7 +131,7 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
                         className={({ isActive }) =>
                           `flex items-center gap-2 h-[30px] dark:text-gray-400 text-gray-700  text-sm px-2 rounded-md transition-colors ${
                             isActive
-                              ? "bg-gray-200 dark:bg-gray-800 font-semibold"
+                              ? "bg-gray-200 dark:bg-gray-800 "
                               : "dark:hover:bg-gray-800 hover:bg-gray-100"
                           }`
                         }
@@ -149,7 +149,7 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
 
       {/* Footer */}
       {!isCollapsed && (
-        <footer className="mt-auto pt-4 border-t border-gray-700 text-sm text-gray-400 text-center">
+        <footer className="mt-auto p-2 border-t dark:border-gray-700 border-gray-300 text-sm text-gray-400 text-center flex flex-col items-center justify-center">
           © {currentYear} Nature Hot Spring reserved.
         </footer>
       )}

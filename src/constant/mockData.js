@@ -1,5 +1,10 @@
 import { images } from "./image";
 
+// mockData.js or dummyRooms.js
+import img1 from "../assets/images/aboutbg.webp";
+import img2 from "../assets/images/signupbg.webp";
+
+//freebies
 export const freebies = [
   {
     image: images.room,
@@ -27,10 +32,31 @@ export const freebies = [
   },
 ];
 
-// mockData.js or dummyRooms.js
-import img1 from "../assets/images/aboutbg.webp";
-import img2 from "../assets/images/signupbg.webp";
+//dummy Room Categories
+export const dummyRoomCategories = [
+  {
+    id: 1,
+    name: "AIR-CONDITIONED ROOMS WITH MINI POOL",
+    image: img1,
+  },
+  {
+    id: 2,
+    name: "AIR-CONDITIONED SUITE ROOMS WITH SHARED BIG",
+    image: img1,
+  },
+  {
+    id: 3,
+    name: "AIR-CONDITIONED ROOMS WITHOUT MINI POOL",
+    image: img1,
+  },
+  {
+    id: 4,
+    name: "STANDARD AIR-CONDITIONED ROOMS WITHOUT MINI POOL",
+    image: img1,
+  },
+];
 
+//dummyRooms
 export const dummyRooms = [
   {
     id: 1,
@@ -108,4 +134,35 @@ export const dummyFunctionHall = [
     capacity: "60-80 persons",
     duration: "8 hours",
   },
+];
+
+//options admin
+export const options = [
+  { value: "mr", label: "Mr." },
+  { value: "mrs", label: "Mrs." },
+  { value: "ms", label: "Ms." },
+  { value: "dr", label: "Dr." },
+];
+
+//amenities
+export const amenities = [
+  "Free Wifi",
+  "Air-Conditioning",
+  "Private Bathroom",
+  "Flowing Hot Water",
+  "TV",
+  "1 Mini Pool",
+  "1 Queen Sized Bed",
+  "4 Pillows",
+  "2 Blankets",
+  "2 Towels",
+];
+
+export const roomInclusions = [
+  "2 Complimentary Breakfast",
+  "Liquid Soap",
+  "Shampoo",
+  "Towels",
+  "Toothbrush and Toothpaste",
+  "Toiletries",
 ];

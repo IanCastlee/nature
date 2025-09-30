@@ -3,7 +3,6 @@ import { images } from "../../constant/image";
 import {
   dummyCottages,
   dummyFunctionHall,
-  dummyRooms,
   freebies,
 } from "../../constant/mockData";
 import { LazyLoadImage } from "react-lazy-load-image-component";
@@ -18,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import SubtTitle from "../molecules/SubtTitle";
 import Title from "../molecules/Title";
 import ReadMoreButton from "../atoms/ReadMoreButton";
+import useGetData from "../../hooks/useGetData";
 
 const About = lazy(() => import("../organisms/About"));
 const ChatBot = lazy(() => import("../molecules/ChatBot"));
@@ -31,6 +31,9 @@ const imageKeys = ["hero1", "hero1_m", "hero2", "hero2_m", "hero3", "hero3_m"];
 function HomePage() {
   const navigate = useNavigate();
   const [showChatBox, setShowChatBox] = React.useState(false);
+
+  // Fetch data
+  const { data, loading, refetch, error } = useGetData("/admin/rooms.php");
 
   // Preload images
   useEffect(() => {
@@ -117,7 +120,7 @@ function HomePage() {
           <About />
         </Suspense>
 
-        <section className="w-full dark:bg-black">
+        <section className="w-full dark:bg-black mt-10">
           <div className="flex flex-col justify-center items-center">
             <SubtTitle title="OUR ROOMS" />
             <Title
@@ -127,22 +130,39 @@ function HomePage() {
           </div>
 
           <div className="w-full flex flex-row flex-wrap px-2 md:px-2 lg:px-[130px] justify-center gap-2">
-            {dummyRooms.map((item) => (
-              <Suspense
-                key={item.name}
-                fallback={
-                  <div className="fixed bottom-4 right-10 text-white">
-                    Loading...
-                  </div>
-                }
-              >
-                <RoomCategoryCard item={item} />
-              </Suspense>
-            ))}
+            {loading && (
+              <div className="text-sm text-blue-600 mt-4">
+                Loading room categories...
+              </div>
+            )}
+
+            {error && (
+              <div className="text-sm text-red-500 mt-4">
+                {error.message || "Something went wrong."}
+              </div>
+            )}
+
+            {!loading && data?.length === 0 && (
+              <div className="text-sm text-gray-500 mt-4">
+                No categories found.
+              </div>
+            )}
+
+            {!loading &&
+              data?.map((item) => (
+                <Suspense
+                  key={item.category_id}
+                  fallback={
+                    <div className="text-white text-sm">Loading card...</div>
+                  }
+                >
+                  <RoomCategoryCard item={item} />
+                </Suspense>
+              ))}
           </div>
         </section>
 
-        <section className="w-full flex flex-col dark:bg-black mt-10">
+        <section className="w-full flex flex-col dark:bg-black mt-28">
           <div className="flex flex-col justify-center items-center">
             <div className="flex flex-row justify-center items-center gap-2">
               <SubtTitle title="OUR CATTAGES" />
@@ -177,7 +197,7 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="w-full flex flex-col dark:bg-black mt-10">
+        <section className="w-full flex flex-col dark:bg-black mt-24">
           <div className="flex flex-col justify-center items-center">
             <div className="flex flex-row justify-center items-center gap-2">
               <SubtTitle title="OUR FUNCTION HALLS" />

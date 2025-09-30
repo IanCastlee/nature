@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { dummyRooms } from "../../constant/mockData";
 import Button from "../admin_atoms/Button";
 import { icons } from "../../constant/icon";
 import TableRow from "../admin_molecules/TableRow";
@@ -8,24 +7,22 @@ import Input from "../../components/atoms/Input";
 import DropDown from "../../components/atoms/DropDown";
 import { options } from "../../constant/mockData";
 import { motion } from "framer-motion";
-import useRoomStore from "../../store/useRoomStore";
-function RoomPage() {
-  const showForm = useRoomStore((state) => state.showForm);
-  const setShowForm = useRoomStore((state) => state.setShowForm);
+import { dummyRooms } from "../../constant/mockData";
+
+function NotAvailableRoomPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const roomsPerPage = 2;
   const [showForm1, setShowForm1] = useState(false);
-  const [showForm2, setShowForm2] = useState(false);
 
-  const filteredRooms = dummyRooms.filter((room) =>
+  const filteredData = dummyRooms.filter((room) =>
     room.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const indexOfLastRoom = currentPage * roomsPerPage;
-  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
-  const currentRooms = filteredRooms.slice(indexOfFirstRoom, indexOfLastRoom);
-  const totalPages = Math.ceil(filteredRooms.length / roomsPerPage);
+  const indexOfLastData = currentPage * roomsPerPage;
+  const indexOfFirstData = indexOfLastData - roomsPerPage;
+  const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
+  const totalPages = Math.ceil(filteredData.length / roomsPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -34,12 +31,14 @@ function RoomPage() {
   return (
     <>
       <div className="scroll-smooth">
-        <h1 className="text-lg font-bold mb-6 dark:text-gray-100">Rooms</h1>
+        <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
+          Not Available Rooms
+        </h1>
 
         <div className="w-full flex flex-row justify-between items-center mb-2">
           <span className="dark:text-gray-100 text-xs font-medium">
-            Showing {filteredRooms.length} room
-            {filteredRooms.length !== 1 ? "s" : ""}
+            Showing {filteredData.length} room
+            {filteredData.length !== 1 ? "s" : ""}
           </span>
 
           <div className="flex flex-row items-center gap-2">
@@ -76,15 +75,15 @@ function RoomPage() {
                   Room Name
                 </th>
 
-                <th className="p-2 dark:text-gray-100  text-right font-medium w-fit">
+                <th className="p-2 dark:text-gray-100  text-right font-medium w-fit ">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody>
-              {currentRooms.length > 0 ? (
-                currentRooms.map((room) => (
-                  <TableRow key={room.id} room={room} />
+              {currentData.length > 0 ? (
+                currentData.map((room) => (
+                  <TableRow key={room.id} room={room} isHidden="hidden" />
                 ))
               ) : (
                 <tr>
@@ -92,7 +91,7 @@ function RoomPage() {
                     colSpan="2"
                     className="p-4 text-center text-gray-500 border dark:border-gray-700"
                   >
-                    No rooms found.
+                    No Rooms Found.
                   </td>
                 </tr>
               )}
@@ -139,35 +138,8 @@ function RoomPage() {
           </motion.div>
         </div>
       )}
-
-      {showForm && (
-        <div className="w-full h-screen fixed inset-0 bg-black/50 flex flex-row justify-center items-center z-50">
-          <motion.div
-            initial={{ opacity: 0, y: -5 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="w-[700px] rounded-lg bg-white dark:bg-gray-800 p-4"
-          >
-            <div className="flex flex-row justify-between items-center mb-5">
-              <h3 className="dark:text-white text-lg">
-                {showForm && showForm.toUpperCase()}
-              </h3>
-              <icons.MdOutlineClose
-                onClick={() => setShowForm(null)}
-                className="text-lg cursor-pointer dark:text-gray-100"
-              />
-            </div>
-            <form action="" className="w-full flex flex-col gap-3">
-              <div className="w-full flex flex-row gap-2">
-                <Input label="Name" />
-                <Input label="Quantity" isNumber={true} />
-              </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
     </>
   );
 }
 
-export default RoomPage;
+export default NotAvailableRoomPage;

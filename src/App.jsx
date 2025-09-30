@@ -12,6 +12,7 @@ import HomePage from "./components/pages/HomePage";
 import AboutPage from "./components/pages/AboutPage";
 import ViewRoomPage from "./components/pages/ViewRoomPage";
 import RoomCategoriesPage from "./components/pages/RoomCategoriesPage";
+import RoomCategoriesPageAdmin from "../src/admin_components/admin_pages/RoomCategoriesPage";
 import CottagesPage from "./components/pages/CottagesPage";
 import Test from "./components/pages/Test";
 import SignUp from "./components/pages/SignUp";
@@ -20,6 +21,7 @@ import About from "./components/organisms/About";
 import Dashboard from "./admin_components/admin_pages/Dashboard";
 import AdminSideBar from "./admin_components/admin_molecules/AdminSideBar";
 import RoomPage from "./admin_components/admin_pages/RoomPage";
+import NotAvailableRoomPage from "./admin_components/admin_pages/NotAvailableRoomPage";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -27,7 +29,7 @@ const UserLayout = () => {
   const shouldHideLayout = hideLayout.includes(location.pathname);
   return (
     <>
-      {/* {!shouldHideLayout && <Header />} */}
+      {!shouldHideLayout && <Header />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
@@ -43,7 +45,7 @@ const UserLayout = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
       </Routes>
-      {/* {!shouldHideLayout && <Footer />} */}
+      {!shouldHideLayout && <Footer />}
     </>
   );
 };
@@ -66,6 +68,14 @@ const AdminLayout = () => {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/room" element={<RoomPage />} />
+          <Route
+            path="/not-available-room"
+            element={<NotAvailableRoomPage />}
+          />
+          <Route
+            path="/room-categories"
+            element={<RoomCategoriesPageAdmin />}
+          />
         </Routes>
       </main>
     </div>
