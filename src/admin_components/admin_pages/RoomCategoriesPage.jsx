@@ -9,15 +9,22 @@ import FileInput from "../../components/atoms/FileInput";
 import useGetData from "../../hooks/useGetData";
 import SearchInput from "../admin_atoms/SearchInput";
 import useFormSubmit from "../../hooks/useFormSubmit";
+import { useRoomCategoryForm } from "../../store/useRoomStore";
+import NoData from "../../components/molecules/NoData";
+import DeleteModal from "../../components/molecules/DeleteModal";
+import useSetInactive from "../../hooks/useSetInactive";
 
 function RoomCategoriesPage() {
+  const showRoomCategoryForm = useRoomCategoryForm((state) => state.showForm);
+  const setRoomCategoryForm = useRoomCategoryForm((state) => state.setShowForm);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [showForm1, setShowForm1] = useState(false);
-  const itemsPerPage = 2;
+  const itemsPerPage = 5;
 
   const [category, setCategory] = useState("");
   const [imageFile, setImageFile] = useState(null);
+  const [editData, setEditData] = useState(null);
 
   // Fetch data
   const { data, loading, refetch, error } = useGetData("/admin/rooms.php");
@@ -44,20 +51,46 @@ function RoomCategoriesPage() {
     error: formError,
   } = useFormSubmit("/admin/rooms.php", () => {
     refetch();
-    setShowForm1(false);
+    setRoomCategoryForm(null);
     setCategory("");
     setImageFile(null);
+    setEditData(null);
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("category", category);
-    formData.append("image", imageFile);
+
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
+    if (showRoomCategoryForm === "update" && editData) {
+      formData.append("id", editData.category_id);
+      formData.append("action", "update");
+    }
+
     submit(formData);
   };
 
-  console.log(category);
+  const handleEdit = (item) => {
+    setEditData(item);
+    setCategory(item.category);
+    setRoomCategoryForm("update");
+  };
+
+  const [deleteItem, setDeleteItem] = useState(null);
+
+  const {
+    setInactive,
+    loading: inactiveLoading,
+    error: inactiveError,
+  } = useSetInactive("/admin/rooms.php", () => {
+    refetch();
+    setDeleteItem(null);
+  });
+
   return (
     <>
       <div className="scroll-smooth">
@@ -87,7 +120,7 @@ function RoomCategoriesPage() {
             />
 
             <Button
-              handleClick={() => setShowForm1(true)}
+              handleClick={() => setRoomCategoryForm("add")}
               className="flex flex-row items-center h-[35px] bg-green-600 text-white text-xs font-medium px-2 rounded-md whitespace-nowrap"
               label={
                 <>
@@ -121,15 +154,17 @@ function RoomCategoriesPage() {
                     key={item.category_id}
                     item={item}
                     isHidden="hidden"
+                    onEdit={handleEdit}
+                    onSetInactive={() => setDeleteItem(item)}
                   />
                 ))
               ) : !loading && currentData.length === 0 ? (
-                <tr className="border dark:border-gray-700">
+                <tr>
                   <td
                     colSpan="3"
                     className="text-center py-4 text-gray-500 dark:text-gray-400"
                   >
-                    No Category Found.
+                    <NoData />
                   </td>
                 </tr>
               ) : null}
@@ -147,7 +182,7 @@ function RoomCategoriesPage() {
       </div>
 
       {/* Modal Form */}
-      {showForm1 && (
+      {showRoomCategoryForm != null && (
         <div className="w-full h-screen fixed inset-0 bg-black/50 flex flex-row justify-center items-center z-50">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -156,9 +191,18 @@ function RoomCategoriesPage() {
             className="w-[700px] rounded-lg bg-white dark:bg-gray-800 p-4"
           >
             <div className="flex flex-row justify-between items-center mb-5">
-              <h3 className="dark:text-white text-lg">Add Room Category</h3>
+              <h3 className="dark:text-white text-lg">
+                {showRoomCategoryForm === "add"
+                  ? "ADD ROOM CATEGORY"
+                  : "UPDATE DETAILS"}
+              </h3>
               <icons.MdOutlineClose
-                onClick={() => setShowForm1(false)}
+                onClick={() => {
+                  setRoomCategoryForm(null);
+                  setCategory("");
+                  setImageFile(null);
+                  setEditData(null);
+                }}
                 className="text-lg cursor-pointer dark:text-gray-100"
               />
             </div>
@@ -173,7 +217,10 @@ function RoomCategoriesPage() {
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 />
-                <FileInput onChange={(e) => setImageFile(e.target.files[0])} />
+                <FileInput
+                  isRequired={showRoomCategoryForm === "add" ? true : false}
+                  onChange={(e) => setImageFile(e.target.files[0])}
+                />
               </div>
 
               {formError && (
@@ -185,12 +232,33 @@ function RoomCategoriesPage() {
                   type="submit"
                   disabled={formLoading}
                   className="bg-blue-600 text-white px-4 py-2 rounded text-sm"
-                  label={formLoading ? "Submitting..." : "Submit"}
+                  label={
+                    formLoading
+                      ? "Submitting..."
+                      : showRoomCategoryForm === "update"
+                      ? "Update"
+                      : "Submit"
+                  }
                 />
               </div>
             </form>
           </motion.div>
         </div>
+      )}
+
+      {deleteItem && (
+        <DeleteModal
+          item={deleteItem}
+          loading={inactiveLoading}
+          onCancel={() => setDeleteItem(null)}
+          onConfirm={() => {
+            console.log("🧨 onConfirm called for item:", deleteItem);
+            setInactive({
+              id: deleteItem?.category_id, // ✅ only send what's needed
+              action: "set_inactive", // ✅ action expected by PHP
+            });
+          }}
+        />
       )}
     </>
   );

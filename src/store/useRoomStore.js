@@ -1,8 +1,11 @@
 import { create } from "zustand";
 
-const useRoomStore = create((set) => ({
+export const useRoomStore = create((set) => ({
   showForm: null,
   setShowForm: (value) => set({ showForm: value }),
 }));
 
-export default useRoomStore;
+export const useRoomCategoryForm = create((set) => ({
+  showForm: null,
+  setShowForm: (value) => set({ showForm: value }),
+}));

@@ -22,6 +22,7 @@ import Dashboard from "./admin_components/admin_pages/Dashboard";
 import AdminSideBar from "./admin_components/admin_molecules/AdminSideBar";
 import RoomPage from "./admin_components/admin_pages/RoomPage";
 import NotAvailableRoomPage from "./admin_components/admin_pages/NotAvailableRoomPage";
+import RoomViewTest from "./components/pages/RoomViewTest";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -41,6 +42,7 @@ const UserLayout = () => {
         <Route path="/cottages" element={<CottagesPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/test" element={<Test />} />
+        <Route path="/room-view" element={<RoomViewTest />} />
 
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />

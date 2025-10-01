@@ -18,6 +18,7 @@ import logo from "../assets/icons/naturelogo.png";
 import line from "../assets/icons/line.png";
 import animationImg from "../assets/icons/beach.png";
 import location from "../../src/assets/icons/street-view.png";
+import empty from "../../src/assets/icons/empty.png";
 
 //offers
 import fish from "../assets/icons/fish.png";
@@ -41,6 +42,7 @@ export const images = {
   wifi,
   aircon,
   logo,
+  empty,
   flowingHotWater,
   line,
   animationImg,

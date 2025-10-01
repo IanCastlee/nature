@@ -1,9 +1,9 @@
 import React, { memo } from "react";
 import { icons } from "../../constant/icon";
 import Button from "../admin_atoms/Button";
-import useRoomStore from "../../store/useRoomStore";
+import { useRoomStore } from "../../store/useRoomStore";
 import { uploadUrl } from "../../utils/fileURL";
-function TableRow({ item, isHidden }) {
+function TableRow({ item, isHidden, onEdit, onSetInactive }) {
   const setShowForm = useRoomStore((state) => state.setShowForm);
   return (
     <tr
@@ -58,12 +58,18 @@ function TableRow({ item, isHidden }) {
           </div>
 
           <button
+            onClick={() => {
+              console.log("TableRow: onSetInactive clicked for", item);
+              onSetInactive(item);
+            }}
             title="Set as not active"
             className="h-[27px] ml-7 bg-red-500 rounded-sm w-[27px] text-white hover:bg-gray-700 flex flex-row justify-center items-center"
           >
             <icons.MdDeleteOutline />
           </button>
+
           <button
+            onClick={() => onEdit(item)}
             title="Update"
             className="h-[27px] m bg-blue-500 rounded-sm w-[27px] text-white hover:bg-gray-700 flex flex-row justify-center items-center"
           >

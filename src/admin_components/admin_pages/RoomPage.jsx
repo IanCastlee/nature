@@ -8,7 +8,7 @@ import Input from "../../components/atoms/Input";
 import DropDown from "../../components/atoms/DropDown";
 import { options } from "../../constant/mockData";
 import { motion } from "framer-motion";
-import useRoomStore from "../../store/useRoomStore";
+import { useRoomStore } from "../../store/useRoomStore";
 function RoomPage() {
   const showForm = useRoomStore((state) => state.showForm);
   const setShowForm = useRoomStore((state) => state.setShowForm);
@@ -16,7 +16,6 @@ function RoomPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const roomsPerPage = 2;
   const [showForm1, setShowForm1] = useState(false);
-  const [showForm2, setShowForm2] = useState(false);
 
   const filteredRooms = dummyRooms.filter((room) =>
     room.name.toLowerCase().includes(searchTerm.toLowerCase())

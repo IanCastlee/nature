@@ -5,8 +5,10 @@ import dummyImage from "../../assets/dummyImages/rooma.jpg";
 import { icons } from "../../constant/icon";
 import HouseRules from "../organisms/HouseRules";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 function ViewRoomPage() {
   const [showHouseRules, setShowHouseRules] = useState(false);
+  const navigate = useNavigate();
   return (
     <>
       <main className="min-h-screen w-full dark:bg-black pb-20">
@@ -50,6 +52,7 @@ function ViewRoomPage() {
               </div>
 
               <icons.FaStreetView
+                onClick={() => navigate("/room-view")}
                 title="View Room"
                 className="text-[40px] text-blue-400 cursor-pointer transform transition-transform duration-300 hover:scale-125"
               />

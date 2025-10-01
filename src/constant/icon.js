@@ -30,6 +30,7 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { GrAnalytics } from "react-icons/gr";
 import { MdDeleteOutline } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
+import { MdDeleteForever } from "react-icons/md";
 
 export const icons = {
   FaPhoneAlt,
@@ -48,6 +49,7 @@ export const icons = {
   PiTowel,
   IoBedOutline,
   HiOutlineRectangleStack,
+  MdDeleteForever,
   BiBlanket,
   FiArrowUpRight,
   IoPricetagsOutline,
