@@ -23,10 +23,7 @@ function DeleteModal({ item, loading, onCancel, onConfirm }) {
           />
           <Button
             disabled={loading}
-            handleClick={() => {
-              console.log("DeleteModal: onConfirm clicked for", item);
-              onConfirm();
-            }}
+            handleClick={() => onConfirm()}
             className="h-[28px] px-2 bg-red-500 text-xs text-white font-medium rounded-md w-auto hover:bg-gray-600"
             label={loading ? "Updating..." : "Set Inactive"}
           />

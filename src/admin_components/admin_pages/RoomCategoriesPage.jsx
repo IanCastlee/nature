@@ -25,6 +25,7 @@ function RoomCategoriesPage() {
   const [category, setCategory] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [editData, setEditData] = useState(null);
+  const [deleteItem, setDeleteItem] = useState(null);
 
   // Fetch data
   const { data, loading, refetch, error } = useGetData("/admin/rooms.php");
@@ -79,8 +80,6 @@ function RoomCategoriesPage() {
     setCategory(item.category);
     setRoomCategoryForm("update");
   };
-
-  const [deleteItem, setDeleteItem] = useState(null);
 
   const {
     setInactive,
@@ -252,10 +251,9 @@ function RoomCategoriesPage() {
           loading={inactiveLoading}
           onCancel={() => setDeleteItem(null)}
           onConfirm={() => {
-            console.log("🧨 onConfirm called for item:", deleteItem);
             setInactive({
-              id: deleteItem?.category_id, // ✅ only send what's needed
-              action: "set_inactive", // ✅ action expected by PHP
+              id: deleteItem?.category_id,
+              action: "set_inactive",
             });
           }}
         />

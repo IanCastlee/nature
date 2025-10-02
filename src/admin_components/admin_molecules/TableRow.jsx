@@ -58,10 +58,7 @@ function TableRow({ item, isHidden, onEdit, onSetInactive }) {
           </div>
 
           <button
-            onClick={() => {
-              console.log("TableRow: onSetInactive clicked for", item);
-              onSetInactive(item);
-            }}
+            onClick={() => onSetInactive(item)}
             title="Set as not active"
             className="h-[27px] ml-7 bg-red-500 rounded-sm w-[27px] text-white hover:bg-gray-700 flex flex-row justify-center items-center"
           >

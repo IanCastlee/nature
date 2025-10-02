@@ -4,14 +4,14 @@ include("../dbConn.php");
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// ✅ Accept raw JSON body if sent
+// Accept raw JSON body if sent
 if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
     $input = json_decode(file_get_contents("php://input"), true);
     $_POST = $input;
 }
 
 if ($method === "GET") {
-    // ✅ Get only active categories
+    // Get only active categories
     $stmt = $conn->prepare("SELECT * FROM room_categories WHERE status = 'active'");
     $stmt->execute();
 
@@ -33,7 +33,7 @@ if ($method === "POST") {
     $uploadDir = "../uploads/room_categories/";
     $filename = null;
 
-    // ✅ Handle file upload if form-data and image provided
+    // Handle file upload if form-data and image provided
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $filename = uniqid() . "_" . basename($_FILES['image']['name']);
         $targetFile = $uploadDir . $filename;
