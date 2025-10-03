@@ -13,7 +13,7 @@ export const menuItems = [
     children: [
       {
         name: "Available Rooms",
-        to: "/admin/room",
+        to: "/admin/available-room",
       },
       {
         name: "Not Available Rooms",

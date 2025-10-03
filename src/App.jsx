@@ -20,9 +20,9 @@ import SignIn from "./components/pages/SignIn";
 import About from "./components/organisms/About";
 import Dashboard from "./admin_components/admin_pages/Dashboard";
 import AdminSideBar from "./admin_components/admin_molecules/AdminSideBar";
-import RoomPage from "./admin_components/admin_pages/RoomPage";
 import NotAvailableRoomPage from "./admin_components/admin_pages/NotAvailableRoomPage";
 import RoomViewTest from "./components/pages/RoomViewTest";
+import AvailableRoomPage from "./admin_components/admin_pages/AvailableRoomPage";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -69,7 +69,7 @@ const AdminLayout = () => {
       >
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/room" element={<RoomPage />} />
+          <Route path="/available-room" element={<AvailableRoomPage />} />
           <Route
             path="/not-available-room"
             element={<NotAvailableRoomPage />}

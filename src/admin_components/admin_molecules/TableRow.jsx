@@ -11,14 +11,15 @@ function TableRow({ item, isHidden, onEdit, onSetInactive }) {
       className="dark:hover:bg-gray-900 hover:bg-gray-50"
     >
       <td className="h-[45px]  p-2 border dark:border-gray-700 border-gray-300">
-        <img
+        {/* <img
           src={`${uploadUrl.uploadurl}/room_categories/${item.image}`}
           alt={item.category}
           className="w-auto h-full rounded shadow-sm"
-        />
+        /> */}
+        Image
       </td>
       <td className="h-[45px]  p-2 border text-xs dark:border-gray-700 dark:text-gray-100 border-gray-300">
-        {item.category}
+        {item.category || item.room_name}
       </td>
       <td className="flex flex-row justify-end p-0 border dark:border-gray-700 border-gray-300 align-middle">
         <div className="flex flex-row items-center gap-2 px-2 h-[45px]">

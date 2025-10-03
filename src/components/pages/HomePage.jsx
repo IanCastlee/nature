@@ -33,7 +33,9 @@ function HomePage() {
   const [showChatBox, setShowChatBox] = React.useState(false);
 
   // Fetch data
-  const { data, loading, refetch, error } = useGetData("/admin/rooms.php");
+  const { data, loading, refetch, error } = useGetData(
+    "/admin/room-category.php"
+  );
 
   // Preload images
   useEffect(() => {

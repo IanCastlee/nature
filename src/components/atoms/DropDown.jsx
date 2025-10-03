@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { icons } from "../../constant/icon";
 function DropDown({ options }) {
   const [selectedTitle, setSelectedTitle] = useState("");
 
@@ -15,13 +15,14 @@ function DropDown({ options }) {
         value={selectedTitle}
         onChange={(e) => setSelectedTitle(e.target.value)}
       >
-        <option value="" disabled>
+        <option className="text-center" value="" disabled>
           -- Select a title --
         </option>
         {options &&
           options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
+            <option key={option.category_id} value={option.category}>
+              <icons.IoCheckmarkCircle className="text-green-600 text-lg" />
+              {option.category}
             </option>
           ))}
       </select>

@@ -9,14 +9,14 @@ import FileInput from "../../components/atoms/FileInput";
 import useGetData from "../../hooks/useGetData";
 import SearchInput from "../admin_atoms/SearchInput";
 import useFormSubmit from "../../hooks/useFormSubmit";
-import { useRoomCategoryForm } from "../../store/useRoomStore";
+import { useForm } from "../../store/useRoomStore";
 import NoData from "../../components/molecules/NoData";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import useSetInactive from "../../hooks/useSetInactive";
 
 function RoomCategoriesPage() {
-  const showRoomCategoryForm = useRoomCategoryForm((state) => state.showForm);
-  const setRoomCategoryForm = useRoomCategoryForm((state) => state.setShowForm);
+  const showRoomCategoryForm = useForm((state) => state.showForm);
+  const setRoomCategoryForm = useForm((state) => state.setShowForm);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,7 +28,9 @@ function RoomCategoriesPage() {
   const [deleteItem, setDeleteItem] = useState(null);
 
   // Fetch data
-  const { data, loading, refetch, error } = useGetData("/admin/rooms.php");
+  const { data, loading, refetch, error } = useGetData(
+    "/admin/room-category.php"
+  );
 
   // Filtered data
   const filteredData =
@@ -50,7 +52,7 @@ function RoomCategoriesPage() {
     submit,
     loading: formLoading,
     error: formError,
-  } = useFormSubmit("/admin/rooms.php", () => {
+  } = useFormSubmit("/admin/room-category.php", () => {
     refetch();
     setRoomCategoryForm(null);
     setCategory("");
@@ -85,7 +87,7 @@ function RoomCategoriesPage() {
     setInactive,
     loading: inactiveLoading,
     error: inactiveError,
-  } = useSetInactive("/admin/rooms.php", () => {
+  } = useSetInactive("/admin/room-category.php", () => {
     refetch();
     setDeleteItem(null);
   });

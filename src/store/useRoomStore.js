@@ -5,7 +5,7 @@ export const useRoomStore = create((set) => ({
   setShowForm: (value) => set({ showForm: value }),
 }));
 
-export const useRoomCategoryForm = create((set) => ({
+export const useForm = create((set) => ({
   showForm: null,
   setShowForm: (value) => set({ showForm: value }),
 }));

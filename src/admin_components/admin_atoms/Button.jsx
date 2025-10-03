@@ -1,8 +1,6 @@
-import React from "react";
-import { icons } from "../../constant/icon";
-function Button({ label, className, handleClick, title }) {
+function Button({ label, className, onClick, title }) {
   return (
-    <button title={title} onClick={handleClick} className={`${className}`}>
+    <button title={title} onClick={onClick} className={`${className}`}>
       {label}
     </button>
   );

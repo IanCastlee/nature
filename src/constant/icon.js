@@ -22,6 +22,9 @@ import { MdOutlineClose } from "react-icons/md";
 import { FiArrowLeftCircle } from "react-icons/fi";
 import { PiSignIn } from "react-icons/pi";
 import { IoAddOutline } from "react-icons/io5";
+import { IoCheckmarkCircle } from "react-icons/io5";
+import { MdOutlineArrowDropDownCircle } from "react-icons/md";
+import { AiOutlineInfoCircle } from "react-icons/ai";
 
 //admin sidebar
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -64,4 +67,7 @@ export const icons = {
   GrAnalytics,
   MdDeleteOutline,
   FaRegEdit,
+  IoCheckmarkCircle,
+  MdOutlineArrowDropDownCircle,
+  AiOutlineInfoCircle,
 };
