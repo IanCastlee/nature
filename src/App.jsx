@@ -23,6 +23,8 @@ import AdminSideBar from "./admin_components/admin_molecules/AdminSideBar";
 import NotAvailableRoomPage from "./admin_components/admin_pages/NotAvailableRoomPage";
 import RoomViewTest from "./components/pages/RoomViewTest";
 import AvailableRoomPage from "./admin_components/admin_pages/AvailableRoomPage";
+import AvailableFunctionHall from "./admin_components/admin_pages/AvailableFunctionHall";
+import NotAvailableFunctionHall from "./admin_components/admin_pages/NotAvailableFunctionHall";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -42,7 +44,7 @@ const UserLayout = () => {
         <Route path="/cottages" element={<CottagesPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/test" element={<Test />} />
-        <Route path="/room-view" element={<RoomViewTest />} />
+        <Route path="/room-view/:photo" element={<RoomViewTest />} />
 
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
@@ -77,6 +79,16 @@ const AdminLayout = () => {
           <Route
             path="/room-categories"
             element={<RoomCategoriesPageAdmin />}
+          />
+
+          <Route
+            path="/available-funtion-hall"
+            element={<AvailableFunctionHall />}
+          />
+
+          <Route
+            path="/not-available-funtion-hall"
+            element={<NotAvailableFunctionHall />}
           />
         </Routes>
       </main>

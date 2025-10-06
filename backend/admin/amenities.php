@@ -12,100 +12,100 @@ if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !
 
 
 
-if ($method === "POST") {
+if ($method === "GET") {
+    $room_id_get = $_GET['room_id_get'] ?? null;
+
+    if (!$room_id_get) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Missing room_id_get"
+        ]);
+        exit;
+    }
+
+    $stmt = $conn->prepare("SELECT * FROM amenities WHERE room_id = ?");
+    $stmt->bind_param("i", $room_id_get);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $data = $result->fetch_all(MYSQLI_ASSOC);
+
+    echo json_encode([
+        "success" => true,
+        "data" => $data
+    ]);
+    exit;
+}
+
+
+if ($method === 'POST') {
     $action = $_POST['action'] ?? 'create';
-    $room_id = $_POST['room_id'] ?? null;
-    $amenity = $_POST['amenity'] ?? '';
-  
+    $id = isset($_POST['id']) ? intval($_POST['id']) : null;
+    $room_id = isset($_POST['room_id']) ? intval($_POST['room_id']) : null;
+    $name = $_POST['name'] ?? '';
+
     // ================================
-    // 1. CREATE NEW ROOM
+    // CREATE AMENITY
     // ================================
     if ($action === "create") {
-        if (!$room_id || !$amenity) {
+        if (!$room_id || !$name) {
             echo json_encode([
                 "success" => false,
-                "message" => " All fields are required."
+                "message" => "All fields are required."
             ]);
             exit;
         }
 
-    // =================================
-    // Check if room_id already exists
-    // =================================
-    $checkStmt = $conn->prepare("SELECT amenities FROM amenities WHERE room_id = ?");
-    $checkStmt->bind_param("i", $room_id);
-    $checkStmt->execute();
-    $result = $checkStmt->get_result();
+        // Check if amenity already exists for the room
+        $checkStmt = $conn->prepare("SELECT amenities FROM amenities WHERE room_id = ? AND amenities = ?");
+        $checkStmt->bind_param("is", $room_id, $name);
+        $checkStmt->execute();
+        $result = $checkStmt->get_result();
 
-    if ($result->num_rows > 0) {
-        //  Room exists — update amenities list
-        $row = $result->fetch_assoc();
-        $existingAmenities = $row['amenities'];
+        if ($result->num_rows < 1) {
+            // Insert new amenity
+            $insertStmt = $conn->prepare("INSERT INTO amenities (room_id, amenities) VALUES (?, ?)");
+            $insertStmt->bind_param("is", $room_id, $name);
 
-        // Convert to array (handle CSV or JSON depending on how you're storing)
-        $amenitiesArray = array_map('trim', explode(',', $existingAmenities));
-
-        // Avoid duplicates
-        if (!in_array($amenity, $amenitiesArray)) {
-            $amenitiesArray[] = $amenity;
-        }
-
-        // Convert back to CSV string
-        $updatedAmenities = implode(', ', $amenitiesArray);
-
-        // Update query
-        $updateStmt = $conn->prepare("UPDATE amenities SET amenities = ? WHERE room_id = ?");
-        $updateStmt->bind_param("si", $updatedAmenities, $room_id);
-
-        if ($updateStmt->execute()) {
-            echo json_encode([
-                "success" => true,
-                "message" => " Amenity updated successfully."
-            ]);
+            if ($insertStmt->execute()) {
+                echo json_encode([
+                    "success" => true,
+                    "message" => "New amenity added successfully."
+                ]);
+            } else {
+                echo json_encode([
+                    "success" => false,
+                    "message" => "Insert failed: " . $insertStmt->error
+                ]);
+            }
         } else {
             echo json_encode([
                 "success" => false,
-                "message" => " Update failed: " . $updateStmt->error
+                "message" => "Amenity already exists."
             ]);
         }
-    } else {
-        // No room — insert new
-        $insertStmt = $conn->prepare("INSERT INTO amenities (room_id, amenities) VALUES (?, ?)");
-        $insertStmt->bind_param("is", $room_id, $amenity);
 
-        if ($insertStmt->execute()) {
-            echo json_encode([
-                "success" => true,
-                "message" => "New amenity added successfully."
-            ]);
-        } else {
-            echo json_encode([
-                "success" => false,
-                "message" => "❌ Insert failed: " . $insertStmt->error
-            ]);
-        }
+        exit; // Exit only after create
     }
 
-    exit;
-}
-    
-
     // ================================
-    // 2. UPDATE ROOM
+    // UPDATE AMENITY
     // ================================
-    if ($action === "update" && $id) {
-        if ($filename) {
-            $stmt = $conn->prepare("UPDATE rooms SET  category_id = ?, room_name = ?, price = ?, capacity = ?, duration = ?, image = ? WHERE room_id = ?");
-            $stmt->bind_param("isdiisi",  $category, $room_name, $price, $capacity, $duration, $filename, $id);
-        } else {
-            $stmt = $conn->prepare("UPDATE rooms SET  category_id = ?, room_name = ?, price = ?, capacity = ?, duration = ? WHERE room_id = ?");
-            $stmt->bind_param("isdiii", $category, $room_name, $price, $capacity, $duration, $id);
+    if ($action === "update") {
+        if (!$id || !$room_id || !$name) {
+            echo json_encode([
+                "success" => false,
+                "message" => "All fields are required for update."
+            ]);
+            exit;
         }
 
+        $stmt = $conn->prepare("UPDATE amenities SET room_id = ?, amenities = ? WHERE amenity_id = ?");
+        $stmt->bind_param("isi", $room_id, $name, $id); 
         if ($stmt->execute()) {
             echo json_encode([
                 "success" => true,
-                "message" => "✅ Room updated successfully."
+                "message" => "Amenity updated successfully."
             ]);
         } else {
             echo json_encode([
@@ -113,36 +113,45 @@ if ($method === "POST") {
                 "message" => "Database error: " . $stmt->error
             ]);
         }
-        exit;
+
+        exit; // ✅ Exit after update
     }
 
-    // ================================
-    // 3. SET ROOM INACTIVE
-    // ================================
-    if ($action === "set_inactive" && $id) {
-        $stmt = $conn->prepare("UPDATE rooms SET status = 'inactive' WHERE room_id = ?");
-        $stmt->bind_param("i", $id);
 
+    // ================================
+    // DELETE AMENITY
+    // ================================
+    if ($action === "delete") {
+        if (!$id) {
+            echo json_encode([
+                "success" => false,
+                "message" => "All fields are required for update."
+            ]);
+            exit;
+        }
+
+      $stmt = $conn->prepare("DELETE FROM amenities WHERE amenity_id = ?");
+      $stmt->bind_param("i", $id);
+ 
         if ($stmt->execute()) {
             echo json_encode([
                 "success" => true,
-                "message" => "✅ Room set to inactive."
+                "message" => "Amenity deleted successfully."
             ]);
         } else {
             echo json_encode([
                 "success" => false,
-                "message" => "❌ Database error: " . $stmt->error
+                "message" => "Database error: " . $stmt->error
             ]);
         }
-        exit;
+
+        exit; 
     }
 
-    // ================================
-    // 4. INVALID ACTION
-    // ================================
+    // Optional: Handle invalid actions
     echo json_encode([
         "success" => false,
-        "message" => "❌ Invalid action or missing required data."
+        "message" => "Invalid action specified."
     ]);
     exit;
 }

@@ -26,17 +26,16 @@ export const menuItems = [
     ],
   },
   {
-    name: "Reports",
-    to: "/admin/reports",
-    icon: icons.BiBlanket,
+    name: "Function Hall",
+    icon: icons.MdOutlineMeetingRoom,
     children: [
       {
-        name: "Active Reports",
-        to: "/admin/room4",
+        name: "Available Function Hall",
+        to: "/admin/available-funtion-hall",
       },
       {
-        name: "Inactive Reports",
-        to: "/admin/rooms4",
+        name: "Not Active Function Hall",
+        to: "/admin/not-available-funtion-hall",
       },
     ],
   },

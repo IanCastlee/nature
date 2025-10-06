@@ -15,8 +15,7 @@ function useGetData(url, autoFetch = true) {
         setData(res.data.data);
         setError(null);
       } else {
-        console.warn("Server returned success: false", res.data);
-        setError(new Error(res.data.message || "API responded with an error."));
+        setError(new Error(res.data || "API responded with an error."));
       }
     } catch (err) {
       // Extract better error message if possible

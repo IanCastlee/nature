@@ -2,12 +2,30 @@ import React, { useEffect } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { images } from "../../constant/image";
 import RoomCard from "../molecules/RoomCard";
+import useGetData from "../../hooks/useGetData";
 
 function RoomCategoriesPage() {
   const { categoryId } = useParams();
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, []);
+
+  const {
+    data: roomDetails,
+    loading,
+    error,
+  } = useGetData(`/admin/room.php?categoryId=${categoryId}`);
+
+  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (error)
+    return (
+      <p className="text-center text-red-500">Error loading room details.</p>
+    );
+  if (!roomDetails) return null;
+
+  console.log(roomDetails);
+  const title =
+    roomDetails.length > 0 ? roomDetails[0].category : "NO ROOM AVAILABLE";
   return (
     <main className="w-full min-h-screen dark:bg-black scroll-smooth pb-20">
       <section className="w-full h-[270px] relative">
@@ -23,7 +41,7 @@ function RoomCategoriesPage() {
 
         <div className="relative z-10 flex flex-col justify-center items-center h-full">
           <h1 className="text-white text-3xl font-semibold text-center max-w-[550px] mt-[100px]">
-            {categoryId}
+            {title}
           </h1>
         </div>
       </section>
@@ -38,7 +56,7 @@ function RoomCategoriesPage() {
           <div className="h-[1px] w-[50px] bg-blue-400"></div>
         </div>
         <div className="w-full  flex flex-row flex-wrap gap-2 justify-start">
-          <RoomCard />
+          <RoomCard rooms={roomDetails} />
         </div>
       </section>
     </main>

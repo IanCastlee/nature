@@ -1,11 +1,16 @@
 import { icons } from "../../constant/icon";
 import Button from "../../admin_components/admin_atoms/Button";
+import { motion } from "framer-motion";
 
 function DeleteModal({ item, name, loading, onCancel, onConfirm }) {
-  console.log("MODALD A: ", item);
   return (
     <div className="w-full h-screen bg-black/10 flex justify-center items-start pt-10 fixed inset-0 z-50">
-      <div className="w-[300px] rounded-md dark:bg-gray-800 bg-white relative p-2 shadow-lg">
+      <motion.div
+        initial={{ opacity: 0, y: -5 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+        className="w-[300px] rounded-md dark:bg-gray-800 bg-white relative p-2 shadow-lg"
+      >
         <div className="mt-8">
           <p className="text-center text-sm font-medium dark:text-white text-gray-800">
             You are about to Set "<span className="text-green-500">{name}</span>
@@ -36,7 +41,7 @@ function DeleteModal({ item, name, loading, onCancel, onConfirm }) {
             <icons.MdDeleteForever className="text-[40px] text-red-500" />
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

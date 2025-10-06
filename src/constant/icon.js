@@ -25,6 +25,7 @@ import { IoAddOutline } from "react-icons/io5";
 import { IoCheckmarkCircle } from "react-icons/io5";
 import { MdOutlineArrowDropDownCircle } from "react-icons/md";
 import { AiOutlineInfoCircle } from "react-icons/ai";
+import { PiLineVerticalThin } from "react-icons/pi";
 
 //admin sidebar
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -34,6 +35,7 @@ import { GrAnalytics } from "react-icons/gr";
 import { MdDeleteOutline } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
+import { MdOutlineMeetingRoom } from "react-icons/md";
 
 export const icons = {
   FaPhoneAlt,
@@ -43,6 +45,7 @@ export const icons = {
   IoSunnySharp,
   IoMoonSharp,
   MdLocationPin,
+  MdOutlineMeetingRoom,
   FaStreetView,
   LiaStreetViewSolid,
   LuUsers,
@@ -56,6 +59,7 @@ export const icons = {
   BiBlanket,
   FiArrowUpRight,
   IoPricetagsOutline,
+  PiLineVerticalThin,
   FaChevronCircleRight,
   GrNotes,
   MdOutlineClose,

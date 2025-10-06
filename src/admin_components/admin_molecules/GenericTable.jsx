@@ -13,7 +13,7 @@ function GenericTable({
             {columns.map((col, index) => (
               <th
                 key={index}
-                className="p-2 dark:text-gray-100 text-left font-medium"
+                className="p-2 dark:text-gray-100 text-left font-medium text-sm"
               >
                 {col.title}
               </th>

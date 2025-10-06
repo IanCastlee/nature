@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { icons } from "../../constant/icon";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { images } from "../../constant/image";
 import useThemeStore from "../../store/themeStore";
 import { menuItems } from "../../constant/menu";
 

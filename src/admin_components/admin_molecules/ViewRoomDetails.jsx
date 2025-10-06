@@ -2,6 +2,7 @@ import { icons } from "../../constant/icon";
 import useGetData from "../../hooks/useGetData";
 import { useForm } from "../../store/useRoomStore";
 import { uploadUrl } from "../../utils/fileURL";
+import { motion } from "framer-motion";
 
 function ViewRoomDetails({ roomId }) {
   const setShowForm = useForm((state) => state.setShowForm);
@@ -25,18 +26,26 @@ function ViewRoomDetails({ roomId }) {
     price,
     capacity,
     duration,
+    description,
     category,
+
     amenities,
     inclusion,
+    extras,
   } = roomDetails;
 
   const parsedAmenities = amenities?.split(",") || [];
   const parsedInclusions = inclusion?.split(",") || [];
+  const parsedExtras = extras?.split(",") || [];
 
-  console.log(roomDetails);
   return (
-    <div className="w-full h-screen bg-black/10 flex justify-center items-start pt-10 fixed inset-0 z-50">
-      <div className="w-[70%] max-h-[80%] bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg overflow-y-auto">
+    <div className="w-full h-screen bg-black/10 flex justify-center items-center  fixed inset-0 z-50">
+      <motion.div
+        initial={{ opacity: 0, y: -5 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="w-[70%] max-h-[90%] bg-white dark:bg-gray-900 rounded-lg p-4 shadow-lg overflow-y-auto"
+      >
         <div className="w-full flex flex-row justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-50">
             Room Details
@@ -75,7 +84,7 @@ function ViewRoomDetails({ roomId }) {
           </div>
         </div>
 
-        <div className="w-full flex flex-row gap-12 mt-6">
+        <div className="w-full flex flex-row gap-x-8 mt-6">
           <ul className="flex-1">
             <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50">
               Amenities
@@ -101,12 +110,12 @@ function ViewRoomDetails({ roomId }) {
               Room Inclusions
             </h3>
             {parsedInclusions.length ? (
-              parsedInclusions.map((amenity, idx) => (
+              parsedInclusions.map((inclusion, idx) => (
                 <li
                   key={idx}
                   className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
                 >
-                  {amenity.trim()}
+                  {inclusion.trim()}
                 </li>
               ))
             ) : (
@@ -118,12 +127,34 @@ function ViewRoomDetails({ roomId }) {
 
           <ul className="flex-1">
             <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50">
-              Extras
+              Room Extras
             </h3>
-            <li className="text-sm text-gray-500 italic">Not available</li>
+            {parsedExtras.length ? (
+              parsedExtras.map((extras, idx) => (
+                <li
+                  key={idx}
+                  className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
+                >
+                  {extras.trim()}
+                </li>
+              ))
+            ) : (
+              <li className="text-sm text-gray-500 italic">
+                No extras listed.
+              </li>
+            )}
           </ul>
         </div>
-      </div>
+
+        <div className="w-full border-t dark:border-gray-700 border-gray-200 mt-10 pt-4">
+          <h3 className="dark:text-white text-gray-700 text-sm font-semibold">
+            * Description
+          </h3>
+          <p className="dark:text-white text-gray-800 text-sm mt-2">
+            {description}
+          </p>
+        </div>
+      </motion.div>
     </div>
   );
 }

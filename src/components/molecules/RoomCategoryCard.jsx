@@ -5,6 +5,7 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import { uploadUrl } from "../../utils/fileURL";
 function RoomCategoryCard({ item }) {
   const navigate = useNavigate();
+
   return (
     <article className="w-full md:w-[49%] lg:w-[49%] h-[200px] relative group overflow-hidden rounded-md cursor-pointer">
       <div className="w-full h-full transition-transform duration-300 group-hover:scale-105">
@@ -35,7 +36,7 @@ function RoomCategoryCard({ item }) {
         </h4>
         <button
           className="text-blue-400 text-sm font-medium border-b-2 border-blue-500"
-          onClick={() => navigate(`/room-category/${item.category}`)}
+          onClick={() => navigate(`/room-category/${item.category_id}`)}
         >
           View Rooms
         </button>

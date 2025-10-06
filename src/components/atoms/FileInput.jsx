@@ -1,10 +1,10 @@
 import React from "react";
 
-function FileInput({ onChange, isRequired }) {
+function FileInput({ onChange, isRequired, label }) {
   return (
     <div className="w-full">
       <label htmlFor="" className="text-xs dark:text-gray-300">
-        File
+        {label}
       </label>
       <input
         type="file"

@@ -4,12 +4,13 @@ import { icons } from "../../constant/icon";
 // Outside AvailableRoomPage.jsx
 export const renderActions = ({
   item,
-  setShowForm,
   onEdit,
+
   onSetInactive,
   onSetAddAmenity,
   onSetViewRoomDetails,
   onSetAddRoomInclusions,
+  onSetAddExtras,
 }) => {
   return (
     <>
@@ -27,7 +28,7 @@ export const renderActions = ({
           label="Inclusions"
         />
         <Button
-          onClick={() => setShowForm("extras")}
+          onClick={() => onSetAddExtras(item.room_id)}
           title="Add Extras"
           className="bg-yellow-500 text-white text-xs px-2 h-[27px] rounded-sm"
           label="Extras"
@@ -55,5 +56,60 @@ export const renderActions = ({
         </button>
       </div>
     </>
+  );
+};
+
+//render Action for Room Other Details
+export const renderActionsRoomOtherDeatails = ({
+  item,
+  onEdit,
+  onSetDelete,
+}) => {
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <button
+        onClick={() => onEdit(item)}
+        className="bg-blue-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="Edit"
+      >
+        <icons.FaRegEdit />
+      </button>
+      <button
+        onClick={() => onSetDelete(item)}
+        className="bg-red-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center "
+        title="Delete"
+      >
+        <icons.MdDeleteOutline />
+      </button>
+    </div>
+  );
+};
+
+//render Action for function hall
+export const renderActionsFuntionHall = ({ item, onEdit, onSetDelete }) => {
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <button
+        onClick={() => onEdit(item)}
+        className="bg-blue-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="Edit"
+      >
+        <icons.FaRegEdit />
+      </button>
+      <button
+        onClick={() => onSetDelete(item)}
+        className="bg-red-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center "
+        title="Delete"
+      >
+        <icons.MdDeleteOutline />
+      </button>
+      <button
+        onClick={() => onSetViewRoomDetails(item.room_id)}
+        className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="View Room Details"
+      >
+        <icons.AiOutlineInfoCircle />
+      </button>
+    </div>
   );
 };
