@@ -31,11 +31,11 @@ export const menuItems = [
     children: [
       {
         name: "Available Function Hall",
-        to: "/admin/available-funtion-hall",
+        to: "/admin/available-function-hall",
       },
       {
         name: "Not Active Function Hall",
-        to: "/admin/not-available-funtion-hall",
+        to: "/admin/not-available-function-hall",
       },
     ],
   },

@@ -11,8 +11,21 @@ if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !
 }
 
 if ($method === "GET") {
-        // Fetch a function  hall 
-    $stmt = $conn->prepare("SELECT * FROM function_hall WHERE status = 'active'");
+    $status = $_GET['status'] ?? 'active';
+
+    // Validate status input
+    if (!in_array($status, ['active', 'inactive'])) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Invalid status value"
+        ]);
+        http_response_code(400);
+        exit;
+    }
+
+    // Prepare and execute query
+    $stmt = $conn->prepare("SELECT * FROM function_hall WHERE status = ?");
+    $stmt->bind_param("s", $status);
     $stmt->execute();
 
     $result = $stmt->get_result();
@@ -23,7 +36,7 @@ if ($method === "GET") {
         "data" => $data
     ]);
     exit;
-    }
+}
 
 if ($method === "POST") {
     $action = $_POST['action'] ?? 'create';
@@ -137,18 +150,40 @@ if ($method === "POST") {
     // 3. SET ROOM INACTIVE
     // ================================
     if ($action === "set_inactive" && $id) {
-        $stmt = $conn->prepare("UPDATE rooms SET status = 'inactive' WHERE room_id = ?");
+        $stmt = $conn->prepare("UPDATE function_hall SET status = 'inactive' WHERE fh_id = ?");
         $stmt->bind_param("i", $id);
 
         if ($stmt->execute()) {
             echo json_encode([
                 "success" => true,
-                "message" => "✅ Room set to inactive."
+                "message" => "Function Hall set to inactive."
             ]);
         } else {
             echo json_encode([
                 "success" => false,
-                "message" => "❌ Database error: " . $stmt->error
+                "message" => " Database error: " . $stmt->error
+            ]);
+        }
+        exit;
+    }
+
+    
+    // ================================
+    // 3. SET ROOM INACTIVE
+    // ================================
+    if ($action === "set_active" && $id) {
+        $stmt = $conn->prepare("UPDATE function_hall SET status = 'active' WHERE fh_id = ?");
+        $stmt->bind_param("i", $id);
+
+        if ($stmt->execute()) {
+            echo json_encode([
+                "success" => true,
+                "message" => "Function Hall set to active."
+            ]);
+        } else {
+            echo json_encode([
+                "success" => false,
+                "message" => " Database error: " . $stmt->error
             ]);
         }
         exit;

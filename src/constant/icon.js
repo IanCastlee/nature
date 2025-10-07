@@ -26,6 +26,9 @@ import { IoCheckmarkCircle } from "react-icons/io5";
 import { MdOutlineArrowDropDownCircle } from "react-icons/md";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { PiLineVerticalThin } from "react-icons/pi";
+import { TbRefresh } from "react-icons/tb";
+import { BsFillQuestionCircleFill } from "react-icons/bs";
+import { LuMessageCircleWarning } from "react-icons/lu";
 
 //admin sidebar
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -40,12 +43,15 @@ import { MdOutlineMeetingRoom } from "react-icons/md";
 export const icons = {
   FaPhoneAlt,
   IoIosMail,
+  TbRefresh,
+  LuMessageCircleWarning,
   MdLocationOn,
   HiArrowSmallRight,
   IoSunnySharp,
   IoMoonSharp,
   MdLocationPin,
   MdOutlineMeetingRoom,
+  BsFillQuestionCircleFill,
   FaStreetView,
   LiaStreetViewSolid,
   LuUsers,

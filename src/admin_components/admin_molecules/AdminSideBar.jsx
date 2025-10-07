@@ -105,7 +105,7 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
                     }`
                   }
                 >
-                  <item.icon className="text-blue-400 text-sm" />
+                  <item.icon className="text-blue-700 text-lg" />
                   {!isCollapsed && <span>{item.name}</span>}
                 </NavLink>
 

@@ -181,6 +181,17 @@ export default function ModalFormOtherDetails({
           name="GG"
           loading={deleteAmenityLoading}
           onCancel={() => setDeleteItem(null)}
+          label="Yes, Delete"
+          label2="delete"
+          label3={`This item will be permanently deleted from the ${
+            deleteItem?.amenity_id
+              ? "amenities"
+              : deleteItem?.inclusion_id
+              ? "inclusions"
+              : deleteItem?.extra_id
+              ? "extras"
+              : "list"
+          } list.`}
           onConfirm={() => {
             computedDelete?.({
               id:

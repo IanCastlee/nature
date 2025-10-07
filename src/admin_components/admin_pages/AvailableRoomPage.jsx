@@ -528,6 +528,10 @@ function AvailableRoomPage() {
           name={deleteItem.room_name}
           loading={inactiveLoading}
           onCancel={() => setDeleteItem(null)}
+          label="Yes, Set as unavailable"
+          label2="unavailable"
+          label3=" This will make this room unavailable, but not delete it
+            permanently."
           onConfirm={() => {
             setInactive({
               id: deleteItem?.room_id,

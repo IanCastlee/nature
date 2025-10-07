@@ -48,13 +48,9 @@ function AvailableFunctionHall() {
 
   // fetch room data
   const { data, loading, refetch, error } = useGetData(
-    "/admin/functionhall.php"
+    `/admin/functionhall.php?status=active`
   );
-  //fethc room categories
-  const { data: roomCategoryData } = useGetData("/admin/room-category.php");
 
-  console.log("FUNCIOTN HALL: ", data);
-  console.log("FUNCIOTN HALLEE: ", error);
   //================//
   // HANDLE CHANGE //
   //==============//
@@ -114,7 +110,6 @@ function AvailableFunctionHall() {
   //=================//
   //  HANDLE SUBMIT //
   //===============//
-  console.log("V", formError);
   //rooms
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -169,7 +164,7 @@ function AvailableFunctionHall() {
     setInactive,
     loading: inactiveLoading,
     error: inactiveError,
-  } = useSetInactive("/admin/room.php", () => {
+  } = useSetInactive("/admin/functionhall.php", () => {
     refetch();
     setDeleteItem(null);
   });
@@ -201,7 +196,6 @@ function AvailableFunctionHall() {
       photo_sphere: null,
     });
   };
-  console.log(form);
   return (
     <>
       <div className="scroll-smooth">
@@ -278,18 +272,21 @@ function AvailableFunctionHall() {
         formLoading={formLoading}
         handleChange={handleChange}
         handleSubmit={handleSubmit}
-        roomCategoryData={roomCategoryData}
       />
 
-      {deleteItem?.room_name && (
+      {deleteItem?.fh_id && (
         <DeleteModal
           item={deleteItem}
-          name={deleteItem.room_name}
+          name={deleteItem?.name}
           loading={inactiveLoading}
           onCancel={() => setDeleteItem(null)}
+          label="Yes, Set as not active"
+          label2="not-active"
+          label3=" This will make this funtion hall unavailable, but not delete it
+            permanently."
           onConfirm={() => {
             setInactive({
-              id: deleteItem?.room_id,
+              id: deleteItem?.fh_id,
               action: "set_inactive",
             });
           }}

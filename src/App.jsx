@@ -82,12 +82,12 @@ const AdminLayout = () => {
           />
 
           <Route
-            path="/available-funtion-hall"
+            path="/available-function-hall"
             element={<AvailableFunctionHall />}
           />
 
           <Route
-            path="/not-available-funtion-hall"
+            path="/not-available-function-hall"
             element={<NotAvailableFunctionHall />}
           />
         </Routes>
