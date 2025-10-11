@@ -55,7 +55,9 @@ function AvailableRoomPage() {
   //==============//
 
   // fetch room data
-  const { data, loading, refetch, error } = useGetData("/admin/room.php");
+  const { data, loading, refetch, error } = useGetData(
+    `/admin/room.php?status=active`
+  );
 
   //fethc room categories
   const { data: roomCategoryData } = useGetData("/admin/room-category.php");
@@ -413,11 +415,6 @@ function AvailableRoomPage() {
       description: "",
       image: null,
       photo_sphere: null,
-    });
-  };
-  const clearField2 = () => {
-    setOtherRoomDetailForm({
-      name: "",
     });
   };
 

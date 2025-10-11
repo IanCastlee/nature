@@ -25,6 +25,9 @@ import RoomViewTest from "./components/pages/RoomViewTest";
 import AvailableRoomPage from "./admin_components/admin_pages/AvailableRoomPage";
 import AvailableFunctionHall from "./admin_components/admin_pages/AvailableFunctionHall";
 import NotAvailableFunctionHall from "./admin_components/admin_pages/NotAvailableFunctionHall";
+import AvailableCottage from "./admin_components/admin_pages/AvailableCottage";
+import NotAvailableCottage from "./admin_components/admin_pages/NotAvailableCottage";
+import ViewFunctionHallPage from "./components/pages/ViewFunctionHallPage";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -41,6 +44,10 @@ const UserLayout = () => {
           element={<RoomCategoriesPage />}
         />
         <Route path="/room-deatails/:roomId" element={<ViewRoomPage />} />
+        <Route
+          path="/funtionhall-deatails/:fhId"
+          element={<ViewFunctionHallPage />}
+        />
         <Route path="/cottages" element={<CottagesPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/test" element={<Test />} />
@@ -89,6 +96,13 @@ const AdminLayout = () => {
           <Route
             path="/not-available-function-hall"
             element={<NotAvailableFunctionHall />}
+          />
+
+          <Route path="/available-cottage" element={<AvailableCottage />} />
+
+          <Route
+            path="/not-available-cottage"
+            element={<NotAvailableCottage />}
           />
         </Routes>
       </main>

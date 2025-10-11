@@ -27,7 +27,7 @@ export const menuItems = [
   },
   {
     name: "Function Hall",
-    icon: icons.MdOutlineMeetingRoom,
+    icon: icons.HiOutlineUserGroup,
     children: [
       {
         name: "Available Function Hall",
@@ -38,6 +38,39 @@ export const menuItems = [
         to: "/admin/not-available-function-hall",
       },
     ],
+  },
+  {
+    name: "Cottage",
+    icon: icons.MdOutlineCottage,
+    children: [
+      {
+        name: "Available Cottage",
+        to: "/admin/available-cottage",
+      },
+      {
+        name: "Not Active Cottage",
+        to: "/admin/not-available-cottage",
+      },
+    ],
+  },
+  {
+    name: "Booking",
+    icon: icons.GoChecklist,
+    children: [
+      {
+        name: "Booking",
+        to: "/admin/available-cottage",
+      },
+      {
+        name: "Booking History",
+        to: "/admin/not-available-cottage",
+      },
+    ],
+  },
+  {
+    name: "Registered Users",
+    to: "/admin/users",
+    icon: icons.LuUsers,
   },
   {
     name: "Analytics",
@@ -58,5 +91,10 @@ export const menuItems = [
         to: "/admin/rooms33",
       },
     ],
+  },
+  {
+    name: "Logout",
+    to: "/admin/analytics",
+    icon: icons.IoIosLogOut,
   },
 ];

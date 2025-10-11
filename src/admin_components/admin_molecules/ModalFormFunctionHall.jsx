@@ -41,6 +41,7 @@ export default function ModalFormFunctionHall({
           <div className="flex gap-2">
             <Input
               label="Name"
+              type="text"
               name="name"
               value={form.name}
               onChange={handleChange}
@@ -48,7 +49,7 @@ export default function ModalFormFunctionHall({
             <Input
               label="Price"
               name="price"
-              isNumber
+              type="number"
               value={form.price}
               onChange={handleChange}
             />
@@ -57,13 +58,14 @@ export default function ModalFormFunctionHall({
           <div className="flex gap-2">
             <Input
               label="Capacity"
+              type="number"
               name="capacity"
-              isNumber
               value={form.capacity}
               onChange={handleChange}
             />
             <Input
               label="Duration"
+              type="text"
               name="duration"
               value={form.duration}
               onChange={handleChange}

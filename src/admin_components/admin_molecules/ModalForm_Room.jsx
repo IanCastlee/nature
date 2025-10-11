@@ -58,6 +58,7 @@ export default function ModalForm_Room({
           <div className="flex gap-2">
             <Input
               label="Room Name"
+              type="text"
               name="room_name"
               value={form.room_name}
               onChange={handleChange}
@@ -65,7 +66,7 @@ export default function ModalForm_Room({
             <Input
               label="Price"
               name="price"
-              isNumber
+              type="number"
               value={form.price}
               onChange={handleChange}
             />
@@ -75,12 +76,13 @@ export default function ModalForm_Room({
             <Input
               label="Capacity"
               name="capacity"
-              isNumber
+              type="number"
               value={form.capacity}
               onChange={handleChange}
             />
             <Input
               label="Duration"
+              type="text"
               name="duration"
               value={form.duration}
               onChange={handleChange}

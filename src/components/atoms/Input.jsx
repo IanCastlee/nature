@@ -1,6 +1,6 @@
 import React from "react";
 
-function Input({ label, isNumber, onChange, value, ...rest }) {
+function Input({ label, type, onChange, value, ...rest }) {
   return (
     <div className="w-full">
       {label && (
@@ -12,7 +12,7 @@ function Input({ label, isNumber, onChange, value, ...rest }) {
         </label>
       )}
       <input
-        type={isNumber ? "number" : "text"}
+        type={type}
         value={value}
         onChange={onChange}
         required

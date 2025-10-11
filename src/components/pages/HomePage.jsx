@@ -1,10 +1,6 @@
 import React, { useEffect, Suspense, lazy } from "react";
 import { images } from "../../constant/image";
-import {
-  dummyCottages,
-  dummyFunctionHall,
-  freebies,
-} from "../../constant/mockData";
+import { dummyCottages, freebies } from "../../constant/mockData";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { icons } from "../../constant/icon";
@@ -31,6 +27,18 @@ const imageKeys = ["hero1", "hero1_m", "hero2", "hero2_m", "hero3", "hero3_m"];
 function HomePage() {
   const navigate = useNavigate();
   const [showChatBox, setShowChatBox] = React.useState(false);
+
+  //==============//
+  //  DATA FETCH  //
+  //==============//
+
+  // fetch room data
+  const {
+    data: dataFh,
+    loading: loadingFh,
+    refetch: refetchFh,
+    error: errorFh,
+  } = useGetData(`/admin/functionhall.php?status=active`);
 
   // Fetch data
   const { data, loading, refetch, error } = useGetData(
@@ -71,7 +79,7 @@ function HomePage() {
                   {/* Overlay & caption */}
                   <div className="absolute inset-0 bg-black bg-opacity-40" />
                   <figcaption className="absolute inset-0 flex flex-col justify-center items-start text-white pl-4 lg:pl-20 z-20">
-                    <h1 className="text-5xl font-playfair max-w-2xl mb-6">
+                    <h1 className="text-5xl font-playfair max-w-2xl mb-6 px-2 lg:px-0">
                       Experience the Serenity of{" "}
                       <span className="text-blue-400 relative inline-block">
                         Nature Hot Spring{" "}
@@ -84,7 +92,7 @@ function HomePage() {
                       </span>
                       Retreat
                     </h1>
-                    <p className="max-w-2xl text-white">
+                    <p className="max-w-2xl text-white text-sm md:text-base lg:text-lg px-2 lg:px-0">
                       Relax in our natural hot spring pools surrounded by lush
                       greenery. Enjoy a peaceful overnight stay in our cozy
                       rooms — perfect for families, couples, and solo travelers
@@ -208,30 +216,33 @@ function HomePage() {
           </div>
 
           <div className="w-full flex flex-row flex-wrap  px-2  md:px-2 lg:px-[130px] justify-center gap-2">
-            {dummyFunctionHall.map((item, index) => (
-              <Suspense
-                key={index}
-                fallback={
-                  <div className="fixed bottom-4 right-10 text-white">
-                    Loading...
-                  </div>
+            {dataFh &&
+              dataFh.slice(0, 2).map((item, index) => (
+                <Suspense
+                  key={index}
+                  fallback={
+                    <div className="fixed bottom-4 right-10 text-white">
+                      Loading...
+                    </div>
+                  }
+                >
+                  <FunctionHallCard item={item} key={index} index={index} />
+                </Suspense>
+              ))}
+          </div>
+          {dataFh?.length > 2 && (
+            <div className="px-2 lg:px-[130px] mt-4">
+              <ReadMoreButton
+                label={
+                  <>
+                    View More{" "}
+                    <icons.HiArrowSmallRight className="text-white inline" />
+                  </>
                 }
-              >
-                <FunctionHallCard item={item} key={index} index={index} />
-              </Suspense>
-            ))}
-          </div>
-          <div className="px-2 lg:px-[130px] mt-4">
-            <ReadMoreButton
-              label={
-                <>
-                  View More{" "}
-                  <icons.HiArrowSmallRight className="text-white inline" />
-                </>
-              }
-              onClick={() => navigate("/cottages")}
-            />
-          </div>
+                onClick={() => navigate("/cottages")}
+              />
+            </div>
+          )}
         </section>
       </main>
 

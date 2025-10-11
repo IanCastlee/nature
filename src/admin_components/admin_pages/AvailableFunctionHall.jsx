@@ -14,13 +14,14 @@ import DeleteModal from "../../components/molecules/DeleteModal";
 import ViewRoomDetails from "../admin_molecules/ViewRoomDetails";
 import { availableFHColumns } from "../../constant/tableColumns";
 import ModalFormFunctionHall from "../admin_molecules/ModalFormFunctionHall";
+import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 
 function AvailableFunctionHall() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
   const [deleteItem, setDeleteItem] = useState(null);
-  const [viewRoomDetailsId, setViewRoomDetailsId] = useState(null);
+  const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -172,9 +173,9 @@ function AvailableFunctionHall() {
   //=====================//
   //  view room details  //
   //=====================//
-  const viewRoomDetails = (item) => {
-    setShowForm("view room");
-    setViewRoomDetailsId(item);
+  const viewFHDetails = (item) => {
+    setShowForm("view fh-hall");
+    setViewFHDetailsId(item);
   };
 
   //handle add room
@@ -196,6 +197,7 @@ function AvailableFunctionHall() {
       photo_sphere: null,
     });
   };
+
   return (
     <>
       <div className="scroll-smooth">
@@ -249,6 +251,7 @@ function AvailableFunctionHall() {
                 setShowForm,
                 onEdit: handleEdit,
                 onSetInactive: (item) => setDeleteItem(item),
+                onSetViewFHDetails: (item) => viewFHDetails(item),
               });
             }}
           />
@@ -293,9 +296,7 @@ function AvailableFunctionHall() {
         />
       )}
 
-      {showForm === "view room" && (
-        <ViewRoomDetails roomId={viewRoomDetailsId} />
-      )}
+      {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
     </>
   );
 }

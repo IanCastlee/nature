@@ -129,6 +129,7 @@ export default function ModalFormOtherDetails({
               <Input
                 label={getLabel()}
                 name="name"
+                type="text"
                 value={otherRoomDetailForm.name || ""}
                 onChange={(e) =>
                   setOtherRoomDetailForm((prev) => ({

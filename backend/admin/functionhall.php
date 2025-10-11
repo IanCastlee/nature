@@ -12,20 +12,31 @@ if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !
 
 if ($method === "GET") {
     $status = $_GET['status'] ?? 'active';
+    $getId = $_GET['id'] ?? null;
 
-    // Validate status input
-    if (!in_array($status, ['active', 'inactive'])) {
-        echo json_encode([
-            "success" => false,
-            "message" => "Invalid status value"
-        ]);
-        http_response_code(400);
-        exit;
-    }
 
-    // Prepare and execute query
-    $stmt = $conn->prepare("SELECT * FROM function_hall WHERE status = ?");
-    $stmt->bind_param("s", $status);
+    if($getId){
+ // Prepare and execute query
+    $stmt = $conn->prepare("SELECT * FROM function_hall WHERE fh_id  = ? ");
+     $stmt->bind_param("i", $getId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $room = $result->fetch_assoc();
+
+        if ($room) {
+            echo json_encode([
+                "success" => true,
+                "data" => $room
+            ]);
+        } else {
+            echo json_encode([
+                "success" => false,
+                "message" => "Room not found."
+            ]);
+        }
+    }else{
+         $stmt = $conn->prepare("SELECT * FROM function_hall WHERE status = 'active'");
+  
     $stmt->execute();
 
     $result = $stmt->get_result();
@@ -36,6 +47,18 @@ if ($method === "GET") {
         "data" => $data
     ]);
     exit;
+    }
+    // Validate status input
+    // if (!in_array($status, ['active', 'inactive'])) {
+    //     echo json_encode([
+    //         "success" => false,
+    //         "message" => "Invalid status value"
+    //     ]);
+    //     http_response_code(400);
+    //     exit;
+    // }
+
+   
 }
 
 if ($method === "POST") {
@@ -124,10 +147,16 @@ if ($method === "POST") {
     // 2. UPDATE ROOM   
     // ================================
     if ($action === "update" && $id) {
-        if ($filename) {
+        if ($filename && $filename_PS) {
             $stmt = $conn->prepare("UPDATE function_hall SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, image = ?, photosphere = ? WHERE fh_id = ?");
             $stmt->bind_param("sdiisssi", $name, $price, $capacity, $duration,$description, $filename, $filename_PS, $id);
-        } else {
+        }elseif($filename){
+             $stmt = $conn->prepare("UPDATE function_hall SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, image = ? WHERE fh_id = ?");
+            $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration,$description, $filename, $id);
+        }elseif($filename_PS){
+             $stmt = $conn->prepare("UPDATE function_hall SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, photosphere = ? WHERE fh_id = ?");
+            $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration,$description, $filename_PS, $id);
+        }else {
              $stmt = $conn->prepare("UPDATE function_hall SET name = ?, price = ?, capacity = ?, duration = ?, description= ? WHERE fh_id = ?");
             $stmt->bind_param("sdiisi", $name, $price, $capacity, $duration,$description, $id);
         }

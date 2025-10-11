@@ -29,6 +29,11 @@ import { PiLineVerticalThin } from "react-icons/pi";
 import { TbRefresh } from "react-icons/tb";
 import { BsFillQuestionCircleFill } from "react-icons/bs";
 import { LuMessageCircleWarning } from "react-icons/lu";
+import { GoChecklist } from "react-icons/go";
+import { IoIosLogOut } from "react-icons/io";
+import { RiMenuLine } from "react-icons/ri";
+import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import { MdOutlineKeyboardArrowUp } from "react-icons/md";
 
 //admin sidebar
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -39,10 +44,19 @@ import { MdDeleteOutline } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { MdOutlineMeetingRoom } from "react-icons/md";
+import { MdOutlineCottage } from "react-icons/md";
+import { HiOutlineUserGroup } from "react-icons/hi2";
 
 export const icons = {
   FaPhoneAlt,
+  RiMenuLine,
+  MdOutlineKeyboardArrowDown,
+  MdOutlineKeyboardArrowUp,
+  GoChecklist,
+  IoIosLogOut,
+  HiOutlineUserGroup,
   IoIosMail,
+  MdOutlineCottage,
   TbRefresh,
   LuMessageCircleWarning,
   MdLocationOn,

@@ -15,7 +15,7 @@ function Freebie({ item }) {
   "
     >
       <img className="h-10 w-10" src={item.image} alt={`${item.name} icon`} />
-      <p className="text-xs font-medium text-center text-gray-200">
+      <p className="text-xs font-medium text-center text-gray-200 whitespace-pre-wrap">
         {item.name}
       </p>
     </article>

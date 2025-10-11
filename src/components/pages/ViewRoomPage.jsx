@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { uploadUrl } from "../../utils/fileURL";
 import useGetData from "../../hooks/useGetData";
+import Button from "../atoms/Button";
 function ViewRoomPage() {
   const { roomId } = useParams();
 
@@ -76,14 +77,14 @@ function ViewRoomPage() {
           </div>
         </section>
 
-        <section className="w-full px-[130px] mt-4">
+        <section className="w-full px-2 lg:px-[130px] mt-4">
           <div className="w-full flex flex-row  justify-between items-center gap-20">
             <div className="flex flex-row items-center gap-20">
               <div className="flex flex-col gap-2">
-                <h3 className="dark:text-gray-300 text-gray-700 text-5xl font-semibold">
+                <h3 className="dark:text-gray-300 text-gray-700 text-2xl md:text-2xl lg:text-5xl font-semibold">
                   {room_name}
                 </h3>
-                <p className="text-blue-400 text-2xl font-medium flex flex-row items-center">
+                <p className="dark:text-white text-lg md:text-lg lg:text-2xl font-medium flex flex-row items-center">
                   <icons.IoPricetagsOutline className="mr-1 text-lg" /> P{price}{" "}
                   / Night
                 </p>
@@ -92,11 +93,21 @@ function ViewRoomPage() {
               <icons.FaStreetView
                 onClick={() => navigate(`/room-view/${photo_sphere}`)}
                 title="View Room"
-                className="text-[40px] text-blue-400 cursor-pointer transform transition-transform duration-300 hover:scale-125"
+                className="text-[40px] text-blue-400 cursor-pointer transform transition-transform duration-300 hover:scale-125 hidden lg:block"
               />
             </div>
 
-            <button
+            <div className="flex flex-col gap-2">
+              <Button
+                style="h-[30px] bg-gray-700 text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
+                label="View House Rules"
+              />
+              <Button
+                style="h-[30px] bg-green-600 text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
+                label="Reserve Now"
+              />
+            </div>
+            {/* <button
               onClick={() => setShowHouseRules(true)}
               className="dark:bg-blue-400 bg-gray-900 dark:border-blue-400 border border-gray-700 
   text-white dark:text-white py-1 px-2 rounded-lg text-sm 
@@ -105,7 +116,7 @@ function ViewRoomPage() {
             >
               <icons.GrNotes className="text-sm" />
               View House Rules
-            </button>
+            </button> */}
           </div>
 
           <div className=" flex flex-flex-row flex-wrap justify-start gap-5">
@@ -120,7 +131,7 @@ function ViewRoomPage() {
             </span>
           </div>
         </section>
-        <section className="w-full flex flex-row justify-between px-[130px] mt-4">
+        <section className="w-full flex flex-row justify-between px-2 md:px-2 lg:px-[130px] mt-4">
           <div className="w-full flex flex-row gap-x-8 mt-6">
             <ul className="flex-1">
               <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">
@@ -184,7 +195,7 @@ function ViewRoomPage() {
           </div>
         </section>
 
-        <section className="w-full flex flex-col px-[130px] mt-4">
+        <section className="w-full flex flex-col px-2 md:px-2 lg:px-[130px] mt-4">
           <div className="w-full border-t dark:border-gray-800 mt-4 pt-4">
             <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50">
               * Description

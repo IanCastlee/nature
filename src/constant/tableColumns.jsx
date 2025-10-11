@@ -75,3 +75,34 @@ export const availableFHColumns = [
     key: "duration",
   },
 ];
+
+//cottage
+export const availableCottageColumns = [
+  {
+    title: "Image",
+    key: "image",
+    render: (item) => (
+      <img
+        src={`${uploadUrl.uploadurl}/cottage/${item.image}`}
+        alt={item.room_name}
+        className="w-10 h-10 rounded shadow-sm"
+      />
+    ),
+  },
+  {
+    title: "Cottage",
+    key: "name",
+  },
+  {
+    title: "Price",
+    key: "price",
+  },
+  {
+    title: "Capacity",
+    key: "capacity",
+  },
+  {
+    title: "Duration",
+    key: "duration",
+  },
+];

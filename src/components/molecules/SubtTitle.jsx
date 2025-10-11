@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-function SubtTitle({ title, hidden }) {
+function SubtTitle({ title, hidden, hidden2 }) {
   return (
     <div className="flex flex-row justify-center items-center gap-2">
       <motion.div
@@ -25,7 +25,7 @@ function SubtTitle({ title, hidden }) {
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
         viewport={{ once: false, amount: 0.5 }}
-        className="h-[1px] w-[35px] bg-blue-400"
+        className={`h-[1px] w-[35px] bg-blue-400 ${hidden2}`}
       ></motion.div>
     </div>
   );

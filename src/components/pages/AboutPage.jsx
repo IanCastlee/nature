@@ -3,6 +3,7 @@ import { images } from "../../constant/image";
 import { motion, useInView } from "framer-motion";
 import Animation from "../molecules/Animation";
 import Blur from "../molecules/Blur";
+import SubtTitle from "../molecules/SubtTitle";
 function AboutPage() {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
@@ -48,11 +49,9 @@ function AboutPage() {
             className="h-[250px] object-cover w-[100%] rounded-lg"
           />
           <div className="w-[100%]  items-start relative">
-            <Animation
-              image={images.animationImg}
-              title="About Us"
-              isReverse={false}
-            />
+            <div className="flex flex-col justify-center items-center ">
+              <SubtTitle title="About Us" />
+            </div>
             <p className="dark:text-white text-black leading-relaxed">
               Welcome to{" "}
               <span className="text-blue-400">
@@ -75,11 +74,9 @@ function AboutPage() {
             className="h-[250px] object-cover w-[100%] rounded-lg"
           />
           <div className="w-[100%] relative">
-            <Animation
-              image={images.animationImg}
-              title="Our Mission"
-              isReverse={true}
-            />
+            <div className="flex flex-col justify-center items-center ">
+              <SubtTitle title="Our Mission" />
+            </div>
             <p className="dark:text-white text-black leading-relaxed">
               At{" "}
               <span className="text-blue-400">
@@ -101,11 +98,9 @@ function AboutPage() {
             className="h-[250px] object-cover w-[100%] rounded-lg"
           />
           <div className="w-[100%]  items-start relative">
-            <Animation
-              image={images.animationImg}
-              title="Our Promise"
-              isReverse={false}
-            />
+            <div className="flex flex-col justify-center items-center ">
+              <SubtTitle title="Our Promise" />
+            </div>
             <p className="dark:text-white text-black leading-relaxed">
               Whether you're seeking a romantic retreat, a family adventure, or
               solo serenity, we promise a rejuvenating experience for your body,

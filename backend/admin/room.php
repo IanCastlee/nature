@@ -13,6 +13,7 @@ if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !
 if ($method === "GET") {
     $roomId = $_GET['id'] ?? null;
     $categoryId = $_GET['categoryId'] ?? null;
+    $status = $_GET['status']  ?? 'active';
 
     if ($roomId) {
         // Fetch a specific room by ID
@@ -62,7 +63,9 @@ echo json_encode([
 exit;
 
     } else {
-        // Fetch all active rooms
+
+           if($status === "active"){
+ // Fetch all active rooms
         $stmt = $conn->prepare("SELECT * FROM rooms WHERE status = 'active'");
         $stmt->execute();
         $result = $stmt->get_result();
@@ -73,6 +76,21 @@ exit;
             "data" => $data
         ]);
         exit;
+        }
+         if($status === "inactive"){
+ // Fetch all inactive rooms
+        $stmt = $conn->prepare("SELECT * FROM rooms WHERE status = 'inactive'");
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_all(MYSQLI_ASSOC);
+
+        echo json_encode([
+            "success" => true,
+            "data" => $data
+        ]);
+        exit;
+        }
+       
     }
 }
 
@@ -163,10 +181,16 @@ if ($method === "POST") {
     // 2. UPDATE ROOM   
     // ================================
     if ($action === "update" && $id) {
-        if ($filename) {
+        if ($filename && $filename_PS) {
             $stmt = $conn->prepare("UPDATE rooms SET category_id = ?, room_name = ?, price = ?, capacity = ?, duration = ?, description= ?, image = ? photo_sphere = ? WHERE room_id = ?");
             $stmt->bind_param("isdiisssi", $category, $room_name, $price, $capacity, $duration,$description, $filename, $filename_PS, $id);
-        } else {
+        }elseif($filename){
+             $stmt = $conn->prepare("UPDATE rooms SET category_id = ?, room_name = ?, price = ?, capacity = ?, duration = ?, description= ?, image = ?  WHERE room_id = ?");
+            $stmt->bind_param("isdiissi", $category, $room_name, $price, $capacity, $duration,$description, $filename, $id);
+        }elseif($filename_PS){
+             $stmt = $conn->prepare("UPDATE rooms SET category_id = ?, room_name = ?, price = ?, capacity = ?, duration = ?, description= ?, photo_sphere = ?  WHERE room_id = ?");
+            $stmt->bind_param("isdiissi", $category, $room_name, $price, $capacity, $duration,$description, $filename_PS, $id);
+        }else {
             $stmt = $conn->prepare("UPDATE rooms SET category_id = ?, room_name = ?, price = ?, capacity = ?, duration = ?, description = ? WHERE room_id = ?");
             $stmt->bind_param("isdiisi", $category, $room_name, $price, $capacity, $duration, $description, $id);
         }
@@ -190,6 +214,23 @@ if ($method === "POST") {
     // ================================
     if ($action === "set_inactive" && $id) {
         $stmt = $conn->prepare("UPDATE rooms SET status = 'inactive' WHERE room_id = ?");
+        $stmt->bind_param("i", $id);
+
+        if ($stmt->execute()) {
+            echo json_encode([
+                "success" => true,
+                "message" => "✅ Room set to inactive."
+            ]);
+        } else {
+            echo json_encode([
+                "success" => false,
+                "message" => "❌ Database error: " . $stmt->error
+            ]);
+        }
+        exit;
+    }
+    if ($action === "set_active" && $id) {
+        $stmt = $conn->prepare("UPDATE rooms SET status = 'active' WHERE room_id = ?");
         $stmt->bind_param("i", $id);
 
         if ($stmt->execute()) {

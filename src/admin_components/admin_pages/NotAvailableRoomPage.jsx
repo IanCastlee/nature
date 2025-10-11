@@ -1,31 +1,92 @@
 import React, { useState } from "react";
-import Button from "../admin_atoms/Button";
-import { icons } from "../../constant/icon";
-import TableRow from "../admin_molecules/TableRow";
 import Pagination from "../admin_molecules/Pagination";
-import Input from "../../components/atoms/Input";
-import DropDown from "../../components/atoms/DropDown";
-import { options } from "../../constant/mockData";
-import { motion } from "framer-motion";
-import { dummyRooms } from "../../constant/mockData";
+import { useForm } from "../../store/useRoomStore";
+import useGetData from "../../hooks/useGetData";
+import NoData from "../../components/molecules/NoData";
+import SearchInput from "../admin_atoms/SearchInput";
+import GenericTable from "../admin_molecules/GenericTable";
+import { renderActions } from "../admin_molecules/RenderActions";
+import useSetInactive from "../../hooks/useSetInactive";
+import DeleteModal from "../../components/molecules/DeleteModal";
+import ViewRoomDetails from "../admin_molecules/ViewRoomDetails";
+import { availableRoomColumns } from "../../constant/tableColumns";
+import { useLocation } from "react-router-dom";
 
 function NotAvailableRoomPage() {
+  const showForm = useForm((state) => state.showForm);
+  const setShowForm = useForm((state) => state.setShowForm);
+
+  const location = useLocation();
+  const isNotAvailablePage = location.pathname.includes("not-available-room");
+
+  const [deleteItem, setDeleteItem] = useState(null);
+  const [viewRoomDetailsId, setViewRoomDetailsId] = useState(null);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const roomsPerPage = 2;
-  const [showForm1, setShowForm1] = useState(false);
+  const itemsPerPage = 10;
 
-  const filteredData = dummyRooms.filter((room) =>
-    room.name.toLowerCase().includes(searchTerm.toLowerCase())
+  //==============//
+  //  DATA FETCH  //
+  //==============//
+
+  // fetch room data
+  const { data, loading, refetch, error } = useGetData(
+    `/admin/room.php?status=inactive`
   );
 
-  const indexOfLastData = currentPage * roomsPerPage;
-  const indexOfFirstData = indexOfLastData - roomsPerPage;
-  const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
-  const totalPages = Math.ceil(filteredData.length / roomsPerPage);
+  //================//
+  // HANDLE CHANGE //
+  //==============//
 
+  //handlePageChange
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  //=================//
+  // DATA FILTERING //
+  //===============//
+
+  //Filtered data
+  const filteredData =
+    data?.filter((item) => {
+      if (!searchTerm) return true;
+
+      const search = searchTerm.toLowerCase();
+      return (
+        item?.room_name?.toLowerCase().includes(search) ||
+        item?.price?.toString().includes(search) ||
+        item?.capacity?.toString().includes(search) ||
+        item?.duration?.toString().includes(search)
+      );
+    }) || [];
+
+  const indexOfLastData = currentPage * itemsPerPage;
+  const indexOfFirstData = indexOfLastData - itemsPerPage;
+  const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  //============================//
+  //   HANDLE DELETE/INACTIVE //
+  //=========================//
+
+  //room
+  const {
+    setInactive,
+    loading: inactiveLoading,
+    error: inactiveError,
+  } = useSetInactive("/admin/room.php", () => {
+    refetch();
+    setDeleteItem(null);
+  });
+
+  //=====================//
+  //  view room details  //
+  //=====================//
+  const viewRoomDetails = (item) => {
+    setShowForm("view room");
+    setViewRoomDetailsId(item);
   };
 
   return (
@@ -35,108 +96,76 @@ function NotAvailableRoomPage() {
           Not Available Rooms
         </h1>
 
+        {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
+        {error && (
+          <p className="text-red-500 text-sm mb-4">
+            {error.message || "Something went wrong."}
+          </p>
+        )}
+
         <div className="w-full flex flex-row justify-between items-center mb-2">
           <span className="dark:text-gray-100 text-xs font-medium">
             Showing {filteredData.length} room
-            {filteredData.length !== 1 ? "s" : ""}
+            {filteredData.length > 1 ? "s" : ""}
           </span>
 
           <div className="flex flex-row items-center gap-2">
-            <input
-              type="text"
-              placeholder="Search rooms..."
+            <SearchInput
+              placeholder="Search room"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-64 h-[35px] text-xs px-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-
-            <Button
-              handleClick={() => setShowForm1(true)}
-              className="flex flex-row items-center  h-[35px] bg-green-600 text-white text-xs font-medium px-2 rounded-md whitespace-nowrap"
-              label={
-                <>
-                  Add New{" "}
-                  <icons.IoAddOutline className="text-lg text-white ml-1" />
-                </>
-              }
+              disabled={loading}
             />
           </div>
         </div>
 
-        {/* Room Table */}
         <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse">
-            <thead>
-              <tr className="dark:bg-gray-900 bg-white">
-                <th className="p-2 dark:text-gray-100   text-left font-medium">
-                  Image
-                </th>
-                <th className="p-2 dark:text-gray-100  text-left font-medium">
-                  Room Name
-                </th>
-
-                <th className="p-2 dark:text-gray-100  text-right font-medium w-fit ">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentData.length > 0 ? (
-                currentData.map((room) => (
-                  <TableRow key={room.id} room={room} isHidden="hidden" />
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="2"
-                    className="p-4 text-center text-gray-500 border dark:border-gray-700"
-                  >
-                    No Rooms Found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <GenericTable
+            columns={availableRoomColumns}
+            data={currentData}
+            loading={loading}
+            noDataComponent={<NoData />}
+            renderActions={(item) => {
+              return renderActions({
+                item,
+                showForm,
+                isNotAvailablePage,
+                onSetInactive: (item) => setDeleteItem(item),
+                onSetViewRoomDetails: (item) => viewRoomDetails(item),
+              });
+            }}
+          />
         </div>
 
-        {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
+        {!loading && totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
 
-      {showForm1 && (
-        <div className="w-full h-screen fixed inset-0 bg-black/50 flex flex-row justify-center items-center z-50">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="w-[700px] rounded-lg bg-white dark:bg-gray-800 p-4"
-          >
-            <div className="flex flex-row justify-between items-center mb-5">
-              <h3 className="dark:text-white text-lg">Add Room</h3>
-              <icons.MdOutlineClose
-                onClick={() => setShowForm1(false)}
-                className="text-lg cursor-pointer dark:text-gray-100"
-              />
-            </div>
-            <form action="" className="w-full flex flex-col gap-3">
-              <div className="w-1/2 flex flex-row ">
-                <DropDown options={options} />
-              </div>
-              <div className="w-full flex flex-row gap-2">
-                <Input label="Room Name" />
-                <Input label="Price" isNumber={true} />
-              </div>
-              <div className="w-full flex flex-row gap-2">
-                <Input label="Quantity" />
-                <Input label="Duration" />
-              </div>
-            </form>
-          </motion.div>
-        </div>
+      {deleteItem?.room_id && (
+        <DeleteModal
+          item={deleteItem}
+          name={deleteItem?.room_name}
+          loading={inactiveLoading}
+          onCancel={() => setDeleteItem(null)}
+          label={isNotAvailablePage ? "Yes, Set as available" : ""}
+          label2="active"
+          label3="This will set the data to available."
+          onConfirm={() => {
+            setInactive({
+              id: deleteItem?.room_id,
+              action: isNotAvailablePage ? "set_active" : "set_inactive",
+            });
+          }}
+        />
+      )}
+
+      {showForm === "view room" && (
+        <ViewRoomDetails roomId={viewRoomDetailsId} />
       )}
     </>
   );

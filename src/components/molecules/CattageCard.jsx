@@ -2,6 +2,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { icons } from "../../constant/icon";
 import { motion } from "framer-motion";
+import Button from "../atoms/Button";
 
 function CattageCard({ item }) {
   return (
@@ -38,10 +39,24 @@ function CattageCard({ item }) {
           <icons.IoIosTimer />
           {item.duration}
         </span>
+        <Button
+          style=" bg-green-600 text-xs text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105 w-fit py-1"
+          label="Reserve Now"
+        />
       </motion.div>
 
-      <button className="text-sm hover:text-blue-400 text-white cursor-pointer absolute right-12 bottom-2 bg-black/60 rounded-full py-1 px-2">
-        More Details
+      <button
+        onClick={() => navigate(`/funtionhall-deatails/${item.fh_id}`)}
+        className="group text-blue-500 text-sm cursor-pointer absolute right-12 bottom-2 rounded-full py-1 px-2 transition-colors duration-300 hover:text-blue-400"
+      >
+        <span
+          className="relative before:content-[''] before:absolute before:bottom-0 before:left-1/2 
+    before:translate-x-[-50%] before:h-[2px] before:w-0 
+    before:bg-blue-400 before:transition-all before:duration-300 
+    group-hover:before:w-full"
+        >
+          More Details
+        </span>
       </button>
 
       <icons.FaStreetView

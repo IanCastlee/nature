@@ -32,9 +32,9 @@ export const images = {
   hero1,
   hero2,
   hero3,
-  hero1_m,
-  hero2_m,
-  hero3_m,
+  // hero1_m,
+  // hero2_m,
+  // hero3_m,
 
   aboutbg,
   messageIcons,

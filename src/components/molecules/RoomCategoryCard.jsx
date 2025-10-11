@@ -22,7 +22,7 @@ function RoomCategoryCard({ item }) {
         className={`
           
           absolute inset-0 
-          bg-black bg-opacity-50 
+          bg-black bg-opacity-40 
           flex items-center justify-center 
           transition-opacity duration-300
           flex-col
@@ -31,7 +31,7 @@ function RoomCategoryCard({ item }) {
           lg:opacity-0  lg:group-hover:opacity-100
         `}
       >
-        <h4 className="text-white text-center text-lg md:text-lg lg:text-xl font-semibold px-2 max-w-[400px]">
+        <h4 className="text-white text-center text-sm md:text-lg lg:text-xl font-semibold px-2 max-w-[400px]">
           {item.category}
         </h4>
         <button

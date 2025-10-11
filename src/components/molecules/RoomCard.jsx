@@ -5,6 +5,7 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import { icons } from "../../constant/icon";
 import { useNavigate } from "react-router-dom";
 import { uploadUrl } from "../../utils/fileURL";
+import Button from "../atoms/Button";
 function RoomCard({ rooms }) {
   const navigate = useNavigate();
 
@@ -15,7 +16,7 @@ function RoomCard({ rooms }) {
           return (
             <article
               key={item.room_id}
-              className="w-full  md:basis-[calc(50%-0.3rem)] lg:basis-[calc(33.333%-0.5rem)] mb-2  bg-white dark:bg-gray-950 dark:border border-gray-900 rounded-lg shadow-md overflow-hidden"
+              className="w-full  md:basis-[calc(50%-0.3rem)] lg:basis-[calc(33.333%-0.5rem)] mb-2  bg-white dark:bg-gray-950 dark:border border-gray-900 rounded-lg shadow-lg overflow-hidden"
             >
               <LazyLoadImage
                 src={`${uploadUrl.uploadurl}/rooms/${item.image}`}
@@ -31,7 +32,7 @@ function RoomCard({ rooms }) {
                     <h2 className="text-xl font-semibold mb-2 dark:text-white">
                       {item.room_name}
                     </h2>
-                    <p className="text-blue-400 text-sm font-medium">
+                    <p className="dark:text-white text-sm font-medium">
                       ₱ {item.price} / Night
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 h-5 flex justify-center items-center px-1 rounded-full text-center mt-1">
@@ -79,7 +80,12 @@ function RoomCard({ rooms }) {
                   </div>
                 </div>
 
-                <div className="flex flex-row justify-end  mt-8">
+                <div className="flex flex-row justify-between  mt-8">
+                  <Button
+                    style="bg-green-600 text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
+                    label="Reserve Now"
+                  />
+
                   <button
                     onClick={() => navigate(`/room-deatails/${item.room_id}`)}
                     className="group relative flex flex-row items-center text-blue-500 text-sm font-medium rounded-sm h-[30px] self-end ml-auto transition-colors duration-300 hover:text-blue-400"
