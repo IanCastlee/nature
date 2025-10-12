@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import useFormSubmit from "../../hooks/useFormSubmit";
 import Toaster from "../molecules/Toaster";
+import useAuthStore from "../../store/authStore"; // ✅ Zustand store
 
 function SignIn() {
   const navigate = useNavigate();
@@ -23,19 +24,22 @@ function SignIn() {
     loading,
     error: formError,
   } = useFormSubmit("/auth/signin.php", (response) => {
+    const { setToken, setUser } = useAuthStore.getState(); // ✅ Zustand functions
+
     if (response?.success) {
       setToast({
         message: response.message || "Login successful!",
         type: "success",
       });
+
       console.log("✅ Login Response:", response);
 
-      // Save token if returned
       if (response.token) {
-        localStorage.setItem("token", response.token);
+        setToken(response.token); // ✅ Save to Zustand
+        setUser(response.user); // ✅ Save user info
       }
 
-      // Redirect after delay
+      // Redirect after 2s
       setTimeout(() => {
         navigate("/");
       }, 2000);
@@ -44,13 +48,12 @@ function SignIn() {
         message: response?.message || "Login failed.",
         type: "error",
       });
-      console.warn("⚠️ Login response returned error state:", response);
+      console.warn("⚠️ Login error:", response);
     }
   });
 
   useEffect(() => {
     if (formError) {
-      console.log("🔥 Form Error Triggered:", formError);
       setToast({
         message:
           typeof formError === "string"

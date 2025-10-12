@@ -2,6 +2,26 @@
 include("../header.php");
 include("../dbConn.php");
 
+// Require Composer autoload (adjust path if needed)
+require_once('../vendor/autoload.php');
+
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+
+// Load environment variables from .env
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
+$secretKey = $_ENV['JWT_SECRET'] ?? null;
+if (!$secretKey) {
+    http_response_code(500);
+    echo json_encode([
+        "success" => false,
+        "message" => "JWT secret key is not set. Contact administrator."
+    ]);
+    exit;
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Allow only POST
@@ -61,7 +81,21 @@ if (!password_verify($password, $user['password'])) {
     exit;
 }
 
-// Success
+// JWT Configuration
+$issuedAt = time();
+$expirationTime = $issuedAt + 3600; // 1 hour expiry
+
+$payload = [
+    "iat" => $issuedAt,
+    "exp" => $expirationTime,
+    "user_id" => $user['user_id'],
+    "email" => $user['email']
+];
+
+// Generate JWT
+$jwt = JWT::encode($payload, $secretKey, 'HS256');
+
+// Success Response
 echo json_encode([
     "success" => true,
     "message" => "Login successful",
@@ -70,6 +104,6 @@ echo json_encode([
         "fullname" => $user['fullname'],
         "email" => $user['email'],
     ],
-    "token" => "your-auth-token" // Replace with JWT or session token
+    "token" => $jwt
 ]);
 exit;

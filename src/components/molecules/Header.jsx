@@ -4,8 +4,11 @@ import { images } from "../../constant/image";
 import { icons } from "../../constant/icon";
 import useThemeStore from "../../store/themeStore";
 import { dummyRooms } from "../../constant/mockData";
+import useAuthStore from "../../store/authStore";
 
 function Header() {
+  const { user } = useAuthStore();
+
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -137,12 +140,38 @@ function Header() {
             </button>
 
             {/* Sign In */}
-            <button
-              className="flex items-center gap-1 bg-blue-400 text-white font-semibold text-xs h-[30px] px-4 rounded-full transform transition duration-200 hover:scale-110"
-              onClick={() => navigate("/signin")}
-            >
-              Sign In <icons.PiSignIn className="text-lg" />
-            </button>
+            {user ? (
+              <span className="text-xs text-white">
+                Welcome, {user.fullname}
+              </span>
+            ) : (
+              <button
+                className="flex items-center gap-1 bg-blue-400 text-white font-semibold text-xs h-[30px] px-4 rounded-full transform transition duration-200 hover:scale-110"
+                onClick={() => navigate("/signin")}
+              >
+                Sign In <icons.PiSignIn className="text-lg" />
+              </button>
+            )}
+
+            {user && (
+              <li className="relative group cursor-pointer">
+                <button
+                  onClick={() => {
+                    useAuthStore.getState().logout();
+                    navigate("/signin");
+                  }}
+                  className={`flex items-center gap-1 text-sm transition-colors duration-300 group-hover:text-blue-400
+          before:content-[''] before:absolute before:bottom-0 before:left-1/2 
+          before:translate-x-[-50%] before:h-[2px] before:w-0 
+          before:bg-blue-400 before:transition-all before:duration-300 
+          group-hover:before:w-full ${
+            scrolled ? "text-black dark:text-white" : "text-white"
+          }`}
+                >
+                  Logout <icons.IoIosLogOut className="text-lg" />
+                </button>
+              </li>
+            )}
           </ul>
         </nav>
 
@@ -266,15 +295,21 @@ function Header() {
 
             {/* Sign In */}
             <li>
-              <button
-                onClick={() => {
-                  navigate("/signin");
-                  setMobileMenuOpen(false);
-                }}
-                className="bg-blue-400 text-white px-3 py-1 rounded-full text-xs"
-              >
-                Sign In
-              </button>
+              {user ? (
+                <span className="text-xs dark:text-white text-black">
+                  {user.fullname}
+                </span>
+              ) : (
+                <button
+                  onClick={() => {
+                    navigate("/signin");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="bg-blue-400 text-white px-3 py-1 rounded-full text-xs"
+                >
+                  Sign In
+                </button>
+              )}
             </li>
           </ul>
         </div>
