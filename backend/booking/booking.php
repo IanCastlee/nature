@@ -7,47 +7,63 @@ header('Content-Type: application/json');
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method !== "POST") {
-    http_response_code(405); // Method Not Allowed
+    http_response_code(405);
     echo json_encode(["error" => "Only POST method is allowed"]);
     exit;
 }
 
-// Accept raw JSON payload
+// Accept JSON body
 if (strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
     $input = json_decode(file_get_contents("php://input"), true);
     $_POST = $input;
 }
 
-// Required fields check
-$requiredFields = ["room_id", "extras"];
+// Required fields
+$requiredFields = ["userId", "facility_type", "facility_id", "extras"];
 foreach ($requiredFields as $field) {
     if (!isset($_POST[$field])) {
-        http_response_code(400); // Bad Request
+        http_response_code(400);
         echo json_encode(["error" => "Missing required field: $field"]);
         exit;
     }
 }
 
-// Sanitize input
-$roomId = intval($_POST['room_id']);
-$extras = $_POST['extras']; // array of extras with id, quantity
+$userId = intval($_POST['userId']);
+$facilityType = $_POST['facility_type']; // e.g., 'room', 'cottage', 'hall'
+$facilityId = intval($_POST['facility_id']);
+$extras = $_POST['extras'];
 
-// Step 1: Get the actual room price from DB
-$roomQuery = $conn->prepare("SELECT price FROM rooms WHERE room_id = ?");
-$roomQuery->bind_param("i", $roomId);
-$roomQuery->execute();
-$roomResult = $roomQuery->get_result();
+// Map table by facility type
+$facilityTableMap = [
+    "room" => "rooms",
+    "cottage" => "cottages",
+    "hall" => "function_halls"
+];
 
-if ($roomResult->num_rows === 0) {
-    http_response_code(404);
-    echo json_encode(["error" => "Room not found"]);
+if (!array_key_exists($facilityType, $facilityTableMap)) {
+    http_response_code(400);
+    echo json_encode(["error" => "Invalid facility type"]);
     exit;
 }
 
-$room = $roomResult->fetch_assoc();
-$actualRoomPrice = floatval($room['price']);
+$table = $facilityTableMap[$facilityType];
 
-// Step 2: Recalculate extras using DB prices
+// Step 1: Get base price from correct table
+$facilityQuery = $conn->prepare("SELECT price FROM $table WHERE room_id = ?");
+$facilityQuery->bind_param("i", $facilityId);
+$facilityQuery->execute();
+$facilityResult = $facilityQuery->get_result();
+
+if ($facilityResult->num_rows === 0) {
+    http_response_code(404);
+    echo json_encode(["error" => "Facility not found"]);
+    exit;
+}
+
+$facility = $facilityResult->fetch_assoc();
+$basePrice = floatval($facility['price']);
+
+// Step 2: Recalculate extras
 $extrasTotal = 0;
 $sanitizedExtras = [];
 
@@ -57,8 +73,7 @@ foreach ($extras as $extra) {
 
     if ($quantity <= 0) continue;
 
-    // Get actual extra price from DB
-    $extraQuery = $conn->prepare("SELECT price, extras FROM room_extras WHERE extra_id = ?");
+    $extraQuery = $conn->prepare("SELECT price, extras FROM extras WHERE extra_id = ?");
     $extraQuery->bind_param("i", $extraId);
     $extraQuery->execute();
     $extraResult = $extraQuery->get_result();
@@ -80,12 +95,15 @@ foreach ($extras as $extra) {
     ];
 }
 
-// Step 3: Compute final total
-$totalPrice = $actualRoomPrice + $extrasTotal;
+// Step 3: Total
+$totalPrice = $basePrice + $extrasTotal;
 
-// Step 4: Insert booking into DB
-$insertBooking = $conn->prepare("INSERT INTO bookings (room_id, room_price, extras_total, total_price) VALUES (?, ?, ?, ?)");
-$insertBooking->bind_param("iddd", $roomId, $actualRoomPrice, $extrasTotal, $totalPrice);
+// Step 4: Save booking
+$insertBooking = $conn->prepare("
+    INSERT INTO booking (user_id, facility_type, facility_id, price)
+    VALUES (?, ?, ?, ?)
+");
+$insertBooking->bind_param("issi", $userId, $facilityType, $facilityId, $totalPrice);
 
 if (!$insertBooking->execute()) {
     http_response_code(500);
@@ -96,10 +114,13 @@ if (!$insertBooking->execute()) {
 $bookingId = $insertBooking->insert_id;
 $insertBooking->close();
 
-// Step 5: Insert extras for this booking
+// Step 5: Save extras
 if (!empty($sanitizedExtras)) {
-    $insertExtra = $conn->prepare("INSERT INTO booking_extras (booking_id, extra_id, name, quantity, price) VALUES (?, ?, ?, ?, ?)");
-    
+    $insertExtra = $conn->prepare("
+        INSERT INTO booking_extras (booking_id, extra_id, name, quantity, price)
+        VALUES (?, ?, ?, ?, ?)
+    ");
+
     foreach ($sanitizedExtras as $extra) {
         $insertExtra->bind_param(
             "iisid",
@@ -115,11 +136,11 @@ if (!empty($sanitizedExtras)) {
     $insertExtra->close();
 }
 
-// ✅ Success
+// ✅ Done
 echo json_encode([
     "success" => true,
     "booking_id" => $bookingId,
-    "room_price" => $actualRoomPrice,
+    "base_price" => $basePrice,
     "extras_total" => $extrasTotal,
     "total_price" => $totalPrice
 ]);

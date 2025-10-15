@@ -148,7 +148,6 @@ function AvailableRoomPage() {
     setShowForm(null);
     clealAddModalField();
   });
-  console.log("formError :", formError);
   //amenity
   const {
     submit: submitAmenity,

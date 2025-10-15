@@ -8,8 +8,11 @@ import CustomDropDownn from "../atoms/CustomDropDownn";
 import Input from "../atoms/Input";
 import React, { useState } from "react";
 import useFormSubmit from "../../hooks/useFormSubmit";
+import useAuthStore from "../../store/authStore";
 
 function BookingPage() {
+  const { user } = useAuthStore();
+
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [addedExtras, setAddedExtras] = useState([]);
@@ -17,15 +20,14 @@ function BookingPage() {
 
   //  Add local state to track selected extra
   const [selectedExtraId, setSelectedExtraId] = useState("");
-
   const {
     submit,
     loading: formLoading,
     error: formError,
-  } = useFormSubmit("/admin/booking.php", () => {
+  } = useFormSubmit("/booking/booking.php", () => {
     // Optional: do something on success
     alert("Booking submitted successfully!");
-    navigate("/booking-success"); // or go back
+    // navigate("/booking-success"); // or go back
   });
 
   const handleSubmitBooking = () => {
@@ -36,10 +38,9 @@ function BookingPage() {
     const totalPrice = Number(price) + extrasTotal;
 
     const payload = {
-      room_id,
-      room_price: Number(price),
-      extras_total: extrasTotal,
-      total_price: totalPrice,
+      userId: user.id, // 👈 FIXED: was user_id
+      facility_type: "room",
+      facility_id: Number(roomId),
       extras: addedExtras.map((extra) => ({
         id: extra.id,
         name: extra.name,
@@ -48,8 +49,10 @@ function BookingPage() {
       })),
     };
 
+    console.log("✅ Submitting payload:", payload);
     submit(payload);
   };
+
   // Function to handle adding selected extra to the list
   const handleAddExtra = () => {
     const selectedExtra = extrasData.find(
@@ -64,8 +67,19 @@ function BookingPage() {
       quantity: extraQty,
     };
 
-    setAddedExtras((prev) => [...prev, newExtra]);
-    setExtraQty(1); // Reset quantity
+    setAddedExtras((prev) => {
+      const exists = prev.find((item) => item.id === newExtra.id);
+      if (exists) {
+        return prev.map((item) =>
+          item.id === newExtra.id
+            ? { ...item, quantity: item.quantity + newExtra.quantity }
+            : item
+        );
+      }
+      return [...prev, newExtra];
+    });
+
+    setExtraQty(1);
   };
 
   const {
@@ -180,27 +194,28 @@ function BookingPage() {
                 )}
               </ul>
 
-              {withExtras !== 0 && (
-                <ul className="flex-1">
-                  <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">
-                    Room Extras
-                  </h3>
-                  {parsedExtras.length ? (
-                    parsedExtras.map((extras, idx) => (
-                      <li
-                        key={idx}
-                        className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
-                      >
-                        {extras.trim()}
-                      </li>
-                    ))
-                  ) : (
-                    <li className="text-sm text-gray-500 italic">
-                      No extras listed.
+              <ul className="flex-1">
+                <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">
+                  Room Extras
+                </h3>
+                {extrasData?.length ? (
+                  extrasData.map((extra, idx) => (
+                    <li
+                      key={idx}
+                      className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
+                    >
+                      {extra.extras} = ₱{" "}
+                      {Number(extra.price).toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                      })}
                     </li>
-                  )}
-                </ul>
-              )}
+                  ))
+                ) : (
+                  <li className="text-sm text-gray-500 italic">
+                    No extras listed.
+                  </li>
+                )}
+              </ul>
             </div>
 
             {/*  Extras Dropdown */}
@@ -225,7 +240,12 @@ function BookingPage() {
                       name="qty"
                       min="1"
                       value={extraQty}
-                      onChange={(e) => setExtraQty(Number(e.target.value))}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        if (!isNaN(val) && val > 0) {
+                          setExtraQty(val);
+                        }
+                      }}
                     />
                   </div>
 
