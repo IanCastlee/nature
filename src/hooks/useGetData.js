@@ -16,6 +16,7 @@ function useGetData(url, autoFetch = true) {
         setError(null);
       } else {
         setError(new Error(res.data || "API responded with an error."));
+        console.log("first", res.data);
       }
     } catch (err) {
       // Extract better error message if possible

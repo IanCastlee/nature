@@ -28,11 +28,21 @@ import NotAvailableFunctionHall from "./admin_components/admin_pages/NotAvailabl
 import AvailableCottage from "./admin_components/admin_pages/AvailableCottage";
 import NotAvailableCottage from "./admin_components/admin_pages/NotAvailableCottage";
 import ViewFunctionHallPage from "./components/pages/ViewFunctionHallPage";
+import BookingPage from "./components/pages/BookingPage";
 const UserLayout = () => {
   const location = useLocation();
 
-  const hideLayout = ["/signup", "/test", "/signin"];
-  const shouldHideLayout = hideLayout.includes(location.pathname);
+  const hideLayoutPaths = [
+    "/signup",
+    "/test",
+    "/signin",
+    "/room-deatails",
+    "/booking",
+  ];
+  const shouldHideLayout = hideLayoutPaths.some((path) =>
+    location.pathname.startsWith(path)
+  );
+
   return (
     <>
       {!shouldHideLayout && <Header />}
@@ -44,6 +54,7 @@ const UserLayout = () => {
           element={<RoomCategoriesPage />}
         />
         <Route path="/room-deatails/:roomId" element={<ViewRoomPage />} />
+        <Route path="/booking/:roomId" element={<BookingPage />} />
         <Route
           path="/funtionhall-deatails/:fhId"
           element={<ViewFunctionHallPage />}
@@ -77,7 +88,7 @@ const AdminLayout = () => {
         }`}
       >
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/available-room" element={<AvailableRoomPage />} />
           <Route
             path="/not-available-room"

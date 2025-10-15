@@ -1,32 +1,133 @@
-import React from "react";
+import React, { useState } from "react";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Tooltip,
+  Legend,
+  Title,
+} from "chart.js";
 
-function Dashboard() {
+ChartJS.register(
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Tooltip,
+  Legend,
+  Title
+);
+
+const Dashboard = () => {
+  const [selectedYear, setSelectedYear] = useState("2025");
+
+  const stats = [
+    { title: "New Bookings", value: "234", percent: "+234%", color: "green" },
+    { title: "Total Expenses", value: "71%", percent: "-71%", color: "red" },
+    { title: "Revenue", value: "$1.45M", percent: "+18%", color: "yellow" },
+    { title: "New Customers", value: "34", percent: "+34", color: "blue" },
+  ];
+
+  // Dummy bookings grouped by year
+  const bookingsByYear = {
+    2023: [20, 30, 40, 50, 35, 60, 45, 55, 65, 70, 80, 90],
+    2024: [25, 35, 30, 60, 50, 75, 60, 70, 80, 90, 100, 110],
+    2025: [45, 60, 40, 80, 75, 90, 85, 95, 100, 110, 120, 130],
+  };
+
+  const chartData = {
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
+    datasets: [
+      {
+        label: `Bookings in ${selectedYear}`,
+        data: bookingsByYear[selectedYear],
+        borderColor: "#4CAF50",
+        backgroundColor: "rgba(76, 175, 80, 0.2)",
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" },
+      title: {
+        display: true,
+        text: `Bookings Per Month - ${selectedYear}`,
+      },
+    },
+  };
+
   return (
-    <div className="scroll-smooth">
-      Lorem ipsum dolor sit amet consectetur adipisicing elit... Lorem ipsum,
-      dolor sit amet consectetur adipisicing elit. Laborum, consequatur officiis
-      expedita aliquam animi ducimus sunt quo dolorem delectus doloribus eos,
-      distinctio consequuntur labore tenetur atque libero! Optio, sed quos
-      assumenda unde adipisci dicta a tempora minima earum error nesciunt
-      provident quisquam tenetur iusto sapiente aut temporibus quam veniam
-      voluptates autem explicabo saepe eveniet, perferendis maxime? Excepturi
-      nihil, eaque ab hic rem incidunt atque magnam labore obcaecati adipisci
-      nisi saepe eum quos vero cupiditate dolore voluptatibus unde ex voluptates
-      enim culpa ut mollitia illum. Quae nulla reiciendis, repellat molestias
-      inventore minima praesentium modi eligendi dignissimos similique magnam
-      nemo quaerat sint cupiditate sunt! Cumque itaque expedita suscipit numquam
-      aut facere hic dolor cum, labore perspiciatis quidem libero est autem
-      laboriosam odit vitae facilis nostrum necessitatibus consectetur non!
-      Officia est facere itaque ex soluta fugiat possimus omnis nesciunt laborum
-      minus sed nulla excepturi sequi et autem, repudiandae quia illo error
-      doloremque dolore saepe esse beatae? Commodi eius laudantium
-      necessitatibus doloremque vel perferendis ab unde sapiente sunt provident
-      voluptatem, facilis magni ea cumque labore ut ullam. Recusandae nesciunt
-      vel, quia doloribus tempore similique tempora reiciendis ipsam delectus
-      odio dolore voluptatum et quam a placeat accusamus qui, hic sit omnis
-      optio impedit? Explicabo, labore.
+    <div className=" dark:bg-gray-800 bg-gray-100 min-h-screen">
+      <h1 className="text-lg font-bold mb-4 dark:text-white text-black">
+        Dashboard Overview
+      </h1>
+
+      {/* Top Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {stats.map((item, index) => (
+          <div
+            key={index}
+            className="bg-white dark:bg-gray-900 p-4 rounded-md shadow-md flex flex-col justify-between"
+          >
+            <h2 className="text-sm text-gray-600 dark:text-gray-200 font-medium">
+              {item.title}
+            </h2>
+            <p
+              className={`text-2xl text-gray-600 dark:text-gray-200 font-bold text-${item.color}-500`}
+            >
+              {item.value}
+            </p>
+            <span
+              className={`text-sm text-gray-600 dark:text-gray-200 text-${item.color}-400`}
+            >
+              {item.percent}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Year Filter */}
+      <div className="mb-4 flex justify-end">
+        <label className="text-xs text-gray-700 dark:text-gray-200 font-medium mr-2 self-center">
+          Filter by Year:
+        </label>
+        <select
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(e.target.value)}
+          className="border dark:bg-gray-900 dark:border-gray-500 dark:text-gray-200 rounded px-2 py-1 text-xs"
+        >
+          <option value="2023">2023</option>
+          <option value="2024">2024</option>
+          <option value="2025">2025</option>
+        </select>
+      </div>
+
+      {/* Graph */}
+      <div className="bg-white dark:bg-gray-900 p-6 rounded-md shadow-md">
+        <Line data={chartData} options={options} />
+      </div>
     </div>
   );
-}
+};
 
 export default Dashboard;

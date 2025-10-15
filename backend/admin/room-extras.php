@@ -43,12 +43,13 @@ if ($method === 'POST') {
     $id = isset($_POST['id']) ? intval($_POST['id']) : null;
     $room_id = isset($_POST['room_id']) ? intval($_POST['room_id']) : null;
     $name = $_POST['name'] ?? '';
+    $price = $_POST['price'] ?? '';
 
     // ================================
     // CREATE EXRAS
     // ================================
     if ($action === "create") {
-        if (!$room_id || !$name) {
+        if (!$room_id || !$name || !$price) {
             echo json_encode([
                 "success" => false,
                 "message" => "All fields are required."
@@ -64,8 +65,8 @@ if ($method === 'POST') {
 
         if ($result->num_rows < 1) {
             // Insert new Extras
-            $insertStmt = $conn->prepare("INSERT INTO extras (room_id, extras) VALUES (?, ?)");
-            $insertStmt->bind_param("is", $room_id, $name);
+            $insertStmt = $conn->prepare("INSERT INTO extras (room_id, extras, price) VALUES (?, ?, ?)");
+            $insertStmt->bind_param("isd", $room_id, $name, $price);
 
             if ($insertStmt->execute()) {
                 echo json_encode([
@@ -92,7 +93,7 @@ if ($method === 'POST') {
     // UPDATE EXTRAS
     // ================================
     if ($action === "update") {
-        if (!$id || !$room_id || !$name) {
+        if (!$id || !$room_id || !$name || !$price) {
             echo json_encode([
                 "success" => false,
                 "message" => "All fields are required for update."
@@ -100,8 +101,8 @@ if ($method === 'POST') {
             exit;
         }
 
-        $stmt = $conn->prepare("UPDATE extras SET room_id = ?, extras = ? WHERE extra_id = ?");
-        $stmt->bind_param("isi", $room_id, $name, $id); 
+        $stmt = $conn->prepare("UPDATE extras SET room_id = ?, extras = ?,  price = ? WHERE extra_id = ?");
+        $stmt->bind_param("isid", $room_id, $name, $price, $id); 
         if ($stmt->execute()) {
             echo json_encode([
                 "success" => true,

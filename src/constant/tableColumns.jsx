@@ -43,6 +43,15 @@ export const getOtherRoomDetails = (showForm) => [
         ? "extras"
         : "name",
   },
+  // Show price only if it's for extras
+  ...(showForm === "add extras" || showForm === "update extras"
+    ? [
+        {
+          title: "Price",
+          key: "price",
+        },
+      ]
+    : []),
 ];
 
 //function hall

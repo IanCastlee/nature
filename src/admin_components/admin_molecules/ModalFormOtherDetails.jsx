@@ -80,6 +80,7 @@ export default function ModalFormOtherDetails({
       id: item.extra_id,
       room_id: item.room_id,
       name: item.extras,
+      price: item.price,
     });
     setShowForm("update extras");
   };
@@ -125,7 +126,7 @@ export default function ModalFormOtherDetails({
                 <p className="text-red-600 text-xs text-center">{formError}</p>
               </div>
             )}
-            <div className="w-full flex flex-row gap-2">
+            <div className="w-full flex flex-row gap-2 py-4 ">
               <Input
                 label={getLabel()}
                 name="name"
@@ -138,6 +139,20 @@ export default function ModalFormOtherDetails({
                   }))
                 }
               />
+              {(showForm === "add extras" || showForm === "update extras") && (
+                <Input
+                  label={showForm === "add extras" ? "Price" : ""}
+                  name="price"
+                  type="number"
+                  value={otherRoomDetailForm.price || ""}
+                  onChange={(e) =>
+                    setOtherRoomDetailForm((prev) => ({
+                      ...prev,
+                      [e.target.name]: e.target.value,
+                    }))
+                  }
+                />
+              )}
             </div>
 
             <div className="flex justify-end">

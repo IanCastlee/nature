@@ -29,6 +29,7 @@ function ViewRoomPage() {
   if (!roomDetails) return null;
 
   const {
+    room_id,
     image,
     room_name,
     price,
@@ -103,6 +104,7 @@ function ViewRoomPage() {
                 label="View House Rules"
               />
               <Button
+                onClick={() => navigate(`/booking/${room_id}`)} // ✅ Correct
                 style="h-[30px] bg-green-600 text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
                 label="Reserve Now"
               />
@@ -206,6 +208,11 @@ function ViewRoomPage() {
       </main>
 
       {showHouseRules && <HouseRules close={() => setShowHouseRules(false)} />}
+
+      <icons.FiArrowLeftCircle
+        className="text-2xl text-white cursor-pointer absolute top-8 left-8 z-20"
+        onClick={() => navigate(-1)}
+      />
     </>
   );
 }

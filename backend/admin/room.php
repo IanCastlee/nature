@@ -15,41 +15,76 @@ if ($method === "GET") {
     $categoryId = $_GET['categoryId'] ?? null;
     $status = $_GET['status']  ?? 'active';
 
-    if ($roomId) {
-        // Fetch a specific room by ID
-        $stmt = $conn->prepare("SELECT r.*, a.amenities, a.amenity_id, e.extras, e.extra_id, i.inclusion, i.inclusion_id, rc.category, rc.category_id 
-                                FROM rooms AS r  
-                                LEFT JOIN room_categories AS rc ON r.category_id = rc.category_id 
-                                LEFT JOIN amenities AS a ON a.room_id = r.room_id 
-                                LEFT JOIN inclusions AS i ON i.room_id = r.room_id 
-                                LEFT JOIN extras AS e ON e.room_id = r.room_id  
-                                WHERE r.room_id = ?");
-        $stmt->bind_param("i", $roomId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $room = $result->fetch_assoc();
+   if ($roomId) {
+    $stmt = $conn->prepare("SELECT r.*, a.amenities, a.amenity_id, e.extras, e.extra_id, i.inclusion, i.inclusion_id, rc.category, rc.category_id 
+                            FROM rooms AS r  
+                            LEFT JOIN room_categories AS rc ON r.category_id = rc.category_id 
+                            LEFT JOIN amenities AS a ON a.room_id = r.room_id 
+                            LEFT JOIN inclusions AS i ON i.room_id = r.room_id 
+                            LEFT JOIN extras AS e ON e.room_id = r.room_id  
+                            WHERE r.room_id = ?");
+    $stmt->bind_param("i", $roomId);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-        if ($room) {
-            echo json_encode([
-                "success" => true,
-                "data" => $room
-            ]);
-        } else {
-            echo json_encode([
-                "success" => false,
-                "message" => "Room not found."
-            ]);
+    $roomData = [];
+    $amenities = [];
+    $inclusions = [];
+    $extras = [];
+
+    while ($row = $result->fetch_assoc()) {
+        if (empty($roomData)) {
+            // Initialize main room data from the first row
+            $roomData = [
+                "room_id" => $row["room_id"],
+                "room_name" => $row["room_name"],
+                "image" => $row["image"],
+                "price" => $row["price"],
+                "capacity" => $row["capacity"],
+                "duration" => $row["duration"],
+                "description" => $row["description"],
+                "category" => $row["category"],
+                "category_id" => $row["category_id"],
+                "photo_sphere" => $row["photo_sphere"],
+                "withExtras" => $row["withExtras"],
+            ];
         }
-        exit;
-    } elseif ($categoryId) {
+
+        if (!empty($row["amenities"])) {
+            $amenities[] = $row["amenities"];
+        }
+
+        if (!empty($row["inclusion"])) {
+            $inclusions[] = $row["inclusion"];
+        }
+
+        if (!empty($row["extras"])) {
+            $extras[] = $row["extras"];
+        }
+    }
+
+    if (!empty($roomData)) {
+        // Merge all collected items into final data
+        $roomData["amenities"] = implode(",", array_unique($amenities));
+        $roomData["inclusion"] = implode(",", array_unique($inclusions));
+        $roomData["extras"] = implode(",", array_unique($extras));
+
+        echo json_encode([
+            "success" => true,
+            "data" => $roomData
+        ]);
+    } else {
+        echo json_encode([
+            "success" => false,
+            "message" => "Room not found."
+        ]);
+    }
+
+    exit;
+}
+elseif ($categoryId) {
         // Fetch rooms filtered by category
-        $stmt = $conn->prepare("SELECT r.*, a.amenity_id, a.amenities, i.inclusion_id, i.inclusion, e.extra_id, e.extras, rc.category, rc.category_id 
-                                FROM rooms AS r  
-                                LEFT JOIN room_categories AS rc ON r.category_id = rc.category_id 
-                                LEFT JOIN amenities AS a ON a.room_id = r.room_id 
-                                LEFT JOIN inclusions AS i ON i.room_id = r.room_id 
-                                LEFT JOIN extras AS e ON e.room_id = r.room_id  
-                                WHERE r.category_id = ? AND r.status = 'active'");
+        $stmt = $conn->prepare("SELECT * FROM rooms WHERE category_id = ? AND status = 'active'");
         $stmt->bind_param("i", $categoryId);
 $stmt->execute();
 $result = $stmt->get_result();

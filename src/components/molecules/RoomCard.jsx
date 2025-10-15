@@ -41,6 +41,7 @@ function RoomCard({ rooms }) {
                   </div>
 
                   <icons.FaStreetView
+                    onClick={() => navigate(`/room-view/${item.photo_sphere}`)}
                     title="View Room"
                     className="text-2xl text-blue-600 cursor-pointer transform transition-transform duration-300 hover:scale-125"
                   />
@@ -79,10 +80,10 @@ function RoomCard({ rooms }) {
                       })}
                   </div>
                 </div>
-
                 <div className="flex flex-row justify-between  mt-8">
                   <Button
-                    style="bg-green-600 text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
+                    onClick={() => navigate(`/booking/${item.room_id}`)} // ✅ Correct
+                    style="bg-green-600 text-xs text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
                     label="Reserve Now"
                   />
 
@@ -94,7 +95,7 @@ function RoomCard({ rooms }) {
                       className="relative before:content-[''] before:absolute before:bottom-0 before:left-1/2 
     before:translate-x-[-50%] before:h-[2px] before:w-0 
     before:bg-blue-400 before:transition-all before:duration-300 
-    group-hover:before:w-full"
+    group-hover:before:w-full text-xs"
                     >
                       More Details
                     </span>

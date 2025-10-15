@@ -17,7 +17,7 @@ export default function ModalForm_Room({
   roomCategoryData,
 }) {
   if (showForm !== "add_room" && showForm !== "update_room") return null;
-
+  console.log("roomCategoryData : ", roomCategoryData);
   return (
     <div className="w-full h-screen fixed inset-0 bg-black/50 flex justify-center items-center z-50">
       <motion.div
@@ -45,7 +45,10 @@ export default function ModalForm_Room({
               onChange={(selectedId) =>
                 setForm((prev) => ({ ...prev, category: selectedId }))
               }
+              valueKey="category_id"
+              labelKey="category"
             />
+
             <FileInput
               label="Room Thumbnail"
               isRequired={showForm === "add_room"}

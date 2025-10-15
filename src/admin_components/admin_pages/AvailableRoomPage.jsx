@@ -36,6 +36,7 @@ function AvailableRoomPage() {
     id: "",
     room_id: "",
     name: "",
+    price: "",
   });
 
   //room form
@@ -177,11 +178,10 @@ function AvailableRoomPage() {
     refetchExtras();
     //clearField2();
   });
-
+  console.log("formErrorExtras ____", formErrorExtras);
   //=================//
   //  HANDLE SUBMIT //
   //===============//
-  console.log("photo_sphere : ", form.image);
 
   //rooms
   const handleSubmit = (e) => {
@@ -267,6 +267,7 @@ function AvailableRoomPage() {
     formData.append("action", isUpdate ? "update" : "create");
     formData.append("room_id", otherRoomDetailForm.room_id);
     formData.append("name", otherRoomDetailForm.name);
+    formData.append("price", otherRoomDetailForm.price);
 
     if (isUpdate) {
       formData.append("id", otherRoomDetailForm.id);
