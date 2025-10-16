@@ -18,8 +18,8 @@ if (strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
     $_POST = $input;
 }
 
-// Required fields
-$requiredFields = ["userId", "facility_type", "facility_id", "extras"];
+//  Required fields
+$requiredFields = ["userId", "facility_id", "extras", "check_in", "check_out"];
 foreach ($requiredFields as $field) {
     if (!isset($_POST[$field])) {
         http_response_code(400);
@@ -29,41 +29,36 @@ foreach ($requiredFields as $field) {
 }
 
 $userId = intval($_POST['userId']);
-$facilityType = $_POST['facility_type']; // e.g., 'room', 'cottage', 'hall'
 $facilityId = intval($_POST['facility_id']);
-$extras = $_POST['extras'];
+$extras = $_POST['extras'] ?? [];
+$checkIn = $_POST['check_in'] ?? null;
+$checkOut = $_POST['check_out'] ?? null;
+$nights = intval($_POST['nights'] ?? 1);
+$frontendTotalPrice = floatval($_POST['total_price'] ?? 0);
 
-// Map table by facility type
-$facilityTableMap = [
-    "room" => "rooms",
-    "cottage" => "cottages",
-    "hall" => "function_halls"
-];
-
-if (!array_key_exists($facilityType, $facilityTableMap)) {
+//  Validate check-in/out
+if (!$checkIn || !$checkOut) {
     http_response_code(400);
-    echo json_encode(["error" => "Invalid facility type"]);
+    echo json_encode(["error" => "Check-in and check-out dates are required"]);
     exit;
 }
 
-$table = $facilityTableMap[$facilityType];
-
-// Step 1: Get base price from correct table
-$facilityQuery = $conn->prepare("SELECT price FROM $table WHERE room_id = ?");
+//  Get base price from `rooms` table
+$facilityQuery = $conn->prepare("SELECT price FROM rooms WHERE room_id = ?");
 $facilityQuery->bind_param("i", $facilityId);
 $facilityQuery->execute();
 $facilityResult = $facilityQuery->get_result();
 
 if ($facilityResult->num_rows === 0) {
     http_response_code(404);
-    echo json_encode(["error" => "Facility not found"]);
+    echo json_encode(["error" => "Room not found"]);
     exit;
 }
 
 $facility = $facilityResult->fetch_assoc();
-$basePrice = floatval($facility['price']);
+$basePrice = floatval($facility['price']) * $nights;
 
-// Step 2: Recalculate extras
+//  Recalculate extras
 $extrasTotal = 0;
 $sanitizedExtras = [];
 
@@ -84,7 +79,7 @@ foreach ($extras as $extra) {
     $price = floatval($extraRow['price']);
     $name = $extraRow['extras'];
 
-    $lineTotal = $price * $quantity;
+    $lineTotal = $price * $quantity * $nights;
     $extrasTotal += $lineTotal;
 
     $sanitizedExtras[] = [
@@ -95,15 +90,28 @@ foreach ($extras as $extra) {
     ];
 }
 
-// Step 3: Total
+//  Final price
 $totalPrice = $basePrice + $extrasTotal;
 
-// Step 4: Save booking
+// Optionally compare frontend vs backend total
+if (abs($frontendTotalPrice - $totalPrice) > 0.01) {
+    // log discrepancy if needed
+}
+
+//  Save booking to `room_booking`
 $insertBooking = $conn->prepare("
-    INSERT INTO booking (user_id, facility_type, facility_id, price)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO room_booking (user_id, facility_id, start_date, end_date, status, price)
+    VALUES (?, ?, ?, ?, 'pending', ?)
 ");
-$insertBooking->bind_param("issi", $userId, $facilityType, $facilityId, $totalPrice);
+
+$insertBooking->bind_param(
+    "iissd",
+    $userId,
+    $facilityId,
+    $checkIn,
+    $checkOut,
+    $totalPrice
+);
 
 if (!$insertBooking->execute()) {
     http_response_code(500);
@@ -114,7 +122,7 @@ if (!$insertBooking->execute()) {
 $bookingId = $insertBooking->insert_id;
 $insertBooking->close();
 
-// Step 5: Save extras
+//  Save extras
 if (!empty($sanitizedExtras)) {
     $insertExtra = $conn->prepare("
         INSERT INTO booking_extras (booking_id, extra_id, name, quantity, price)
@@ -136,7 +144,7 @@ if (!empty($sanitizedExtras)) {
     $insertExtra->close();
 }
 
-// ✅ Done
+//  Response
 echo json_encode([
     "success" => true,
     "booking_id" => $bookingId,

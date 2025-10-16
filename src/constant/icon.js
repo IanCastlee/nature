@@ -34,6 +34,8 @@ import { IoIosLogOut } from "react-icons/io";
 import { RiMenuLine } from "react-icons/ri";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { MdOutlineKeyboardArrowUp } from "react-icons/md";
+import { FaUserCircle } from "react-icons/fa";
+import { GrHistory } from "react-icons/gr";
 
 //admin sidebar
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -52,6 +54,7 @@ export const icons = {
   RiMenuLine,
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowUp,
+  GrHistory,
   GoChecklist,
   IoIosLogOut,
   HiOutlineUserGroup,
@@ -60,6 +63,7 @@ export const icons = {
   TbRefresh,
   LuMessageCircleWarning,
   MdLocationOn,
+  FaUserCircle,
   HiArrowSmallRight,
   IoSunnySharp,
   IoMoonSharp,

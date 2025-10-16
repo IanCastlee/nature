@@ -14,7 +14,8 @@ function SignUp() {
   const [toast, setToast] = useState(null);
 
   const [form, setForm] = useState({
-    fullname: "",
+    firstname: "",
+    lastname: "",
     phone: "",
     address: "",
     email: "",
@@ -54,7 +55,7 @@ function SignUp() {
   };
 
   const handleNext = () => {
-    if (!form.fullname || !form.phone || !form.address) {
+    if (!form.firstname || !form.lastname || !form.phone || !form.address) {
       setToast({ message: "Please fill in all fields", type: "error" });
       return;
     }
@@ -89,7 +90,8 @@ function SignUp() {
     }
 
     const formData = new FormData();
-    formData.append("fullname", form.fullname);
+    formData.append("firstname", form.firstname);
+    formData.append("lastname", form.lastname);
     formData.append("phone", form.phone);
     formData.append("address", form.address);
     formData.append("email", form.email);
@@ -151,12 +153,20 @@ function SignUp() {
             >
               {step === 1 && (
                 <>
-                  <Input
-                    label="Fullname"
-                    name="fullname"
-                    value={form.fullname}
-                    onChange={handleChange}
-                  />
+                  <div className="flex flex-row gap-1">
+                    <Input
+                      label="Firstname"
+                      name="firstname"
+                      value={form.firstname}
+                      onChange={handleChange}
+                    />
+                    <Input
+                      label="Lastname"
+                      name="lastname"
+                      value={form.lastname}
+                      onChange={handleChange}
+                    />
+                  </div>
                   <Input
                     label="Phone"
                     name="phone"

@@ -10,7 +10,6 @@ function RoomCategoriesPage() {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, []);
 
-  console.log("categoryId :  ", categoryId);
   const {
     data: roomDetails,
     loading,
@@ -24,7 +23,6 @@ function RoomCategoriesPage() {
     );
   if (!roomDetails) return null;
 
-  console.log(roomDetails);
   const title =
     roomDetails.length > 0 ? roomDetails[0].category : "NO ROOM AVAILABLE";
   return (

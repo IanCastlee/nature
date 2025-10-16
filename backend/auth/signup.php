@@ -11,7 +11,8 @@ if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !
 }
 
 if ($method === 'POST') {
-    $fullname = trim($_POST['fullname'] ?? '');
+    $firstname = trim($_POST['firstname'] ?? '');
+    $lastname = trim($_POST['lastname'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
     $address = trim($_POST['address'] ?? '');
     $email = trim($_POST['email'] ?? '');
@@ -19,7 +20,7 @@ if ($method === 'POST') {
     $action = $_POST['action'] ?? '';
 
     // Basic validation
-    if (empty($fullname) || empty($phone) || empty($address) || empty($email) || empty($password)) {
+    if (empty($firstname) || empty($lastname) || empty($phone) || empty($address) || empty($email) || empty($password)) {
         echo json_encode(["success" => false, "message" => "All fields are required."]);
         exit;
     }
@@ -57,8 +58,8 @@ if ($method === 'POST') {
     $verification_token = bin2hex(random_bytes(16));
 
     // Insert into database with email_verified = 0 and token
-    $stmt = $conn->prepare("INSERT INTO users (fullname, phone, address, email, password, email_verified, verification_token, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 0, ?, NOW(), NOW())");
-    $stmt->bind_param("ssssss", $fullname, $phone, $address, $email, $hashedPassword, $verification_token);
+    $stmt = $conn->prepare("INSERT INTO users (firstname, lastname, phone, address, email, password, email_verified, verification_token, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, 0, ?, NOW(), NOW())");
+    $stmt->bind_param("sssssss", $firstname, $lastname, $phone, $address, $email, $hashedPassword, $verification_token);
 
     if ($stmt->execute()) {
         // Optionally, you can send verification email here with the token

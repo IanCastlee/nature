@@ -29,6 +29,7 @@ import AvailableCottage from "./admin_components/admin_pages/AvailableCottage";
 import NotAvailableCottage from "./admin_components/admin_pages/NotAvailableCottage";
 import ViewFunctionHallPage from "./components/pages/ViewFunctionHallPage";
 import BookingPage from "./components/pages/BookingPage";
+import MyBookingPage from "./components/pages/MyBookingPage";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -43,9 +44,11 @@ const UserLayout = () => {
     location.pathname.startsWith(path)
   );
 
+  const isHome = location.pathname === "/";
+
   return (
     <>
-      {!shouldHideLayout && <Header />}
+      {!shouldHideLayout && <Header isHome={isHome} />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
@@ -55,6 +58,7 @@ const UserLayout = () => {
         />
         <Route path="/room-deatails/:roomId" element={<ViewRoomPage />} />
         <Route path="/booking/:roomId" element={<BookingPage />} />
+        <Route path="/my-booking/:userId" element={<MyBookingPage />} />
         <Route
           path="/funtionhall-deatails/:fhId"
           element={<ViewFunctionHallPage />}

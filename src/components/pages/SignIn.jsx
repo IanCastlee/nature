@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import useFormSubmit from "../../hooks/useFormSubmit";
 import Toaster from "../molecules/Toaster";
-import useAuthStore from "../../store/authStore"; // ✅ Zustand store
+import useAuthStore from "../../store/authStore";
 
 function SignIn() {
   const navigate = useNavigate();
@@ -24,19 +24,16 @@ function SignIn() {
     loading,
     error: formError,
   } = useFormSubmit("/auth/signin.php", (response) => {
-    const { setToken, setUser } = useAuthStore.getState(); // ✅ Zustand functions
-
+    const { setToken, setUser } = useAuthStore.getState();
     if (response?.success) {
       setToast({
         message: response.message || "Login successful!",
         type: "success",
       });
 
-      console.log("✅ Login Response:", response);
-
       if (response.token) {
-        setToken(response.token); // ✅ Save to Zustand
-        setUser(response.user); // ✅ Save user info
+        setToken(response.token);
+        setUser(response.user);
       }
 
       // Redirect after 2s

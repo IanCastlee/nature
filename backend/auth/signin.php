@@ -55,7 +55,7 @@ if (empty($email) || empty($password)) {
 }
 
 // Query user
-$stmt = $conn->prepare("SELECT user_id, fullname, email, password FROM users WHERE email = ?");
+$stmt = $conn->prepare("SELECT user_id, firstname, lastname, email, password FROM users WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -83,7 +83,7 @@ if (!password_verify($password, $user['password'])) {
 
 // JWT Configuration
 $issuedAt = time();
-$expirationTime = $issuedAt + 3600; // 1 hour expiry
+$expirationTime = $issuedAt + 3600; 
 
 $payload = [
     "iat" => $issuedAt,
@@ -101,7 +101,8 @@ echo json_encode([
     "message" => "Login successful",
     "user" => [
         "id" => $user['user_id'],
-        "fullname" => $user['fullname'],
+        "firstname" => $user['firstname'],
+        "lastname" => $user['lastname'],
         "email" => $user['email'],
     ],
     "token" => $jwt

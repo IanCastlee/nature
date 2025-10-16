@@ -5,8 +5,9 @@ import { icons } from "../../constant/icon";
 import useThemeStore from "../../store/themeStore";
 import { dummyRooms } from "../../constant/mockData";
 import useAuthStore from "../../store/authStore";
+import Button from "../atoms/Button";
 
-function Header() {
+function Header({ isHome }) {
   const { user } = useAuthStore();
 
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ function Header() {
   const [mobileOfferOpen, setMobileOfferOpen] = useState(false);
   const [mobileRoomsOpen, setMobileRoomsOpen] = useState(false);
   const { darkMode, toggleDarkMode } = useThemeStore();
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,11 +30,13 @@ function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full h-[60px] z-50 flex items-center px-4 md:px-10 transition-colors duration-300 ${
+      className={` fixed top-0 left-0 w-full h-[70px] z-50 flex items-center px-4 md:px-10 transition-colors duration-300 ${
         scrolled
           ? "bg-white shadow-md dark:bg-black"
-          : mobileMenuOpen && "dark:bg-black bg-white lg:bg-transparent"
-      }`}
+          : isHome
+          ? "bg-transparent"
+          : "bg-white dark:bg-black"
+      } ${mobileMenuOpen ? "bg-white dark:bg-black" : ""}`}
     >
       <div className="w-full h-full flex justify-between items-center relative">
         {/* Logo */}
@@ -42,8 +46,8 @@ function Header() {
             src={images.logo}
             alt="Logo"
             className={`transition-all duration-300 ${
-              scrolled ? "h-[55px]" : "h-[150px]"
-            } cursor-pointer absolute top-2 left-0 `}
+              scrolled ? "h-[55px]" : isHome ? "h-[150px]" : "h-[55px]"
+            } cursor-pointer absolute top-2 left-0`}
           />
         )}
 
@@ -64,12 +68,12 @@ function Header() {
                 <Link
                   to={`/${item === "Home" ? "" : item.toLowerCase()}`}
                   className={`text-sm transition-colors duration-300 group-hover:text-blue-400
-                    before:content-[''] before:absolute before:bottom-0 before:left-1/2 
-                    before:translate-x-[-50%] before:h-[2px] before:w-0 
-                    before:bg-blue-400 before:transition-all before:duration-300 
-                    group-hover:before:w-full ${
-                      scrolled ? "text-black dark:text-white" : "text-white"
-                    }`}
+            before:content-[''] before:absolute before:bottom-0 before:left-1/2 
+            before:translate-x-[-50%] before:h-[2px] before:w-0 
+            before:bg-blue-400 before:transition-all before:duration-300 
+            group-hover:before:w-full ${
+              !scrolled && isHome ? "text-white" : "text-black dark:text-white"
+            }`}
                 >
                   {item}
                 </Link>
@@ -80,19 +84,19 @@ function Header() {
             <li className="relative group cursor-pointer">
               <span
                 className={`text-sm transition-colors duration-300 group-hover:text-blue-400
-                  before:content-[''] before:absolute before:bottom-0 before:left-1/2 
-                  before:translate-x-[-50%] before:h-[2px] before:w-0 
-                  before:bg-blue-400 before:transition-all before:duration-300 
-                  group-hover:before:w-full ${
-                    scrolled ? "text-black dark:text-white" : "text-white"
-                  }`}
+          before:content-[''] before:absolute before:bottom-0 before:left-1/2 
+          before:translate-x-[-50%] before:h-[2px] before:w-0 
+          before:bg-blue-400 before:transition-all before:duration-300 
+          group-hover:before:w-full ${
+            !scrolled && isHome ? "text-white" : "text-black dark:text-white"
+          }`}
               >
                 Offer
               </span>
 
               <ul
                 className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg opacity-0 invisible 
-                group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out z-50"
+        group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out z-50"
               >
                 <li className="relative group/submenu cursor-pointer">
                   <span className="block px-4 py-2 hover:bg-gray-100 text-sm">
@@ -101,7 +105,7 @@ function Header() {
 
                   <ul
                     className="absolute right-full top-0 mt-8 mr-1 w-64 bg-white shadow-lg opacity-0 invisible 
-                    group-hover/submenu:opacity-100 group-hover/submenu:visible transition-all duration-300 ease-in-out z-50"
+            group-hover/submenu:opacity-100 group-hover/submenu:visible transition-all duration-300 ease-in-out z-50"
                   >
                     {dummyRooms.map((item) => (
                       <li
@@ -109,7 +113,7 @@ function Header() {
                         onClick={() => navigate(`/room-category/${item.name}`)}
                         className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-xs"
                       >
-                        {item.name}
+                        {user.firstname.split(" ")[0]}
                       </li>
                     ))}
                   </ul>
@@ -139,11 +143,63 @@ function Header() {
               )}
             </button>
 
-            {/* Sign In */}
+            {/* Sign In / User Dropdown */}
             {user ? (
-              <span className="text-xs text-white">
-                Welcome, {user.fullname}
-              </span>
+              <div className="relative">
+                <div
+                  className="flex flex-row items-center gap-2 bg-blue-400 py-1 px-2 rounded-full cursor-pointer hover:scale-105 transition-transform"
+                  onClick={() => setShowDropdown((prev) => !prev)}
+                >
+                  <icons.FaUserCircle size={28} className="text-white" />
+                  <span className="text-xs text-white font-medium">
+                    {user.firstname.split(" ")[0]}
+                  </span>
+
+                  <icons.MdOutlineArrowDropDownCircle
+                    size={18}
+                    className={`${
+                      showDropdown ? "rotate-180" : "rotate-0"
+                    } transition-transform text-gray-200`}
+                  />
+                </div>
+
+                {showDropdown && (
+                  <div className="absolute flex flex-col gap-1 top-full right-0 mt-5 w-64 bg-white dark:bg-gray-800 shadow-lg rounded-md p-4 z-50">
+                    <Button
+                      onClick={() => navigate(`/my-booking/${user.id}`)}
+                      style="w-full flex flex-row items-center gap-2 text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                      label={
+                        <>
+                          <icons.GoChecklist /> Booking
+                        </>
+                      }
+                    />
+
+                    <Button
+                      style="w-full flex flex-row items-center gap-2 text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                      label={
+                        <>
+                          <icons.IoSettingsOutline /> Setting
+                        </>
+                      }
+                    />
+
+                    <Button
+                      onClick={() => {
+                        useAuthStore.getState().logout();
+                        navigate("/signin");
+                      }}
+                      style="w-full flex flex-row  justify-center items-center px-4 py-2 text-sm text-white hover:bg-gray-500 dark:hover:bg-gray-700 bg-red-600 rounded-full text-center gap-2"
+                      label={
+                        <>
+                          Logout{" "}
+                          <icons.IoIosLogOut className="text-lg text-white" />
+                        </>
+                      }
+                    />
+                  </div>
+                )}
+              </div>
             ) : (
               <button
                 className="flex items-center gap-1 bg-blue-400 text-white font-semibold text-xs h-[30px] px-4 rounded-full transform transition duration-200 hover:scale-110"
@@ -151,26 +207,6 @@ function Header() {
               >
                 Sign In <icons.PiSignIn className="text-lg" />
               </button>
-            )}
-
-            {user && (
-              <li className="relative group cursor-pointer">
-                <button
-                  onClick={() => {
-                    useAuthStore.getState().logout();
-                    navigate("/signin");
-                  }}
-                  className={`flex items-center gap-1 text-sm transition-colors duration-300 group-hover:text-blue-400
-          before:content-[''] before:absolute before:bottom-0 before:left-1/2 
-          before:translate-x-[-50%] before:h-[2px] before:w-0 
-          before:bg-blue-400 before:transition-all before:duration-300 
-          group-hover:before:w-full ${
-            scrolled ? "text-black dark:text-white" : "text-white"
-          }`}
-                >
-                  Logout <icons.IoIosLogOut className="text-lg" />
-                </button>
-              </li>
             )}
           </ul>
         </nav>
