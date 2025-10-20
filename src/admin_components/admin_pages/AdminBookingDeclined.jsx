@@ -5,23 +5,14 @@ import useGetData from "../../hooks/useGetData";
 import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
-import { renderActionsFuntionHall } from "../admin_molecules/RenderActions";
-import useSetInactive from "../../hooks/useSetInactive";
-import DeleteModal from "../../components/molecules/DeleteModal";
-import { availableFHColumns } from "../../constant/tableColumns";
-import { useLocation } from "react-router-dom";
+import { renderActionsBookingHistory } from "../admin_molecules/RenderActions";
+import { booking } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 
-function NotAvailableFunctionHall() {
+function AdminBookingDeclined() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
-  const location = useLocation();
-  const isNotAvailablePage = location.pathname.includes(
-    "not-available-function-hall"
-  );
-
-  const [deleteItem, setDeleteItem] = useState(null);
   const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,9 +23,9 @@ function NotAvailableFunctionHall() {
   //  DATA FETCH  //
   //==============//
 
-  // fetch room data
+  // fetch booking data
   const { data, loading, refetch, error } = useGetData(
-    `/admin/functionhall.php?status=inactive`
+    `/booking/get-booking.php?status=declined`
   );
 
   //handlePageChange
@@ -52,11 +43,15 @@ function NotAvailableFunctionHall() {
       if (!searchTerm) return true;
 
       const search = searchTerm.toLowerCase();
+
       return (
-        item?.name?.toLowerCase().includes(search) ||
-        item?.price?.toString().includes(search) ||
-        item?.capacity?.toString().includes(search) ||
-        item?.duration?.toString().includes(search)
+        (item?.firstname || "").toLowerCase().includes(search) ||
+        (item?.lastname || "").toLowerCase().includes(search) ||
+        (item?.room_name || "").toLowerCase().includes(search) ||
+        (item?.start_date || "").toLowerCase().includes(search) ||
+        (item?.end_date || "").toLowerCase().includes(search) ||
+        (item?.nights?.toString() || "").includes(search) ||
+        (item?.status || "").toLowerCase().includes(search)
       );
     }) || [];
 
@@ -64,20 +59,6 @@ function NotAvailableFunctionHall() {
   const indexOfFirstData = indexOfLastData - itemsPerPage;
   const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-  //============================//
-  //   HANDLE DELETE/INACTIVE //
-  //=========================//
-
-  //room
-  const {
-    setInactive,
-    loading: inactiveLoading,
-    error: inactiveError,
-  } = useSetInactive("/admin/functionhall.php", () => {
-    refetch();
-    setDeleteItem(null);
-  });
 
   //=====================//
   //  view room details  //
@@ -91,7 +72,7 @@ function NotAvailableFunctionHall() {
     <>
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
-          Not Active Function Hall
+          Declined Booking
         </h1>
 
         {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
@@ -103,8 +84,7 @@ function NotAvailableFunctionHall() {
 
         <div className="w-full flex flex-row justify-between items-center mb-2">
           <span className="dark:text-gray-100 text-xs font-medium">
-            Showing {filteredData.length} function hall
-            {filteredData.length > 0 ? "s" : ""}
+            Showing {filteredData.length} Booking
           </span>
 
           <div className="flex flex-row items-center gap-2">
@@ -119,17 +99,14 @@ function NotAvailableFunctionHall() {
 
         <div className="overflow-x-auto">
           <GenericTable
-            columns={availableFHColumns}
+            columns={booking}
             data={currentData}
             loading={loading}
             noDataComponent={<NoData />}
             renderActions={(item) => {
-              return renderActionsFuntionHall({
+              return renderActionsBookingHistory({
                 item,
-                showForm,
-                isNotAvailablePage,
-                onSetInactive: (item) => setDeleteItem(item),
-                onSetViewFHDetails: (item) => viewFHDetails(item),
+                setShowForm,
               });
             }}
           />
@@ -144,27 +121,9 @@ function NotAvailableFunctionHall() {
         )}
       </div>
 
-      {deleteItem?.fh_id && (
-        <DeleteModal
-          item={deleteItem}
-          name={deleteItem?.name}
-          loading={inactiveLoading}
-          onCancel={() => setDeleteItem(null)}
-          label={isNotAvailablePage ? "Yes, Set as available" : ""}
-          label2="active"
-          label3="This will set the data to available."
-          onConfirm={() => {
-            setInactive({
-              id: deleteItem?.fh_id,
-              action: isNotAvailablePage ? "set_active" : "set_inactive",
-            });
-          }}
-        />
-      )}
-
       {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
     </>
   );
 }
 
-export default NotAvailableFunctionHall;
+export default AdminBookingDeclined;

@@ -15,8 +15,9 @@ function useFormSubmit(url, onSuccess) {
       if (res.data.success) {
         onSuccess?.(res.data);
       } else {
-        setError(res.data);
         console.log("⚠️ Form submission returned error state:", res.data);
+
+        setError(res.data);
       }
     } catch (err) {
       setError(err.message);

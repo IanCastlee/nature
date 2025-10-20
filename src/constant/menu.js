@@ -19,6 +19,7 @@ export const menuItems = [
         name: "Not Available Rooms",
         to: "/admin/not-available-room",
       },
+
       {
         name: "Room Categories",
         to: "/admin/room-categories",
@@ -58,19 +59,33 @@ export const menuItems = [
     icon: icons.GoChecklist,
     children: [
       {
-        name: "Booking",
-        to: "/admin/available-cottage",
+        name: "Pending Booking",
+        to: "/admin/booking",
       },
       {
-        name: "Booking History",
-        to: "/admin/not-available-cottage",
+        name: "Approved Booking",
+        to: "/admin/booking-history",
+      },
+      {
+        name: "Declined Booking",
+        to: "/admin/declined-booking",
       },
     ],
   },
+
   {
-    name: "Registered Users",
-    to: "/admin/users",
+    name: "Users",
     icon: icons.LuUsers,
+    children: [
+      {
+        name: "Verified Users",
+        to: "/admin/verified-users",
+      },
+      {
+        name: "Not-Verified Users",
+        to: "/admin/notverified-users",
+      },
+    ],
   },
   {
     name: "Analytics",

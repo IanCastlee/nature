@@ -22,9 +22,14 @@ function DeleteModal({
       >
         <div className="mt-8">
           <p className="text-center text-sm font-medium dark:text-white text-gray-800">
-            You are about to Set "<span className="text-green-500">{name}</span>
-            " as <span className="text-green-500 font-medium">{label2}</span>
+            {label && label !== "Yes, Approve"
+              ? "You are about to set"
+              : "Are you sure you want to set"}{" "}
+            <span className="text-green-500">{name}</span>
+            {label && label !== "Yes, Approve" ? " as" : "'s"}{" "}
+            <span className="text-green-500">{label2}</span>
           </p>
+
           <p className="text-center text-xs dark:text-gray-200 font-medium text-gray-600 mt-5">
             {label3}
           </p>
@@ -38,8 +43,10 @@ function DeleteModal({
           />
           <Button
             disabled={loading}
-            onClick={() => onConfirm()}
-            className="h-[28px] px-2 bg-red-500 text-xs text-white font-medium rounded-md w-auto hover:bg-gray-600"
+            onClick={onConfirm}
+            className={`h-[28px] px-2 ${
+              label === "Yes, Approve" ? "bg-green-600" : "bg-red-500"
+            } text-xs text-white font-medium rounded-md w-auto hover:bg-gray-600`}
             label={loading ? "Updating..." : label}
           />
         </div>

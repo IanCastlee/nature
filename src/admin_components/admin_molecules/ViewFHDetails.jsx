@@ -13,7 +13,10 @@ function ViewFHDetails({ fhId }) {
     error,
   } = useGetData(`/admin/functionhall.php?id=${fhId}`);
 
-  console.log("functionHallDetails : ", functionHallDetails);
+  console.log(
+    "functionHallDetails : ",
+    functionHallDetails ? functionHallDetails : {}
+  );
 
   if (loading) return <p className="text-center mt-10">Loading...</p>;
   if (error)

@@ -5,25 +5,22 @@ import useGetData from "../../hooks/useGetData";
 import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
-import { renderActions } from "../admin_molecules/RenderActions";
+import { renderActionsBooking } from "../admin_molecules/RenderActions";
 import useSetInactive from "../../hooks/useSetInactive";
 import DeleteModal from "../../components/molecules/DeleteModal";
-import ViewRoomDetails from "../admin_molecules/ViewRoomDetails";
-import { availableRoomColumns } from "../../constant/tableColumns";
-import { useLocation } from "react-router-dom";
-import Button from "../admin_atoms/Button";
+import { booking } from "../../constant/tableColumns";
+import ViewFHDetails from "../admin_molecules/ViewFHDetails";
+import ModalDeclinedForm from "../admin_molecules/ModalDeclinedForm";
 
-function NotAvailableRoomPage() {
+function AdminBookingPage() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
-  const [toggleRooms, setToggleRooms] = useState(true);
-
-  const location = useLocation();
-  const isNotAvailablePage = location.pathname.includes("not-available-room");
+  const [approveItem, setApproveItem] = useState(null);
+  const [declinedItem, setDeclinedItem] = useState(null);
 
   const [deleteItem, setDeleteItem] = useState(null);
-  const [viewRoomDetailsId, setViewRoomDetailsId] = useState(null);
+  const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,14 +30,10 @@ function NotAvailableRoomPage() {
   //  DATA FETCH  //
   //==============//
 
-  // fetch room data
+  // fetch booking data
   const { data, loading, refetch, error } = useGetData(
-    `/admin/room.php?status=${toggleRooms ? "inactive" : "under_maintenance"}`
+    `/booking/get-booking.php?status=pending`
   );
-
-  //================//
-  // HANDLE CHANGE //
-  //==============//
 
   //handlePageChange
   const handlePageChange = (pageNumber) => {
@@ -57,11 +50,15 @@ function NotAvailableRoomPage() {
       if (!searchTerm) return true;
 
       const search = searchTerm.toLowerCase();
+
       return (
-        item?.room_name?.toLowerCase().includes(search) ||
-        item?.price?.toString().includes(search) ||
-        item?.capacity?.toString().includes(search) ||
-        item?.duration?.toString().includes(search)
+        (item?.firstname || "").toLowerCase().includes(search) ||
+        (item?.lastname || "").toLowerCase().includes(search) ||
+        (item?.room_name || "").toLowerCase().includes(search) ||
+        (item?.start_date || "").toLowerCase().includes(search) ||
+        (item?.end_date || "").toLowerCase().includes(search) ||
+        (item?.nights?.toString() || "").includes(search) ||
+        (item?.status || "").toLowerCase().includes(search)
       );
     }) || [];
 
@@ -74,42 +71,41 @@ function NotAvailableRoomPage() {
   //   HANDLE DELETE/INACTIVE //
   //=========================//
 
-  //room
+  //set approved
   const {
     setInactive,
-    loading: inactiveLoading,
-    error: inactiveError,
-  } = useSetInactive("/admin/room.php", () => {
+    loading: approveLoading,
+    error: approveError,
+  } = useSetInactive("/booking/booking.php", () => {
     refetch();
-    setDeleteItem(null);
+    setApproveItem(null);
+  });
+
+  //set declined
+  const {
+    setInactive: setDeclined,
+    loading: declinedLoading,
+    error: decclinedError,
+  } = useSetInactive("/booking/booking.php", () => {
+    refetch();
+    setDeclinedItem(null);
   });
 
   //=====================//
   //  view room details  //
   //=====================//
-  const viewRoomDetails = (item) => {
-    setShowForm("view room");
-    setViewRoomDetailsId(item);
+  const viewFHDetails = (item) => {
+    setShowForm("view fh-hall");
+    setViewFHDetailsId(item);
   };
 
   return (
     <>
       <div className="scroll-smooth">
-        <div className="w-full flex flex-row items-center justify-between ">
-          <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
-            {toggleRooms
-              ? " Not Available Room(s)"
-              : "Under Maintenance Rooms(s)"}
-          </h1>
+        <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
+          Booking Record
+        </h1>
 
-          <Button
-            onClick={() => setToggleRooms(!toggleRooms)}
-            className="flex flex-row items-center h-[35px] bg-yellow-600 text-white text-xs font-medium px-2 rounded-md whitespace-nowrap"
-            label={
-              toggleRooms ? "Show Under Maintenance" : "Show All Not Active"
-            }
-          />
-        </div>
         {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
         {error && (
           <p className="text-red-500 text-sm mb-4">
@@ -119,8 +115,7 @@ function NotAvailableRoomPage() {
 
         <div className="w-full flex flex-row justify-between items-center mb-2">
           <span className="dark:text-gray-100 text-xs font-medium">
-            Showing {filteredData.length} room
-            {filteredData.length > 1 ? "s" : ""}
+            Showing {filteredData.length} Booking
           </span>
 
           <div className="flex flex-row items-center gap-2">
@@ -135,17 +130,16 @@ function NotAvailableRoomPage() {
 
         <div className="overflow-x-auto">
           <GenericTable
-            columns={availableRoomColumns}
+            columns={booking}
             data={currentData}
             loading={loading}
             noDataComponent={<NoData />}
             renderActions={(item) => {
-              return renderActions({
+              return renderActionsBooking({
                 item,
-                showForm,
-                isNotAvailablePage,
-                onSetInactive: (item) => setDeleteItem(item),
-                onSetViewRoomDetails: (item) => viewRoomDetails(item),
+                setShowForm,
+                onSetApprove: (item) => setApproveItem(item),
+                onSetDeClined: (item) => setDeclinedItem(item),
               });
             }}
           />
@@ -160,29 +154,46 @@ function NotAvailableRoomPage() {
         )}
       </div>
 
-      {deleteItem?.room_id && (
+      {approveItem?.booking_id && (
         <DeleteModal
-          item={deleteItem}
-          name={deleteItem?.room_name}
-          loading={inactiveLoading}
-          onCancel={() => setDeleteItem(null)}
-          label={isNotAvailablePage ? "Yes, Set as available" : ""}
-          label2="active"
-          label3="This will set the data to available."
+          item={approveItem}
+          name={approveItem?.firstname}
+          loading={approveLoading}
+          onCancel={() => setApproveItem(null)}
+          label="Yes, Approve"
+          label2="booking as approve"
+          label3="Are you sure you want to approve this booking?"
           onConfirm={() => {
             setInactive({
-              id: deleteItem?.room_id,
-              action: isNotAvailablePage ? "set_active" : "set_inactive",
+              id: approveItem?.booking_id,
+              action: "set_approve",
             });
           }}
         />
       )}
 
-      {showForm === "view room" && (
-        <ViewRoomDetails roomId={viewRoomDetailsId} />
+      {declinedItem?.booking_id && (
+        <ModalDeclinedForm
+          userId={declinedItem.user_id}
+          bookingId={declinedItem.booking_id}
+          onConfirm={(reason) => {
+            setDeclined({
+              id: declinedItem.booking_id,
+              action: "set_decline",
+              reason: reason,
+            });
+          }}
+          onClose={() => setDeclinedItem(null)}
+          onSuccess={() => {
+            setDeclinedItem(null);
+            refetch();
+          }}
+        />
       )}
+
+      {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
     </>
   );
 }
 
-export default NotAvailableRoomPage;
+export default AdminBookingPage;

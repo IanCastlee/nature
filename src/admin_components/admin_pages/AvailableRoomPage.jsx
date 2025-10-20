@@ -440,7 +440,7 @@ function AvailableRoomPage() {
 
           <div className="flex flex-row items-center gap-2">
             <SearchInput
-              placeholder="Search room"
+              placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               disabled={loading}

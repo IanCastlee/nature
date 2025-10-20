@@ -10,6 +10,7 @@ function RoomCategoriesPage() {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   }, []);
 
+  ///fetch room based on category
   const {
     data: roomDetails,
     loading,
@@ -26,7 +27,7 @@ function RoomCategoriesPage() {
   const title =
     roomDetails.length > 0 ? roomDetails[0].category : "NO ROOM AVAILABLE";
   return (
-    <main className="w-full min-h-screen dark:bg-black scroll-smooth pb-20">
+    <main className="w-full min-h-screen dark:bg-black scroll-smooth pb-20 mt-[50px]">
       <section className="w-full h-[270px] relative">
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -39,7 +40,7 @@ function RoomCategoriesPage() {
         </div>
 
         <div className="relative z-10 flex flex-col justify-center items-center h-full">
-          <h1 className="text-white text-3xl font-semibold text-center max-w-[550px] mt-[100px]">
+          <h1 className="text-white text-3xl mb-4 font-semibold text-center max-w-[550px] mt-[100px]">
             {title}
           </h1>
         </div>

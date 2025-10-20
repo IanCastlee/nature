@@ -30,6 +30,12 @@ import NotAvailableCottage from "./admin_components/admin_pages/NotAvailableCott
 import ViewFunctionHallPage from "./components/pages/ViewFunctionHallPage";
 import BookingPage from "./components/pages/BookingPage";
 import MyBookingPage from "./components/pages/MyBookingPage";
+import OtherFacilitiesBookingPage from "./components/pages/OtherFacilitiesBookingPage";
+import AdminBookingPage from "./admin_components/admin_pages/AdminBookingPage";
+import AdminBookingHistory from "./admin_components/admin_pages/AdminBookingHistory";
+import AdminBookingDeclined from "./admin_components/admin_pages/AdminBookingDeclined";
+import VerifiedUsers from "./admin_components/admin_pages/VerifiedUsers";
+import NotVerifiedUsers from "./admin_components/admin_pages/NotVerifiedUsers";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -39,6 +45,7 @@ const UserLayout = () => {
     "/signin",
     "/room-deatails",
     "/booking",
+    "/other-facilities-booking",
   ];
   const shouldHideLayout = hideLayoutPaths.some((path) =>
     location.pathname.startsWith(path)
@@ -58,6 +65,10 @@ const UserLayout = () => {
         />
         <Route path="/room-deatails/:roomId" element={<ViewRoomPage />} />
         <Route path="/booking/:roomId" element={<BookingPage />} />
+        <Route
+          path="/other-facilities-booking/:facilityId"
+          element={<OtherFacilitiesBookingPage />}
+        />
         <Route path="/my-booking/:userId" element={<MyBookingPage />} />
         <Route
           path="/funtionhall-deatails/:fhId"
@@ -94,6 +105,7 @@ const AdminLayout = () => {
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/available-room" element={<AvailableRoomPage />} />
+
           <Route
             path="/not-available-room"
             element={<NotAvailableRoomPage />}
@@ -119,6 +131,13 @@ const AdminLayout = () => {
             path="/not-available-cottage"
             element={<NotAvailableCottage />}
           />
+
+          <Route path="/booking" element={<AdminBookingPage />} />
+          <Route path="/booking-history" element={<AdminBookingHistory />} />
+          <Route path="/declined-booking" element={<AdminBookingDeclined />} />
+
+          <Route path="/verified-users" element={<VerifiedUsers />} />
+          <Route path="/notverified-users" element={<NotVerifiedUsers />} />
         </Routes>
       </main>
     </div>

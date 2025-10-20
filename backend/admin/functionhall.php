@@ -1,24 +1,33 @@
 <?php
+header('Content-Type: application/json');
+
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 include("../header.php");
 include("../dbConn.php");
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Accept raw JSON if sent
-if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
+// Accept raw JSON body for POST if sent
+if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"] ?? '', "application/json") !== false) {
     $input = json_decode(file_get_contents("php://input"), true);
-    $_POST = $input;
+    if (is_array($input)) {
+        $_POST = $input;
+    }
 }
 
+// ================================
+// Handle GET requests
+// ================================
 if ($method === "GET") {
-    $status = $_GET['status'] ?? 'active';
-    $getId = $_GET['id'] ?? null;
+    $status = $_GET['status'] ?? null;
+    $getId = isset($_GET['id']) ? intval($_GET['id']) : null;
 
-
-    if($getId){
- // Prepare and execute query
-    $stmt = $conn->prepare("SELECT * FROM function_hall WHERE fh_id  = ? ");
-     $stmt->bind_param("i", $getId);
+    // 1. Get a function hall by ID
+    if ($getId) {
+        $stmt = $conn->prepare("SELECT * FROM function_hall WHERE fh_id = ?");
+        $stmt->bind_param("i", $getId);
         $stmt->execute();
         $result = $stmt->get_result();
         $room = $result->fetch_assoc();
@@ -34,37 +43,38 @@ if ($method === "GET") {
                 "message" => "Room not found."
             ]);
         }
-    }else{
-         $stmt = $conn->prepare("SELECT * FROM function_hall WHERE status = 'active'");
-  
-    $stmt->execute();
+        exit;
+    }
 
-    $result = $stmt->get_result();
-    $data = $result->fetch_all(MYSQLI_ASSOC);
+    // 2. Get all active or inactive function halls
+    if ($status === 'active' || $status === 'inactive') {
+        $stmt = $conn->prepare("SELECT * FROM function_hall WHERE status = ?");
+        $stmt->bind_param("s", $status);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_all(MYSQLI_ASSOC);
 
+        echo json_encode([
+            "success" => true,
+            "data" => $data
+        ]);
+        exit;
+    }
+
+    // 3. Invalid GET request
     echo json_encode([
-        "success" => true,
-        "data" => $data
+        "success" => false,
+        "message" => "Invalid GET request. Provide 'id' or valid 'status'."
     ]);
     exit;
-    }
-    // Validate status input
-    // if (!in_array($status, ['active', 'inactive'])) {
-    //     echo json_encode([
-    //         "success" => false,
-    //         "message" => "Invalid status value"
-    //     ]);
-    //     http_response_code(400);
-    //     exit;
-    // }
-
-   
 }
 
+// ================================
+// Handle POST requests
+// ================================
 if ($method === "POST") {
-    $action = $_POST['action'] ?? 'create';
-  
-    $id = $_POST['id'] ?? '';
+    $action = $_POST['action'] ?? '';
+    $id = $_POST['id'] ?? null;
     $name = $_POST['name'] ?? '';
     $price = $_POST['price'] ?? '';
     $capacity = $_POST['capacity'] ?? '';
@@ -76,7 +86,7 @@ if ($method === "POST") {
     $filename = null;
     $filename_PS = null;
 
-    // Handle image upload if present
+    // Handle image upload
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $filename = uniqid() . "_" . basename($_FILES['image']['name']);
         $targetFile = $uploadDir . $filename;
@@ -94,7 +104,7 @@ if ($method === "POST") {
         }
     }
 
-        // Handle photo  sphere upload if present
+    // Handle photo sphere upload
     if (isset($_FILES['photo_sphere']) && $_FILES['photo_sphere']['error'] === UPLOAD_ERR_OK) {
         $filename_PS = uniqid() . "_" . basename($_FILES['photo_sphere']['name']);
         $targetFile = $uploadDir_PS . $filename_PS;
@@ -112,15 +122,12 @@ if ($method === "POST") {
         }
     }
 
-
-    // ================================
-    // 1. CREATE NEW ROOM
-    // ================================
+    // 1. CREATE new room
     if ($action === "create") {
-        if (!$name  || !$price || !$capacity || !$duration || !$description) {
+        if (!$name || !$price || !$capacity || !$duration || !$description) {
             echo json_encode([
                 "success" => false,
-                "message" => "All fields are requxxxxired."
+                "message" => "All fields are required."
             ]);
             exit;
         }
@@ -143,22 +150,20 @@ if ($method === "POST") {
         exit;
     }
 
-    // ================================
-    // 2. UPDATE ROOM   
-    // ================================
+    // 2. UPDATE room
     if ($action === "update" && $id) {
         if ($filename && $filename_PS) {
             $stmt = $conn->prepare("UPDATE function_hall SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, image = ?, photosphere = ? WHERE fh_id = ?");
-            $stmt->bind_param("sdiisssi", $name, $price, $capacity, $duration,$description, $filename, $filename_PS, $id);
-        }elseif($filename){
-             $stmt = $conn->prepare("UPDATE function_hall SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, image = ? WHERE fh_id = ?");
-            $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration,$description, $filename, $id);
-        }elseif($filename_PS){
-             $stmt = $conn->prepare("UPDATE function_hall SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, photosphere = ? WHERE fh_id = ?");
-            $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration,$description, $filename_PS, $id);
-        }else {
-             $stmt = $conn->prepare("UPDATE function_hall SET name = ?, price = ?, capacity = ?, duration = ?, description= ? WHERE fh_id = ?");
-            $stmt->bind_param("sdiisi", $name, $price, $capacity, $duration,$description, $id);
+            $stmt->bind_param("sdiisssi", $name, $price, $capacity, $duration, $description, $filename, $filename_PS, $id);
+        } elseif ($filename) {
+            $stmt = $conn->prepare("UPDATE function_hall SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, image = ? WHERE fh_id = ?");
+            $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration, $description, $filename, $id);
+        } elseif ($filename_PS) {
+            $stmt = $conn->prepare("UPDATE function_hall SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, photosphere = ? WHERE fh_id = ?");
+            $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration, $description, $filename_PS, $id);
+        } else {
+            $stmt = $conn->prepare("UPDATE function_hall SET name = ?, price = ?, capacity = ?, duration = ?, description= ? WHERE fh_id = ?");
+            $stmt->bind_param("sdiisi", $name, $price, $capacity, $duration, $description, $id);
         }
 
         if ($stmt->execute()) {
@@ -175,9 +180,7 @@ if ($method === "POST") {
         exit;
     }
 
-    // ================================
-    // 3. SET ROOM INACTIVE
-    // ================================
+    // 3. SET to inactive
     if ($action === "set_inactive" && $id) {
         $stmt = $conn->prepare("UPDATE function_hall SET status = 'inactive' WHERE fh_id = ?");
         $stmt->bind_param("i", $id);
@@ -190,16 +193,13 @@ if ($method === "POST") {
         } else {
             echo json_encode([
                 "success" => false,
-                "message" => " Database error: " . $stmt->error
+                "message" => "Database error: " . $stmt->error
             ]);
         }
         exit;
     }
 
-    
-    // ================================
-    // 3. SET ROOM INACTIVE
-    // ================================
+    // 4. SET to active
     if ($action === "set_active" && $id) {
         $stmt = $conn->prepare("UPDATE function_hall SET status = 'active' WHERE fh_id = ?");
         $stmt->bind_param("i", $id);
@@ -212,18 +212,25 @@ if ($method === "POST") {
         } else {
             echo json_encode([
                 "success" => false,
-                "message" => " Database error: " . $stmt->error
+                "message" => "Database error: " . $stmt->error
             ]);
         }
         exit;
     }
 
-    // ================================
-    // 4. INVALID ACTION
-    // ================================
+    // 5. Invalid POST action
     echo json_encode([
         "success" => false,
         "message" => "❌ Invalid action or missing required data."
     ]);
     exit;
 }
+
+// ================================
+// Unsupported HTTP Method
+// ================================
+echo json_encode([
+    "success" => false,
+    "message" => "Unsupported request method."
+]);
+exit;

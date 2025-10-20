@@ -39,10 +39,6 @@ function CattageCard({ item }) {
           <icons.IoIosTimer />
           {item.duration}
         </span>
-        <Button
-          style=" bg-green-600 text-xs text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105 w-fit py-1"
-          label="Reserve Now"
-        />
       </motion.div>
 
       <button

@@ -84,7 +84,7 @@ if ($method === "GET") {
 }
 elseif ($categoryId) {
         // Fetch rooms filtered by category
-        $stmt = $conn->prepare("SELECT * FROM rooms WHERE category_id = ? AND status = 'active'");
+        $stmt = $conn->prepare("SELECT r.*, rc.category_id, rc.category FROM rooms AS r JOIN room_categories AS rc ON r.category_id = rc.category_id WHERE r.category_id = ? AND r.status != 'inactive' ");
         $stmt->bind_param("i", $categoryId);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -99,7 +99,7 @@ exit;
 
     } else {
 
-           if($status === "active"){
+        if($status === "active"){
  // Fetch all active rooms
         $stmt = $conn->prepare("SELECT * FROM rooms WHERE status = 'active'");
         $stmt->execute();
@@ -127,7 +127,21 @@ exit;
         }
        
     }
-}
+    if($status === "under_maintenance"){
+ // Fetch all under maintenance rooms
+        $stmt = $conn->prepare("SELECT * FROM rooms WHERE status = 'under maintenance'");
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_all(MYSQLI_ASSOC);
+
+        echo json_encode([
+            "success" => true,
+            "data" => $data
+        ]);
+        exit;
+        }
+       
+    }
 
 if ($method === "POST") {
     $action = $_POST['action'] ?? 'create';

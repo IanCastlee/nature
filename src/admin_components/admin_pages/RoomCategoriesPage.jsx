@@ -13,6 +13,8 @@ import { useForm } from "../../store/useRoomStore";
 import NoData from "../../components/molecules/NoData";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import useSetInactive from "../../hooks/useSetInactive";
+import { roomCategories } from "../../constant/tableColumns";
+import GenericTable from "../admin_molecules/GenericTable";
 
 function RoomCategoriesPage() {
   const showRoomCategoryForm = useForm((state) => state.showForm);
@@ -114,7 +116,7 @@ function RoomCategoriesPage() {
 
           <div className="flex flex-row items-center gap-2">
             <SearchInput
-              placeholder="Search room"
+              placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               disabled={loading}
@@ -151,12 +153,20 @@ function RoomCategoriesPage() {
             <tbody>
               {!loading && currentData.length > 0 ? (
                 currentData.map((item) => (
-                  <TableRow
-                    key={item.category_id}
-                    item={item}
-                    isHidden="hidden"
-                    onEdit={handleEdit}
-                    onSetInactive={() => setDeleteItem(item)}
+                  <GenericTable
+                    columns={roomCategories}
+                    data={currentData}
+                    loading={loading}
+                    noDataComponent={<NoData />}
+                    renderActions={(item) => {
+                      return renderActions({
+                        item,
+                        showForm,
+                        isNotAvailablePage,
+                        onSetInactive: (item) => setDeleteItem(item),
+                        onSetViewRoomDetails: (item) => viewRoomDetails(item),
+                      });
+                    }}
                   />
                 ))
               ) : !loading && currentData.length === 0 ? (

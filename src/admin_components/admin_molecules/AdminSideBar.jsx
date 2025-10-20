@@ -4,7 +4,7 @@ import { icons } from "../../constant/icon";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import useThemeStore from "../../store/themeStore";
 import { menuItems } from "../../constant/menu";
-
+import { images } from "../../constant/image";
 function AdminSideBar({ isCollapsed, toggleCollapse }) {
   const { darkMode, toggleDarkMode } = useThemeStore();
   const [openDropdowns, setOpenDropdowns] = useState({});
@@ -52,26 +52,37 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
         </button>
         <button
           onClick={toggleCollapse}
-          className="text-white p-1 hover:bg-gray-700 rounded self-end"
+          className="text-white p-1 dark:hover:bg-gray-700 hover:bg-gray-200 rounded self-end"
           aria-label="Toggle Sidebar"
         >
           {isCollapsed ? (
-            <FiChevronRight size={20} />
+            <FiChevronRight
+              size={20}
+              className="dark:text-white text-gray-700"
+            />
           ) : (
-            <FiChevronLeft size={20} />
+            <FiChevronLeft
+              size={20}
+              className="dark:text-white text-gray-700"
+            />
           )}
         </button>
       </div>
 
       {/* Logo */}
       <div className="w-full flex flex-row justify-center mb-4">
-        <h3 className="text-lg font-medium dark:text-gray-100 text-gray-800 ">
-          <span className="text-blue-400 font-semibold">NATURE</span> HOT SPRING
-        </h3>
+        {!isCollapsed ? (
+          <h3 className="text-lg font-medium dark:text-gray-100 text-gray-800 ">
+            <span className="text-blue-400 font-semibold">NATURE</span> HOT
+            SPRING
+          </h3>
+        ) : (
+          <img src={images.logo} alt="logo" />
+        )}
       </div>
 
       {/* Menu items */}
-      <ul className="flex flex-col gap-4 p-2">
+      <ul className={`flex flex-col gap-4 p-2 hover:${toggleCollapse}`}>
         {menuItems.map((item) => {
           const hasChildren =
             Array.isArray(item.children) && item.children.length > 0;

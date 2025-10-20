@@ -45,14 +45,62 @@ function BookingPage() {
 
   useEffect(() => {
     if (notAvailableDates && notAvailableDates.booked_dates) {
-      const bookedRanges = notAvailableDates.booked_dates.map(
-        ({ start, end }) => ({
-          from: new Date(start),
-          to: new Date(end),
-        })
-      );
-      // Combine with disabling past dates
-      setDisabledRanges([{ before: new Date() }, ...bookedRanges]);
+      const normalizeDate = (d) => {
+        const nd = new Date(d);
+        nd.setHours(0, 0, 0, 0);
+        return nd;
+      };
+
+      const today = normalizeDate(new Date());
+      let disabledDates = [];
+
+      // 1. Expand all booked ranges into flat disabled days
+      notAvailableDates.booked_dates.forEach(({ start, end }) => {
+        const from = normalizeDate(start);
+        const to = normalizeDate(end);
+
+        for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+          disabledDates.push(normalizeDate(d));
+        }
+      });
+
+      // 2. Sort and store as Set
+      disabledDates.sort((a, b) => a - b);
+      let disabledSet = new Set(disabledDates.map((d) => d.getTime()));
+      const extendedDisabled = [...disabledDates];
+
+      // 3. Add all 1-day gaps
+      for (let i = 1; i < disabledDates.length; i++) {
+        const prev = disabledDates[i - 1];
+        const curr = disabledDates[i];
+        const diff = (curr - prev) / (1000 * 60 * 60 * 24);
+
+        if (diff === 2) {
+          const middle = new Date(prev);
+          middle.setDate(middle.getDate() + 1);
+          const normalizedMiddle = normalizeDate(middle);
+
+          if (!disabledSet.has(normalizedMiddle.getTime())) {
+            extendedDisabled.push(normalizedMiddle);
+            disabledSet.add(normalizedMiddle.getTime());
+          }
+        }
+      }
+
+      // ✅ 4. Always disable today
+      if (!disabledSet.has(today.getTime())) {
+        extendedDisabled.push(today);
+        disabledSet.add(today.getTime());
+      }
+
+      // 5. Remove duplicates
+      const finalDisabled = Array.from(
+        new Set(extendedDisabled.map((d) => d.getTime()))
+      ).map((t) => new Date(t));
+
+      // 6. Add dates before today
+      const pastDates = { before: today }; // disables all dates before today
+      setDisabledRanges([pastDates, ...finalDisabled]);
     }
   }, [notAvailableDates]);
 
@@ -86,8 +134,13 @@ function BookingPage() {
     const payload = {
       userId: user.id,
       facility_id: Number(roomId),
-      check_in: selectedRange.from?.toISOString() || null,
-      check_out: selectedRange.to?.toISOString() || null,
+      check_in: selectedRange.from
+        ? selectedRange.from.toLocaleDateString("en-CA")
+        : null,
+      check_out: selectedRange.to
+        ? selectedRange.to.toLocaleDateString("en-CA")
+        : null,
+
       nights,
       extras: addedExtras.map((extra) => ({
         id: extra.id,
@@ -137,11 +190,49 @@ function BookingPage() {
     return daysDiff;
   };
 
+  //fetch room details
   const {
     data: roomDetails,
     loading,
     error,
   } = useGetData(`/admin/room.php?id=${roomId}`);
+
+  ///fetch room based on category
+  const { data: dataCategoryIds } = useGetData(
+    `/admin/room.php?categoryId=${roomDetails?.category_id}`
+  );
+
+  //handleNextRoom
+  const handleNextRoom = () => {
+    if (!dataCategoryIds || dataCategoryIds.length === 0) return;
+
+    const currentIndex = dataCategoryIds.findIndex(
+      (room) => String(room.room_id) === roomId
+    );
+
+    if (currentIndex === -1) return;
+
+    const nextIndex = (currentIndex + 1) % dataCategoryIds.length;
+    const nextRoomId = dataCategoryIds[nextIndex].room_id;
+
+    navigate(`/booking/${nextRoomId}`);
+  };
+  //handle PreviousRoom
+  const handlePreviousRoom = () => {
+    if (!dataCategoryIds || dataCategoryIds.length === 0) return;
+
+    const currentIndex = dataCategoryIds.findIndex(
+      (room) => String(room.room_id) === roomId
+    );
+
+    if (currentIndex === -1) return;
+
+    const prevIndex =
+      (currentIndex - 1 + dataCategoryIds.length) % dataCategoryIds.length;
+    const prevRoomId = dataCategoryIds[prevIndex].room_id;
+
+    navigate(`/booking/${prevRoomId}`);
+  };
 
   const {
     data: extrasData,
@@ -181,7 +272,7 @@ function BookingPage() {
   const grandTotal = roomTotal + extrasTotal;
 
   const isSubmitDisabled =
-    formLoading || !selectedRange.from || !selectedRange.to;
+    formLoading || !selectedRange.from || !selectedRange.to || nights === 0;
 
   return (
     <>
@@ -206,15 +297,29 @@ function BookingPage() {
               <h2 className="font-semibold text-sm dark:text-gray-200 text-gray-800">
                 Room Details
               </h2>
-              <Button
-                label={
-                  <>
-                    Next Room
-                    <icons.FiArrowUpRight />
-                  </>
-                }
-                style="flex flex-row items-center gap-1 text-sm text-blue-500 font-medium rounded-sm px-2 transition-all duration-300 transform hover:scale-105 mb-4"
-              />
+
+              <div className="flex flex-row items-center gap-10">
+                <Button
+                  onClick={handlePreviousRoom}
+                  label={
+                    <>
+                      <icons.BsArrowRight className="transform -scale-x-100" />
+                      Previous Room
+                    </>
+                  }
+                  style="flex flex-row items-center gap-1 text-sm text-blue-500 font-medium rounded-sm px-2 transition-all duration-300 transform hover:scale-105 mb-4"
+                />
+                <Button
+                  onClick={handleNextRoom}
+                  label={
+                    <>
+                      Next Room
+                      <icons.BsArrowRight />
+                    </>
+                  }
+                  style="flex flex-row items-center gap-1 text-sm text-blue-500 font-medium rounded-sm px-2 transition-all duration-300 transform hover:scale-105 mb-4"
+                />
+              </div>
             </div>
 
             <h1 className="text-3xl dark:text-white text-gray-800 font-semibold">

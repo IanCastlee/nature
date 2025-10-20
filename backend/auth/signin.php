@@ -55,7 +55,7 @@ if (empty($email) || empty($password)) {
 }
 
 // Query user
-$stmt = $conn->prepare("SELECT user_id, firstname, lastname, email, password FROM users WHERE email = ?");
+$stmt = $conn->prepare("SELECT user_id, firstname, lastname, email, password, acc_type FROM users WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -89,7 +89,8 @@ $payload = [
     "iat" => $issuedAt,
     "exp" => $expirationTime,
     "user_id" => $user['user_id'],
-    "email" => $user['email']
+    "email" => $user['email'],
+    "acc_type" => $user['acc_type'] 
 ];
 
 // Generate JWT
@@ -104,6 +105,7 @@ echo json_encode([
         "firstname" => $user['firstname'],
         "lastname" => $user['lastname'],
         "email" => $user['email'],
+        "acc_type" => $user['acc_type']
     ],
     "token" => $jwt
 ]);

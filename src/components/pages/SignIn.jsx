@@ -49,6 +49,8 @@ function SignIn() {
     }
   });
 
+  console.log("formError : ", formError);
+
   useEffect(() => {
     if (formError) {
       setToast({
@@ -177,7 +179,7 @@ function SignIn() {
 
         <icons.FiArrowLeftCircle
           className="text-2xl text-white cursor-pointer absolute top-8 left-8 z-20"
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
         />
       </main>
     </>

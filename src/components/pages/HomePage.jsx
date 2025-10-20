@@ -32,7 +32,7 @@ function HomePage() {
   //  DATA FETCH  //
   //==============//
 
-  // fetch room data
+  // fetch fh data
   const {
     data: dataFh,
     loading: loadingFh,
@@ -172,6 +172,55 @@ function HomePage() {
           </div>
         </section>
 
+        <section className="w-full flex flex-col dark:bg-black mt-24">
+          <div className="flex flex-col justify-center items-center">
+            <div className="flex flex-row justify-center items-center gap-2">
+              <SubtTitle title="OUR FUNCTION HALLS" />
+            </div>
+            <Title title="SPACIOUS AND STYLISH FUNCTION HALLS FOR YOU" />
+          </div>
+
+          <div className="w-full flex flex-row flex-wrap  px-2  md:px-2 lg:px-[130px] justify-center gap-2">
+            {loadingFh && (
+              <div className="text-sm text-blue-600 mt-4">
+                Loading function halls...
+              </div>
+            )}
+
+            {errorFh && (
+              <div className="text-sm text-red-500 mt-4">
+                {errorFh.message || "Something went wrong."}
+              </div>
+            )}
+            {dataFh &&
+              dataFh.slice(0, 2).map((item, index) => (
+                <Suspense
+                  key={index}
+                  fallback={
+                    <div className="fixed bottom-4 right-10 text-white">
+                      Loading...
+                    </div>
+                  }
+                >
+                  <FunctionHallCard item={item} key={index} index={index} />
+                </Suspense>
+              ))}
+          </div>
+          {dataFh?.length > 2 && (
+            <div className="px-2 lg:px-[130px] mt-4">
+              <ReadMoreButton
+                label={
+                  <>
+                    View More{" "}
+                    <icons.HiArrowSmallRight className="text-white inline" />
+                  </>
+                }
+                onClick={() => navigate("/cottages")}
+              />
+            </div>
+          )}
+        </section>
+
         <section className="w-full flex flex-col dark:bg-black mt-28">
           <div className="flex flex-col justify-center items-center">
             <div className="flex flex-row justify-center items-center gap-2">
@@ -205,44 +254,6 @@ function HomePage() {
               onClick={() => navigate("/cottages")}
             />
           </div>
-        </section>
-
-        <section className="w-full flex flex-col dark:bg-black mt-24">
-          <div className="flex flex-col justify-center items-center">
-            <div className="flex flex-row justify-center items-center gap-2">
-              <SubtTitle title="OUR FUNCTION HALLS" />
-            </div>
-            <Title title="SPACIOUS AND STYLISH FUNCTION HALLS FOR YOU" />
-          </div>
-
-          <div className="w-full flex flex-row flex-wrap  px-2  md:px-2 lg:px-[130px] justify-center gap-2">
-            {dataFh &&
-              dataFh.slice(0, 2).map((item, index) => (
-                <Suspense
-                  key={index}
-                  fallback={
-                    <div className="fixed bottom-4 right-10 text-white">
-                      Loading...
-                    </div>
-                  }
-                >
-                  <FunctionHallCard item={item} key={index} index={index} />
-                </Suspense>
-              ))}
-          </div>
-          {dataFh?.length > 2 && (
-            <div className="px-2 lg:px-[130px] mt-4">
-              <ReadMoreButton
-                label={
-                  <>
-                    View More{" "}
-                    <icons.HiArrowSmallRight className="text-white inline" />
-                  </>
-                }
-                onClick={() => navigate("/cottages")}
-              />
-            </div>
-          )}
         </section>
       </main>
 

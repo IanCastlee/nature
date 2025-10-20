@@ -113,7 +113,7 @@ function Header({ isHome }) {
                         onClick={() => navigate(`/room-category/${item.name}`)}
                         className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-xs"
                       >
-                        {user.firstname.split(" ")[0]}
+                        {user?.firstname.split(" ")[0]}
                       </li>
                     ))}
                   </ul>
@@ -133,15 +133,6 @@ function Header({ isHome }) {
                 </li>
               </ul>
             </li>
-
-            {/* Theme Toggle */}
-            <button onClick={toggleDarkMode}>
-              {darkMode ? (
-                <icons.IoSunnySharp className="text-yellow-500 text-lg" />
-              ) : (
-                <icons.IoMoonSharp className="text-gray-500 text-lg" />
-              )}
-            </button>
 
             {/* Sign In / User Dropdown */}
             {user ? (
@@ -208,6 +199,15 @@ function Header({ isHome }) {
                 Sign In <icons.PiSignIn className="text-lg" />
               </button>
             )}
+
+            {/* Theme Toggle */}
+            <button onClick={toggleDarkMode}>
+              {darkMode ? (
+                <icons.IoSunnySharp className="text-yellow-500 text-lg" />
+              ) : (
+                <icons.IoMoonSharp className="text-gray-500 text-lg" />
+              )}
+            </button>
           </ul>
         </nav>
 

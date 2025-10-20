@@ -37,6 +37,8 @@ function NotAvailableCottage() {
     `/admin/cottage.php?status=inactive`
   );
 
+  console.log("NOT INACTUVE : ", data);
+
   //handlePageChange
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -108,7 +110,7 @@ function NotAvailableCottage() {
 
           <div className="flex flex-row items-center gap-2">
             <SearchInput
-              placeholder="Search room"
+              placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               disabled={loading}

@@ -65,6 +65,7 @@ function FunctionHallCard({ item, index }) {
 
           <div className="flex flex-row justify-end  mt-8">
             <Button
+              onClick={() => navigate(`other-facilities-booking/${item.fh_id}`)}
               style=" w-full bg-green-600 h-[30px] text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
               label="Reserve Now"
             />

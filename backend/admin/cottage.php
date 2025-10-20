@@ -1,71 +1,82 @@
 <?php
+header('Content-Type: application/json');
+
+// Enable error reporting only for debugging
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 include("../header.php");
 include("../dbConn.php");
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Accept raw JSON if sent
-if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
+// Accept raw JSON if sent (e.g., via Axios or fetch)
+if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"] ?? '', "application/json") !== false) {
     $input = json_decode(file_get_contents("php://input"), true);
-    $_POST = $input;
+    if (is_array($input)) {
+        $_POST = $input;
+    }
 }
 
+// ================================
+// Handle GET Requests
+// ================================
 if ($method === "GET") {
-    $status = $_GET['status'] ?? 'active';
-    $getId = $_GET['id'] ?? null;
+    $status = $_GET['status'] ?? null;
+    $getId = isset($_GET['id']) ? intval($_GET['id']) : null;
 
-
-    if($getId){
- // Prepare and execute query
-    $stmt = $conn->prepare("SELECT * FROM cottages WHERE cottage_id  = ? ");
-     $stmt->bind_param("i", $getId);
+    // 1. Get cottage by ID
+    if ($getId) {
+        $stmt = $conn->prepare("SELECT * FROM cottages WHERE cottage_id = ?");
+        $stmt->bind_param("i", $getId);
         $stmt->execute();
         $result = $stmt->get_result();
-        $room = $result->fetch_assoc();
+        $cottage = $result->fetch_assoc();
 
-        if ($room) {
+        if ($cottage) {
             echo json_encode([
                 "success" => true,
-                "data" => $room
+                "data" => $cottage
             ]);
         } else {
             echo json_encode([
                 "success" => false,
-                "message" => "Room not found."
+                "message" => "Cottage not found."
             ]);
         }
-    }else{
-         $stmt = $conn->prepare("SELECT * FROM cottages WHERE status = 'active'");
-  
-    $stmt->execute();
+        exit;
+    }
 
-    $result = $stmt->get_result();
-    $data = $result->fetch_all(MYSQLI_ASSOC);
+    // 2. Get all by status (active/inactive)
+    if ($status === 'active' || $status === 'inactive') {
+        $stmt = $conn->prepare("SELECT * FROM cottages WHERE status = ?");
+        $stmt->bind_param("s", $status);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_all(MYSQLI_ASSOC);
 
+        echo json_encode([
+            "success" => true,
+            "data" => $data
+        ]);
+        exit;
+    }
+
+    // 3. Invalid GET input
     echo json_encode([
-        "success" => true,
-        "data" => $data
+        "success" => false,
+        "message" => "Invalid GET request. Provide 'id' or valid 'status'."
     ]);
     exit;
-    }
-    // Validate status input
-    // if (!in_array($status, ['active', 'inactive'])) {
-    //     echo json_encode([
-    //         "success" => false,
-    //         "message" => "Invalid status value"
-    //     ]);
-    //     http_response_code(400);
-    //     exit;
-    // }
-
-   
 }
 
-
+// ================================
+// Handle POST Requests
+// ================================
 if ($method === "POST") {
     $action = $_POST['action'] ?? 'create';
-  
-    $id = $_POST['id'] ?? '';
+
+    $id = $_POST['id'] ?? null;
     $name = $_POST['name'] ?? '';
     $price = $_POST['price'] ?? '';
     $capacity = $_POST['capacity'] ?? '';
@@ -77,7 +88,7 @@ if ($method === "POST") {
     $filename = null;
     $filename_PS = null;
 
-    // Handle image upload if present
+    // Upload: image
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $filename = uniqid() . "_" . basename($_FILES['image']['name']);
         $targetFile = $uploadDir . $filename;
@@ -89,13 +100,13 @@ if ($method === "POST") {
         if (!move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
             echo json_encode([
                 "success" => false,
-                "message" => " Failed to upload image. Check directory permissions."
+                "message" => "❌ Failed to upload image."
             ]);
             exit;
         }
     }
 
-        // Handle photo  sphere upload if present
+    // Upload: photo sphere
     if (isset($_FILES['photo_sphere']) && $_FILES['photo_sphere']['error'] === UPLOAD_ERR_OK) {
         $filename_PS = uniqid() . "_" . basename($_FILES['photo_sphere']['name']);
         $targetFile = $uploadDir_PS . $filename_PS;
@@ -107,21 +118,18 @@ if ($method === "POST") {
         if (!move_uploaded_file($_FILES['photo_sphere']['tmp_name'], $targetFile)) {
             echo json_encode([
                 "success" => false,
-                "message" => " Failed to upload photo_sphere. Check directory permissions."
+                "message" => "❌ Failed to upload photo_sphere."
             ]);
             exit;
         }
     }
 
-
-    // ================================
-    // 1. CREATE NEW ROOM
-    // ================================
+    // 1. CREATE
     if ($action === "create") {
-        if (!$name  || !$price || !$capacity || !$duration || !$description) {
+        if (!$name || !$price || !$capacity || !$duration || !$description) {
             echo json_encode([
                 "success" => false,
-                "message" => "All fields are requxxxxired."
+                "message" => "❌ All fields are required."
             ]);
             exit;
         }
@@ -133,52 +141,48 @@ if ($method === "POST") {
         if ($stmt->execute()) {
             echo json_encode([
                 "success" => true,
-                "message" => "Function Hall added successfully."
+                "message" => "✅ Cottage added successfully."
             ]);
         } else {
             echo json_encode([
                 "success" => false,
-                "message" => "Database error: " . $stmt->error
+                "message" => "❌ Database error: " . $stmt->error
             ]);
         }
         exit;
     }
 
-    // ================================
-    // 2. UPDATE ROOM   
-    // ================================
+    // 2. UPDATE
     if ($action === "update" && $id) {
         if ($filename && $filename_PS) {
             $stmt = $conn->prepare("UPDATE cottages SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, image = ?, photosphere = ? WHERE cottage_id = ?");
-            $stmt->bind_param("sdiisssi", $name, $price, $capacity, $duration,$description, $filename, $filename_PS, $id);
-        }elseif($filename){
-             $stmt = $conn->prepare("UPDATE cottages SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, image = ? WHERE cottage_id = ?");
-            $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration,$description, $filename, $id);
-        }elseif($filename_PS){
-             $stmt = $conn->prepare("UPDATE cottages SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, photosphere = ? WHERE cottage_id = ?");
-            $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration,$description, $filename_PS, $id);
-        }else {
-             $stmt = $conn->prepare("UPDATE cottages SET name = ?, price = ?, capacity = ?, duration = ?, description= ? WHERE cottage_id = ?");
-            $stmt->bind_param("sdiisi", $name, $price, $capacity, $duration,$description, $id);
+            $stmt->bind_param("sdiisssi", $name, $price, $capacity, $duration, $description, $filename, $filename_PS, $id);
+        } elseif ($filename) {
+            $stmt = $conn->prepare("UPDATE cottages SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, image = ? WHERE cottage_id = ?");
+            $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration, $description, $filename, $id);
+        } elseif ($filename_PS) {
+            $stmt = $conn->prepare("UPDATE cottages SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, photosphere = ? WHERE cottage_id = ?");
+            $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration, $description, $filename_PS, $id);
+        } else {
+            $stmt = $conn->prepare("UPDATE cottages SET name = ?, price = ?, capacity = ?, duration = ?, description= ? WHERE cottage_id = ?");
+            $stmt->bind_param("sdiisi", $name, $price, $capacity, $duration, $description, $id);
         }
 
         if ($stmt->execute()) {
             echo json_encode([
                 "success" => true,
-                "message" => " Cottage  updated successfully."
+                "message" => "✅ Cottage updated successfully."
             ]);
         } else {
             echo json_encode([
                 "success" => false,
-                "message" => " Database error: " . $stmt->error
+                "message" => "❌ Database error: " . $stmt->error
             ]);
         }
         exit;
     }
 
-    // ================================
-    // 3. SET ROOM INACTIVE
-    // ================================
+    // 3. SET INACTIVE
     if ($action === "set_inactive" && $id) {
         $stmt = $conn->prepare("UPDATE cottages SET status = 'inactive' WHERE cottage_id = ?");
         $stmt->bind_param("i", $id);
@@ -186,21 +190,18 @@ if ($method === "POST") {
         if ($stmt->execute()) {
             echo json_encode([
                 "success" => true,
-                "message" => "Cottage  set to inactive."
+                "message" => "Cottage set to inactive."
             ]);
         } else {
             echo json_encode([
                 "success" => false,
-                "message" => " Database error: " . $stmt->error
+                "message" => "❌ Database error: " . $stmt->error
             ]);
         }
         exit;
     }
 
-    
-    // ================================
-    // 3. SET ROOM INACTIVE
-    // ================================
+    // 4. SET ACTIVE
     if ($action === "set_active" && $id) {
         $stmt = $conn->prepare("UPDATE cottages SET status = 'active' WHERE cottage_id = ?");
         $stmt->bind_param("i", $id);
@@ -208,23 +209,30 @@ if ($method === "POST") {
         if ($stmt->execute()) {
             echo json_encode([
                 "success" => true,
-                "message" => "Cottage  set to active."
+                "message" => "Cottage set to active."
             ]);
         } else {
             echo json_encode([
                 "success" => false,
-                "message" => " Database error: " . $stmt->error
+                "message" => "❌ Database error: " . $stmt->error
             ]);
         }
         exit;
     }
 
-    // ================================
-    // 4. INVALID ACTION
-    // ================================
+    // 5. INVALID ACTION
     echo json_encode([
         "success" => false,
-        "message" => " Invalid action or missing required data."
+        "message" => "❌ Invalid action or missing required data."
     ]);
     exit;
 }
+
+// ================================
+// Fallback for Unsupported Method
+// ================================
+echo json_encode([
+    "success" => false,
+    "message" => "Unsupported request method."
+]);
+exit;

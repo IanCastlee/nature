@@ -51,6 +51,8 @@ function AvailableCottage() {
     `/admin/cottage.php?status=active`
   );
 
+  console.log("____: ", data);
+
   //================//
   // HANDLE CHANGE //
   //==============//
@@ -63,6 +65,8 @@ function AvailableCottage() {
       [name]: value,
     }));
   };
+
+  console.log("______: ", viewCottageDetailsId);
 
   //handlePageChange
   const handlePageChange = (pageNumber) => {
@@ -219,7 +223,7 @@ function AvailableCottage() {
 
           <div className="flex flex-row items-center gap-2">
             <SearchInput
-              placeholder="Search room"
+              placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               disabled={loading}
