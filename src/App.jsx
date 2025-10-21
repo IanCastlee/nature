@@ -36,6 +36,7 @@ import AdminBookingHistory from "./admin_components/admin_pages/AdminBookingHist
 import AdminBookingDeclined from "./admin_components/admin_pages/AdminBookingDeclined";
 import VerifiedUsers from "./admin_components/admin_pages/VerifiedUsers";
 import NotVerifiedUsers from "./admin_components/admin_pages/NotVerifiedUsers";
+import ViewCottagePage from "./components/pages/ViewCottagePage";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -73,6 +74,10 @@ const UserLayout = () => {
         <Route
           path="/funtionhall-deatails/:fhId"
           element={<ViewFunctionHallPage />}
+        />
+        <Route
+          path="/cottage-details/:cottageId"
+          element={<ViewCottagePage />}
         />
         <Route path="/cottages" element={<CottagesPage />} />
         <Route path="/about" element={<About />} />

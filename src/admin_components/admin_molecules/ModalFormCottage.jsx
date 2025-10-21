@@ -91,7 +91,7 @@ export default function ModalFormCottage({
               }
             />
             <FileInput
-              label="Function Hall Thumbnail"
+              label="Cottage Thumbnail"
               isRequired={showForm === "add_cottage"}
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, image: e.target.files[0] }))

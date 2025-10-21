@@ -67,6 +67,48 @@ export const renderActions = ({
   );
 };
 
+//renderActionsRoomCategories
+export const renderActionsRoomCategories = ({
+  item,
+  onEdit,
+  onSetInactive,
+  onSetViewRoomDetails,
+
+  isNotAvailablePage,
+}) => {
+  return (
+    <>
+      <div className="flex items-center justify-end gap-2">
+        <button
+          onClick={() => onSetInactive(item)}
+          className="bg-red-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center ml-4"
+          title={
+            isNotAvailablePage ? "Set as available" : "Set as not in-active"
+          }
+        >
+          <icons.TbRefresh />
+        </button>
+        {!isNotAvailablePage && (
+          <button
+            onClick={() => onEdit(item)}
+            className="bg-blue-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+            title="Edit"
+          >
+            <icons.FaRegEdit />
+          </button>
+        )}
+        <button
+          onClick={() => onSetViewRoomDetails(item.room_id)}
+          className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+          title="View Room Details"
+        >
+          <icons.AiOutlineInfoCircle />
+        </button>
+      </div>
+    </>
+  );
+};
+
 //render Action for Room Other Details
 export const renderActionsRoomOtherDeatails = ({
   item,

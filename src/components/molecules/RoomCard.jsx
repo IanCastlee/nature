@@ -21,7 +21,7 @@ function RoomCard({ rooms }) {
               key={item.room_id}
               className="w-full md:basis-[calc(50%-0.3rem)] lg:basis-[calc(33.333%-0.5rem)] mb-2 bg-white dark:bg-gray-950 dark:border border-gray-900 rounded-lg shadow-lg overflow-hidden"
             >
-              {/* 🖼 Image with Maintenance Overlay */}
+              {/*  Image with Maintenance Overlay */}
               <div className="w-full h-48 relative">
                 <LazyLoadImage
                   src={`${uploadUrl.uploadurl}/rooms/${item.image}`}

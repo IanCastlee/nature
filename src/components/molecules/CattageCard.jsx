@@ -3,13 +3,16 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import { icons } from "../../constant/icon";
 import { motion } from "framer-motion";
 import Button from "../atoms/Button";
+import { uploadUrl } from "../../utils/fileURL";
+import { useNavigate } from "react-router-dom";
 
 function CattageCard({ item }) {
+  const navigate = useNavigate();
   return (
     <article className="w-full  md:basis-[calc(50%-0.3rem)] lg:basis-[calc(33.333%-0.5rem)] h-[230px] relative group overflow-hidden rounded-md cursor-pointer">
       <div className="w-full h-full transition-transform duration-300 group-hover:scale-105">
         <LazyLoadImage
-          src={item.image}
+          src={`${uploadUrl.uploadurl}/cottage/${item.image}`}
           alt={item.name}
           effect="blur"
           wrapperClassName="w-full h-full"
@@ -42,7 +45,7 @@ function CattageCard({ item }) {
       </motion.div>
 
       <button
-        onClick={() => navigate(`/funtionhall-deatails/${item.fh_id}`)}
+        onClick={() => navigate(`/cottage-details/2`)}
         className="group text-blue-500 text-sm cursor-pointer absolute right-12 bottom-2 rounded-full py-1 px-2 transition-colors duration-300 hover:text-blue-400"
       >
         <span
@@ -56,6 +59,7 @@ function CattageCard({ item }) {
       </button>
 
       <icons.FaStreetView
+        onClick={() => navigate(`/room-view/${item.photosphere}`)}
         title="View Room"
         className="text-3xl hover:text-blue-400 text-white cursor-pointer transform transition-transform duration-300 hover:scale-125 absolute right-2 bottom-2 bg-black/60 rounded-full p-1"
       />

@@ -45,6 +45,16 @@ function HomePage() {
     "/admin/room-category.php"
   );
 
+  // fetch cottage data
+  const {
+    data: dataCottage,
+    loading: loadingCottage,
+    refetch: refetchCottage,
+    error: errorCottage,
+  } = useGetData(`/admin/cottage.php?status=active`);
+
+  console.log("___", dataCottage);
+
   // Preload images
   useEffect(() => {
     imageKeys.forEach((key) => {
@@ -230,7 +240,19 @@ function HomePage() {
           </div>
 
           <div className="w-full flex flex-row flex-wrap md:flex-nowrap lg:flex-nowrap px-2  md:px-2 lg:px-[130px] justify-center gap-2">
-            {dummyCottages.slice(0, 3).map((item) => (
+            {loadingCottage && (
+              <div className="text-sm text-blue-600 mt-4">
+                Loading cottages...
+              </div>
+            )}
+
+            {errorCottage && (
+              <div className="text-sm text-red-500 mt-4">
+                {errorCottage.message || "Something went wrong."}
+              </div>
+            )}
+
+            {dataCottage?.slice(0, 3).map((item) => (
               <Suspense
                 key={item.name}
                 fallback={

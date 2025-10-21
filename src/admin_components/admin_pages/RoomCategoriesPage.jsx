@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Button from "../admin_atoms/Button";
 import { icons } from "../../constant/icon";
-import TableRow from "../admin_molecules/TableRow";
 import Pagination from "../admin_molecules/Pagination";
 import Input from "../../components/atoms/Input";
 import { motion } from "framer-motion";
@@ -15,10 +14,14 @@ import DeleteModal from "../../components/molecules/DeleteModal";
 import useSetInactive from "../../hooks/useSetInactive";
 import { roomCategories } from "../../constant/tableColumns";
 import GenericTable from "../admin_molecules/GenericTable";
+import {
+  renderActions,
+  renderActionsRoomCategories,
+} from "../admin_molecules/RenderActions";
 
 function RoomCategoriesPage() {
-  const showRoomCategoryForm = useForm((state) => state.showForm);
-  const setRoomCategoryForm = useForm((state) => state.setShowForm);
+  const showForm = useForm((state) => state.showForm);
+  const setShowForm = useForm((state) => state.setShowForm);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,12 +32,10 @@ function RoomCategoriesPage() {
   const [editData, setEditData] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
 
-  // Fetch data
   const { data, loading, refetch, error } = useGetData(
     "/admin/room-category.php"
   );
 
-  // Filtered data
   const filteredData =
     data?.filter((item) =>
       item.category.toLowerCase().includes(searchTerm.toLowerCase())
@@ -45,21 +46,16 @@ function RoomCategoriesPage() {
   const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  // Submit Handler Hook
   const {
     submit,
     loading: formLoading,
     error: formError,
   } = useFormSubmit("/admin/room-category.php", () => {
     refetch();
-    setRoomCategoryForm(null);
     setCategory("");
     setImageFile(null);
     setEditData(null);
+    setShowForm(null); // ✅ CLOSE MODAL
   });
 
   const handleSubmit = (e) => {
@@ -70,29 +66,33 @@ function RoomCategoriesPage() {
     if (imageFile) {
       formData.append("image", imageFile);
     }
-
-    if (showRoomCategoryForm === "update" && editData) {
+    if (showForm === "update_room_category" && editData) {
       formData.append("id", editData.category_id);
       formData.append("action", "update");
     }
-
     submit(formData);
+  };
+
+  const { setInactive, loading: inactiveLoading } = useSetInactive(
+    "/admin/room-category.php",
+    () => {
+      refetch();
+      setDeleteItem(null);
+    }
+  );
+
+  //handle add room
+  const handleShowAddCategories = () => {
+    setShowForm("add_room_category");
+    clearField();
   };
 
   const handleEdit = (item) => {
     setEditData(item);
     setCategory(item.category);
-    setRoomCategoryForm("update");
+    setImageFile(null);
+    setShowForm("update_room_category");
   };
-
-  const {
-    setInactive,
-    loading: inactiveLoading,
-    error: inactiveError,
-  } = useSetInactive("/admin/room-category.php", () => {
-    refetch();
-    setDeleteItem(null);
-  });
 
   return (
     <>
@@ -108,13 +108,13 @@ function RoomCategoriesPage() {
           </p>
         )}
 
-        <div className="w-full flex flex-row justify-between items-center mb-2">
+        <div className="w-full flex justify-between mb-2">
           <span className="dark:text-gray-100 text-xs font-medium">
             Showing {filteredData.length} categor
             {filteredData.length !== 1 ? "ies" : "y"}
           </span>
 
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex gap-2">
             <SearchInput
               placeholder="Search..."
               value={searchTerm}
@@ -123,7 +123,7 @@ function RoomCategoriesPage() {
             />
 
             <Button
-              handleClick={() => setRoomCategoryForm("add")}
+              onClick={handleShowAddCategories}
               className="flex flex-row items-center h-[35px] bg-green-600 text-white text-xs font-medium px-2 rounded-md whitespace-nowrap"
               label={
                 <>
@@ -136,100 +136,72 @@ function RoomCategoriesPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse">
-            <thead>
-              <tr className="dark:bg-gray-900 bg-white">
-                <th className="p-2 dark:text-gray-100 text-left font-medium">
-                  Image
-                </th>
-                <th className="p-2 dark:text-gray-100 text-left font-medium">
-                  Category
-                </th>
-                <th className="p-2 dark:text-gray-100 text-right font-medium">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {!loading && currentData.length > 0 ? (
-                currentData.map((item) => (
-                  <GenericTable
-                    columns={roomCategories}
-                    data={currentData}
-                    loading={loading}
-                    noDataComponent={<NoData />}
-                    renderActions={(item) => {
-                      return renderActions({
-                        item,
-                        showForm,
-                        isNotAvailablePage,
-                        onSetInactive: (item) => setDeleteItem(item),
-                        onSetViewRoomDetails: (item) => viewRoomDetails(item),
-                      });
-                    }}
-                  />
-                ))
-              ) : !loading && currentData.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan="3"
-                    className="text-center py-4 text-gray-500 dark:text-gray-400"
-                  >
-                    <NoData />
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
+          {!loading && currentData.length > 0 ? (
+            <GenericTable
+              columns={roomCategories}
+              data={currentData}
+              loading={loading}
+              noDataComponent={<NoData />}
+              renderActions={(item) =>
+                renderActionsRoomCategories({
+                  item,
+                  setShowForm,
+                  onEdit: handleEdit,
+                  onSetInactive: (item) => setDeleteItem(item),
+                  // onSetViewCottageDetails: (item) => viewCottageDetails(item),
+                })
+              }
+            />
+          ) : !loading && currentData.length === 0 ? (
+            <NoData />
+          ) : null}
         </div>
 
         {!loading && totalPages > 1 && (
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={handlePageChange}
+            onPageChange={setCurrentPage}
           />
         )}
       </div>
 
-      {/* Modal Form */}
-      {showRoomCategoryForm != null && (
-        <div className="w-full h-screen fixed inset-0 bg-black/50 flex flex-row justify-center items-center z-50">
+      {/* FORM MODAL */}
+      {(showForm === "add_room_category" ||
+        showForm === "update_room_category") && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="w-[700px] rounded-lg bg-white dark:bg-gray-800 p-4"
+            animate={{ opacity: 1, y: 0 }}
+            className="w-[700px] bg-white dark:bg-gray-800 rounded-lg p-4"
           >
-            <div className="flex flex-row justify-between items-center mb-5">
+            <div className="flex justify-between mb-5">
               <h3 className="dark:text-white text-lg">
-                {showRoomCategoryForm === "add"
+                {showForm === "add_room_category"
                   ? "ADD ROOM CATEGORY"
                   : "UPDATE DETAILS"}
               </h3>
               <icons.MdOutlineClose
                 onClick={() => {
-                  setRoomCategoryForm(null);
+                  setShowForm(null);
                   setCategory("");
                   setImageFile(null);
                   setEditData(null);
                 }}
-                className="text-lg cursor-pointer dark:text-gray-100"
+                className="cursor-pointer dark:text-gray-100"
               />
             </div>
 
-            <form
-              onSubmit={handleSubmit}
-              className="w-full flex flex-col gap-3"
-            >
-              <div className="w-full flex flex-row gap-2">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+              <div className="flex gap-2">
                 <Input
                   label="Category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 />
                 <FileInput
-                  isRequired={showRoomCategoryForm === "add" ? true : false}
+                  label="Room Category thumbnail"
+                  isRequired={showForm === "add_room_category"}
                   onChange={(e) => setImageFile(e.target.files[0])}
                 />
               </div>
@@ -238,7 +210,7 @@ function RoomCategoriesPage() {
                 <p className="text-red-500 text-sm mt-2">{formError}</p>
               )}
 
-              <div className="flex justify-end mt-3">
+              <div className="flex justify-end">
                 <Button
                   type="submit"
                   disabled={formLoading}
@@ -246,7 +218,7 @@ function RoomCategoriesPage() {
                   label={
                     formLoading
                       ? "Submitting..."
-                      : showRoomCategoryForm === "update"
+                      : showForm === "update_room_category"
                       ? "Update"
                       : "Submit"
                   }
@@ -257,14 +229,38 @@ function RoomCategoriesPage() {
         </div>
       )}
 
-      {deleteItem && (
+      {deleteItem?.category_id && (
         <DeleteModal
           item={deleteItem}
+          name={deleteItem?.category}
           loading={inactiveLoading}
           onCancel={() => setDeleteItem(null)}
-          onConfirm={() => {
+          label="Yes, Set as not active"
+          label2="not-active"
+          label3=" This will make this category unavailable, but not delete it
+            permanently."
+          onConfirm={() =>
             setInactive({
               id: deleteItem?.category_id,
+              action: "set_inactive",
+            })
+          }
+        />
+      )}
+
+      {deleteItem?.cottage_id && (
+        <DeleteModal
+          item={deleteItem}
+          name={deleteItem?.cottage_id}
+          loading={inactiveLoading}
+          onCancel={() => setDeleteItem(null)}
+          label="Yes, Set as not active"
+          label2="not-active"
+          label3=" This will make this cottage unavailable, but not delete it
+            permanently."
+          onConfirm={() => {
+            setInactive({
+              id: deleteItem?.cottage_id,
               action: "set_inactive",
             });
           }}

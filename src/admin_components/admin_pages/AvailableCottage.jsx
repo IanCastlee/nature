@@ -66,8 +66,6 @@ function AvailableCottage() {
     }));
   };
 
-  console.log("______: ", viewCottageDetailsId);
-
   //handlePageChange
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
