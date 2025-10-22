@@ -4,7 +4,7 @@ import { icons } from "./icon";
 export const menuItems = [
   {
     name: "Dashboard",
-    to: "/admin/dashboard",
+    to: "/admin",
     icon: icons.LuLayoutDashboard,
   },
   {
@@ -109,7 +109,7 @@ export const menuItems = [
   },
   {
     name: "Logout",
-    to: "/admin/analytics",
+    action: "logout",
     icon: icons.IoIosLogOut,
   },
 ];

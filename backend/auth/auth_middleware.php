@@ -1,50 +1,43 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
-use \Firebase\JWT\JWT;
-use \Firebase\JWT\Key;
-
 /**
- * Get Authorization header
+ * JWT Authentication Middleware
+ * ----------------------------------------
+ * Verifies token, checks expiry, retrieves user, and (optionally) enforces role.
  */
-function get_authorization_header() {
-    if (isset($_SERVER['Authorization'])) return trim($_SERVER["Authorization"]);
-    if (isset($_SERVER['HTTP_AUTHORIZATION'])) return trim($_SERVER["HTTP_AUTHORIZATION"]);
-    if (function_exists('apache_request_headers')) {
-        $headers = apache_request_headers();
-        foreach ($headers as $key => $value) {
-            if (strtolower($key) === 'authorization') {
-                return trim($value);
-            }
-        }
-    }
-    return null;
-}
+
+require_once(__DIR__ . '/../vendor/autoload.php');
+require_once(__DIR__ . '/../dbConn.php');
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+//  Load environment variables
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->safeLoad();
 
 /**
- * Extract Bearer token
+ * Get Bearer token from Authorization header or request
  */
 function get_bearer_token() {
-    $header = get_authorization_header();
-    if ($header && preg_match('/Bearer\s(\S+)/', $header, $matches)) {
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? null;
+
+    if ($authHeader && preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
         return $matches[1];
     }
+
+    // Fallback: token from query or POST
     return $_REQUEST['token'] ?? null;
 }
 
 /**
- * Require valid user token
+ * Require authentication (and optional role)
+ *
+ * @param mysqli $conn
+ * @param string|null $requiredRole - e.g., 'admin' or 'user'
+ * @return array $user - user data from DB
  */
-function require_valid_jwt() {
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-    $dotenv->safeLoad();
-    $secretKey = $_ENV['JWT_SECRET'] ?? null;
-
-    if (!$secretKey) {
-        http_response_code(500);
-        echo json_encode(["success" => false, "message" => "JWT secret not set"]);
-        exit;
-    }
-
+function require_auth($conn, $requiredRole = null) {
     $token = get_bearer_token();
     if (!$token) {
         http_response_code(401);
@@ -52,24 +45,67 @@ function require_valid_jwt() {
         exit;
     }
 
-    try {
-        return JWT::decode($token, new Key($secretKey, 'HS256'));
-    } catch (Exception $e) {
-        http_response_code(401);
-        echo json_encode(["success" => false, "message" => "Invalid or expired token"]);
+    $secretKey = $_ENV['JWT_SECRET'] ?? null;
+    if (!$secretKey) {
+        http_response_code(500);
+        echo json_encode(["success" => false, "message" => "Server configuration error"]);
         exit;
     }
-}
 
-/**
- * Require admin (acc_type = 0)
- */
-function require_admin() {
-    $decoded = require_valid_jwt();
-    if (!isset($decoded->acc_type) || (int)$decoded->acc_type !== 0) {
-        http_response_code(403);
-        echo json_encode(["success" => false, "message" => "Admins only"]);
+    try {
+        //  Decode and verify token
+        $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
+
+        //  Explicit expiry check (extra safety)
+        if (isset($decoded->exp) && $decoded->exp < time()) {
+            throw new Exception("Token expired");
+        }
+
+    } catch (Exception $e) {
+        // Optional: log error to server logs (for debugging)
+        error_log("JWT error: " . $e->getMessage());
+
+        http_response_code(401);
+        echo json_encode([
+            "success" => false,
+            "message" => "Invalid or expired token"
+        ]);
         exit;
     }
-    return $decoded;
+
+    //  Validate payload content
+    $userId = $decoded->user_id ?? null;
+    if (!$userId) {
+        http_response_code(401);
+        echo json_encode(["success" => false, "message" => "Invalid token payload"]);
+        exit;
+    }
+
+    //  Fetch user securely from database
+    $stmt = $conn->prepare("
+        SELECT user_id, email, acc_type, firstname, lastname
+        FROM users
+        WHERE user_id = ?
+    ");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
+        http_response_code(401);
+        echo json_encode(["success" => false, "message" => "User not found"]);
+        exit;
+    }
+
+    $user = $result->fetch_assoc();
+
+    //  Role check (if required)
+    if ($requiredRole && $user['acc_type'] !== $requiredRole) {
+        http_response_code(403);
+        echo json_encode(["success" => false, "message" => "Forbidden: insufficient permissions"]);
+        exit;
+    }
+
+    //  Return user data for authorized request
+    return $user;
 }

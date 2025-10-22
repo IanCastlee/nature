@@ -11,12 +11,7 @@ import useAuthStore from "../../store/authStore";
 
 function SignIn() {
   const navigate = useNavigate();
-
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [form, setForm] = useState({ email: "", password: "" });
   const [toast, setToast] = useState(null);
 
   const {
@@ -25,21 +20,25 @@ function SignIn() {
     error: formError,
   } = useFormSubmit("/auth/signin.php", (response) => {
     const { setToken, setUser } = useAuthStore.getState();
+
     if (response?.success) {
       setToast({
         message: response.message || "Login successful!",
         type: "success",
       });
 
+      // Save token and user in store
       if (response.token) {
         setToken(response.token);
         setUser(response.user);
       }
 
-      // Redirect after 2s
+      // Use backend redirect (safe)
+      const redirectTo = response.redirect || "/";
+
       setTimeout(() => {
-        navigate("/");
-      }, 2000);
+        navigate(redirectTo);
+      }, 1500);
     } else {
       setToast({
         message: response?.message || "Login failed.",
@@ -48,8 +47,6 @@ function SignIn() {
       console.warn("⚠️ Login error:", response);
     }
   });
-
-  console.log("formError : ", formError);
 
   useEffect(() => {
     if (formError) {
@@ -65,10 +62,7 @@ function SignIn() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -125,7 +119,7 @@ function SignIn() {
               <img
                 src={images.logo}
                 className="h-[230px] w-auto object-contain"
-                alt="Nature Hot Spring Logo"
+                alt="Logo"
               />
               <p className="text-center text-sm text-white">
                 Sign in to access your account and manage your bookings.
@@ -166,7 +160,7 @@ function SignIn() {
             </form>
 
             <div className="mt-2 text-xs">
-              Don't have an account?
+              Don’t have an account?
               <span
                 onClick={() => navigate("/signup")}
                 className="text-blue-600 cursor-pointer font-medium ml-1"

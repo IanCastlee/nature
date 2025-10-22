@@ -37,6 +37,8 @@ import AdminBookingDeclined from "./admin_components/admin_pages/AdminBookingDec
 import VerifiedUsers from "./admin_components/admin_pages/VerifiedUsers";
 import NotVerifiedUsers from "./admin_components/admin_pages/NotVerifiedUsers";
 import ViewCottagePage from "./components/pages/ViewCottagePage";
+import ProtectedRoute from "./components/routes/ProtectedRoute";
+import NotFound from "./components/pages/NotFound";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -86,6 +88,8 @@ const UserLayout = () => {
 
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
       {!shouldHideLayout && <Footer />}
     </>
@@ -108,7 +112,7 @@ const AdminLayout = () => {
         }`}
       >
         <Routes>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/available-room" element={<AvailableRoomPage />} />
 
           <Route
@@ -160,7 +164,14 @@ function App() {
     <Router>
       <Routes>
         <Route path="/*" element={<UserLayout />} />
-        <Route path="/admin/*" element={<AdminLayout />} />
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

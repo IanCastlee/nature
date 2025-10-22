@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 const useAuthStore = create(
   persist(
@@ -11,7 +11,8 @@ const useAuthStore = create(
       logout: () => set({ token: null, user: null }),
     }),
     {
-      name: "auth-storage", // persists in localStorage
+      name: "auth-storage",
+      storage: createJSONStorage(() => sessionStorage),
     }
   )
 );

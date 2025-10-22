@@ -3,11 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { uploadUrl } from "../../utils/fileURL";
+import { motion } from "framer-motion";
+
 function RoomCategoryCard({ item }) {
   const navigate = useNavigate();
 
   return (
-    <article className="w-full md:w-[49%] lg:w-[49%] h-[200px] relative group overflow-hidden rounded-md cursor-pointer">
+    <motion.article
+      className="w-full md:w-[49%] lg:w-[49%] h-[200px] relative group overflow-hidden rounded-md cursor-pointer"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ amount: 0.2 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+    >
+      {/* Image */}
       <div className="w-full h-full transition-transform duration-300 group-hover:scale-105">
         <LazyLoadImage
           src={`${uploadUrl.uploadurl}/room_categories/${item.image}`}
@@ -18,18 +27,12 @@ function RoomCategoryCard({ item }) {
         />
       </div>
 
+      {/* Overlay */}
       <div
-        className={`
-          
-          absolute inset-0 
-          bg-black bg-opacity-40 
-          flex items-center justify-center 
-          transition-opacity duration-300
-          flex-col
-
-          opacity-100   sm:opacity-100 md:opacity-100 
-          lg:opacity-0  lg:group-hover:opacity-100
-        `}
+        className={`absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center 
+          transition-opacity duration-300 flex-col
+          opacity-100 sm:opacity-100 md:opacity-100 
+          lg:opacity-0 lg:group-hover:opacity-100`}
       >
         <h4 className="text-white text-center text-sm md:text-lg lg:text-xl font-semibold px-2 max-w-[400px]">
           {item.category}
@@ -41,7 +44,7 @@ function RoomCategoryCard({ item }) {
           View Rooms
         </button>
       </div>
-    </article>
+    </motion.article>
   );
 }
 

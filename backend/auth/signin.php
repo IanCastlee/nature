@@ -1,112 +1,69 @@
 <?php
 include("../header.php");
-include("../dbConn.php");
+require_once "../dbConn.php";
+require_once "../config/jwt.php";
 
-// Require Composer autoload (adjust path if needed)
-require_once('../vendor/autoload.php');
+header("Content-Type: application/json");
 
-use \Firebase\JWT\JWT;
-use \Firebase\JWT\Key;
-
-// Load environment variables from .env
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
-
-$secretKey = $_ENV['JWT_SECRET'] ?? null;
-if (!$secretKey) {
-    http_response_code(500);
-    echo json_encode([
-        "success" => false,
-        "message" => "JWT secret key is not set. Contact administrator."
-    ]);
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    echo json_encode(["success" => false, "message" => "Invalid request method"]);
     exit;
 }
 
-$method = $_SERVER['REQUEST_METHOD'];
+$email = trim($_POST["email"] ?? "");
+$password = trim($_POST["password"] ?? "");
 
-// Allow only POST
-if ($method !== 'POST') {
-    http_response_code(405);
-    echo json_encode([
-        "success" => false,
-        "message" => "Method not allowed."
-    ]);
-    exit;
-}
-
-// Optional: handle JSON request body
-if (strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
-    $input = json_decode(file_get_contents("php://input"), true);
-    $_POST = $input;
-}
-
-// Sanitize inputs
-$email = trim($_POST['email'] ?? '');
-$password = $_POST['password'] ?? '';
-
-// Check required fields
 if (empty($email) || empty($password)) {
-    http_response_code(400);
-    echo json_encode([
-        "success" => false,
-        "message" => "Email and password are required."
-    ]);
+    echo json_encode(["success" => false, "message" => "Email and password are required"]);
     exit;
 }
 
-// Query user
-$stmt = $conn->prepare("SELECT user_id, firstname, lastname, email, password, acc_type FROM users WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
+try {
+    // Use mysqli prepared statement
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
 
-if ($result->num_rows === 0) {
-    http_response_code(401);
+    if (!$user || !password_verify($password, $user["password"])) {
+        echo json_encode(["success" => false, "message" => "Invalid email or password"]);
+        exit;
+    }
+
+    // Generate JWT token
+    $payload = [
+        "user_id" => $user["user_id"],
+        "email" => $user["email"],
+        "acc_type" => $user["acc_type"],
+        "exp" => time() + (60 * 60 * 4) // 4 hours
+    ];
+
+    $jwt = create_jwt($payload); // from jwt.php
+
+    // Safe redirect path
+    $redirect = "/";
+    if ($user["acc_type"] === "admin") {
+        $redirect = "/admin";
+    }
+
     echo json_encode([
-        "success" => false,
-        "message" => "No account found with that email."
+        "success" => true,
+        "message" => "Login successful",
+        "token" => $jwt,
+        "user" => [
+            "user_id" => $user["user_id"],
+            "firstname" => $user["firstname"],
+            "lastname" => $user["lastname"],
+            "email" => $user["email"],
+            "acc_type" => $user["acc_type"]
+        ],
+        "redirect" => $redirect
     ]);
     exit;
-}
 
-$user = $result->fetch_assoc();
-
-// Verify password
-if (!password_verify($password, $user['password'])) {
-    http_response_code(401);
-    echo json_encode([
-        "success" => false,
-        "message" => "Incorrect password."
-    ]);
+} catch (Exception $e) {
+    echo json_encode(["success" => false, "message" => "Server error: " . $e->getMessage()]);
     exit;
 }
-
-// JWT Configuration
-$issuedAt = time();
-$expirationTime = $issuedAt + 3600; 
-
-$payload = [
-    "iat" => $issuedAt,
-    "exp" => $expirationTime,
-    "user_id" => $user['user_id'],
-    "email" => $user['email'],
-    "acc_type" => $user['acc_type'] 
-];
-
-// Generate JWT
-$jwt = JWT::encode($payload, $secretKey, 'HS256');
-
-// Success Response
-echo json_encode([
-    "success" => true,
-    "message" => "Login successful",
-    "user" => [
-        "id" => $user['user_id'],
-        "firstname" => $user['firstname'],
-        "lastname" => $user['lastname'],
-        "email" => $user['email'],
-        "acc_type" => $user['acc_type']
-    ],
-    "token" => $jwt
-]);
-exit;
+?>
