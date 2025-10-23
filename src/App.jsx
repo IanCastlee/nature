@@ -39,6 +39,10 @@ import NotVerifiedUsers from "./admin_components/admin_pages/NotVerifiedUsers";
 import ViewCottagePage from "./components/pages/ViewCottagePage";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 import NotFound from "./components/pages/NotFound";
+import TermsAndConditions from "./components/pages/TermsAndConditions";
+import AdminFhBooking from "./admin_components/admin_pages/AdminFhBooking";
+import AdminBookingFhApproved from "./admin_components/admin_pages/AdminBookingFhApproved";
+import AdminBookingFhDeclined from "./admin_components/admin_pages/AdminBookingFhDeclined";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -88,6 +92,8 @@ const UserLayout = () => {
 
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
+
+        <Route path="/terms" element={<TermsAndConditions />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -144,6 +150,16 @@ const AdminLayout = () => {
           <Route path="/booking" element={<AdminBookingPage />} />
           <Route path="/booking-history" element={<AdminBookingHistory />} />
           <Route path="/declined-booking" element={<AdminBookingDeclined />} />
+
+          <Route path="/fh-booking" element={<AdminFhBooking />} />
+          <Route
+            path="/fhbooking-declined"
+            element={<AdminBookingFhDeclined />}
+          />
+          <Route
+            path="/fhbooking-approved"
+            element={<AdminBookingFhApproved />}
+          />
 
           <Route path="/verified-users" element={<VerifiedUsers />} />
           <Route path="/notverified-users" element={<NotVerifiedUsers />} />

@@ -137,7 +137,7 @@ function AvailableFunctionHall() {
   };
 
   //=================//
-  //  HANDLE EDIT //
+  //  HANDLE EDIT   //
   //===============//
 
   //room

@@ -12,6 +12,14 @@ function SignUp() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [toast, setToast] = useState(null);
+  const [termsAgreed, setTermsAgreed] = useState(false);
+
+  // Show/Hide password
+  const [showPassword, setShowPassword] = useState(false);
+  const [showCPassword, setShowCPassword] = useState(false);
+
+  // Password strength
+  const [passwordStrength, setPasswordStrength] = useState("");
 
   const [form, setForm] = useState({
     firstname: "",
@@ -32,7 +40,6 @@ function SignUp() {
     setTimeout(() => navigate("/signin"), 2000);
   });
 
-  // Show error toast if formError changes
   useEffect(() => {
     if (formError) {
       setToast({
@@ -45,13 +52,29 @@ function SignUp() {
     }
   }, [formError]);
 
-  //handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    if (name === "password") {
+      calculatePasswordStrength(value);
+    }
+  };
+
+  const calculatePasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+
+    if (strength <= 1) setPasswordStrength("Weak");
+    else if (strength === 2 || strength === 3) setPasswordStrength("Medium");
+    else if (strength === 4) setPasswordStrength("Strong");
+    else setPasswordStrength("");
   };
 
   const handleNext = () => {
@@ -71,6 +94,14 @@ function SignUp() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!termsAgreed) {
+      setToast({
+        message: "You must agree to the Terms and Conditions",
+        type: "error",
+      });
+      return;
+    }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) {
@@ -101,6 +132,13 @@ function SignUp() {
     submit(formData);
   };
 
+  const getStrengthColor = () => {
+    if (passwordStrength === "Weak") return "bg-red-500";
+    if (passwordStrength === "Medium") return "bg-yellow-500";
+    if (passwordStrength === "Strong") return "bg-green-500";
+    return "bg-gray-300";
+  };
+
   return (
     <>
       {toast && (
@@ -121,6 +159,7 @@ function SignUp() {
           transition={{ duration: 0.5 }}
           className="w-[800px] h-full max-h-[500px] bg-white rounded-lg z-10 flex flex-row overflow-hidden"
         >
+          {/* Left side */}
           <section
             className="h-full w-1/2 bg-cover bg-center bg-no-repeat flex justify-center items-center p-4"
             style={{ backgroundImage: `url(${images.signupbg})` }}
@@ -140,6 +179,7 @@ function SignUp() {
             </figcaption>
           </section>
 
+          {/* Right side */}
           <section className="w-1/2 h-full flex flex-col justify-center items-center p-4 overflow-y-auto">
             <h3 className="text-lg font-semibold mb-5">Create your account</h3>
 
@@ -195,23 +235,93 @@ function SignUp() {
                     value={form.email}
                     onChange={handleChange}
                   />
-                  <Input
-                    label="Password"
-                    name="password"
-                    type="password"
-                    value={form.password}
-                    onChange={handleChange}
-                  />
-                  <Input
-                    label="Confirm Password"
-                    name="cpassword"
-                    type="password"
-                    value={form.cpassword}
-                    onChange={handleChange}
-                  />
+
+                  {/* Password */}
+                  <div className="relative">
+                    <Input
+                      label="Password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      value={form.password}
+                      onChange={handleChange}
+                    />
+                    <span
+                      className="absolute right-2 top-[40px] cursor-pointer text-gray-500"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                    >
+                      {showPassword ? (
+                        <icons.IoEyeOffOutline />
+                      ) : (
+                        <icons.IoEyeOutline />
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Password strength bar */}
+                  {form.password && (
+                    <div className="h-1 w-full bg-gray-200 rounded mt-1">
+                      <div
+                        className={`h-1 rounded ${getStrengthColor()}`}
+                        style={{
+                          width:
+                            passwordStrength === "Weak"
+                              ? "33%"
+                              : passwordStrength === "Medium"
+                              ? "66%"
+                              : "100%",
+                        }}
+                      ></div>
+                    </div>
+                  )}
+                  {form.password && (
+                    <span className="text-xs text-gray-600 mt-1">
+                      Strength: {passwordStrength}
+                    </span>
+                  )}
+
+                  {/* Confirm password */}
+                  <div className="relative">
+                    <Input
+                      label="Confirm Password"
+                      name="cpassword"
+                      type={showCPassword ? "text" : "password"}
+                      value={form.cpassword}
+                      onChange={handleChange}
+                    />
+                    <span
+                      className="absolute right-2 top-[40px] cursor-pointer text-gray-500"
+                      onClick={() => setShowCPassword((prev) => !prev)}
+                    >
+                      {showPassword ? (
+                        <icons.IoEyeOffOutline />
+                      ) : (
+                        <icons.IoEyeOutline />
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Terms */}
+                  <div className="flex items-center gap-2 text-xs mt-2">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      checked={termsAgreed}
+                      onChange={(e) => setTermsAgreed(e.target.checked)}
+                    />
+                    <label htmlFor="terms">
+                      I agree to the{" "}
+                      <span
+                        className="text-blue-600 cursor-pointer"
+                        onClick={() => navigate("/terms")}
+                      >
+                        Terms and Conditions
+                      </span>
+                    </label>
+                  </div>
+
                   <Button
                     type="submit"
-                    style="w-full h-[35px] bg-blue-400 text-white rounded"
+                    style="w-full h-[35px] bg-blue-400 text-white rounded mt-2"
                     label={loading ? "Signing up..." : "Sign Up"}
                     disabled={loading}
                   />

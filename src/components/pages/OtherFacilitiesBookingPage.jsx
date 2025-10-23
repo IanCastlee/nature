@@ -136,7 +136,7 @@ function OtherFacilitiesBookingPage() {
       startTime: startTime,
       endTime: formattedEndTime,
       facilityType: "function hall",
-      userId: user?.id,
+      userId: user?.user_id,
     });
   };
 

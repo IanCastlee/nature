@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from "react";
+import React, { memo } from "react";
 import { motion } from "framer-motion";
 import dummyImage from "../../assets/dummyImages/rooma.jpg";
 import { LazyLoadImage } from "react-lazy-load-image-component";
@@ -10,14 +10,6 @@ import Button from "../atoms/Button";
 
 function RoomCard({ rooms }) {
   const navigate = useNavigate();
-
-  //  Check if user is signed in
-  useEffect(() => {
-    const user = sessionStorage.getItem("user"); // or localStorage if you store there
-    if (!user) {
-      navigate("/"); // redirect to homepage if not signed in
-    }
-  }, [navigate]);
 
   // Animation variants
   const cardVariants = {
@@ -49,7 +41,7 @@ function RoomCard({ rooms }) {
               }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
             >
-              {/* Image Section */}
+              {/* Image with Maintenance Overlay */}
               <div className="w-full h-48 relative overflow-hidden">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
@@ -83,7 +75,7 @@ function RoomCard({ rooms }) {
                 )}
               </div>
 
-              {/* Room Info */}
+              {/* Room Details */}
               <div className="p-4">
                 <div className="w-full flex flex-row justify-between items-center">
                   <div className="flex flex-col">
@@ -112,7 +104,7 @@ function RoomCard({ rooms }) {
                   </motion.div>
                 </div>
 
-                {/* Capacity + Duration */}
+                {/* Room Info */}
                 <div className="border-t dark:border-gray-800 mt-4 flex flex-wrap justify-start pt-4 gap-5">
                   <span className="inline-flex items-center text-sm dark:text-gray-100 text-gray-700 font-medium">
                     <icons.LuUsers className="mr-1 text-blue-600 dark:text-blue-400" />{" "}

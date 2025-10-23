@@ -46,7 +46,7 @@ try {
     if ($user["acc_type"] === "admin") {
         $redirect = "/admin";
     }
-
+/////////////////////////////////////////////////////
     echo json_encode([
         "success" => true,
         "message" => "Login successful",

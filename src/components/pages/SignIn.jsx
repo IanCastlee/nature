@@ -13,6 +13,7 @@ function SignIn() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [toast, setToast] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     submit,
@@ -144,13 +145,25 @@ function SignIn() {
                 value={form.email}
                 onChange={handleChange}
               />
-              <Input
-                label="Password"
-                type="password"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-              />
+              <div className="relative">
+                <Input
+                  label="Password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={form.password}
+                  onChange={handleChange}
+                />
+                <span
+                  className="absolute right-2 top-[40px] cursor-pointer text-gray-500"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? (
+                    <icons.IoEyeOffOutline />
+                  ) : (
+                    <icons.IoEyeOutline />
+                  )}
+                </span>
+              </div>
               <Button
                 type="submit"
                 style="w-full h-[35px] bg-blue-400 text-sm font-medium rounded-lg text-white"

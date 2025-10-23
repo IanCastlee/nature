@@ -55,7 +55,7 @@ export const menuItems = [
     ],
   },
   {
-    name: "Booking",
+    name: "Room Booking",
     icon: icons.GoChecklist,
     children: [
       {
@@ -69,6 +69,25 @@ export const menuItems = [
       {
         name: "Declined Booking",
         to: "/admin/declined-booking",
+      },
+    ],
+  },
+
+  {
+    name: "Function Hall Booking",
+    icon: icons.GoChecklist,
+    children: [
+      {
+        name: "Pending Booking",
+        to: "/admin/fh-booking",
+      },
+      {
+        name: "Approved Booking",
+        to: "/admin/fhbooking-approved",
+      },
+      {
+        name: "Declined Booking",
+        to: "/admin/fhbooking-declined",
       },
     ],
   },

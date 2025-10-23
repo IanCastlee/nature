@@ -37,6 +37,8 @@ import { MdOutlineKeyboardArrowUp } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
 import { GrHistory } from "react-icons/gr";
 import { BsArrowRight } from "react-icons/bs";
+import { IoEyeOutline } from "react-icons/io5";
+import { IoEyeOffOutline } from "react-icons/io5";
 
 //admin sidebar
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -52,6 +54,8 @@ import { HiOutlineUserGroup } from "react-icons/hi2";
 
 export const icons = {
   FaPhoneAlt,
+  IoEyeOutline,
+  IoEyeOffOutline,
   BsArrowRight,
   RiMenuLine,
   MdOutlineKeyboardArrowDown,

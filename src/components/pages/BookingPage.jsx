@@ -16,6 +16,8 @@ import "react-day-picker/dist/style.css";
 function BookingPage() {
   const { user } = useAuthStore();
 
+  console.log("______:", user);
+
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [addedExtras, setAddedExtras] = useState([]);
@@ -87,7 +89,7 @@ function BookingPage() {
         }
       }
 
-      // ✅ 4. Always disable today
+      //  4. Always disable today
       if (!disabledSet.has(today.getTime())) {
         extendedDisabled.push(today);
         disabledSet.add(today.getTime());
@@ -132,7 +134,7 @@ function BookingPage() {
     );
 
     const payload = {
-      userId: user.id,
+      userId: user.user_id,
       facility_id: Number(roomId),
       check_in: selectedRange.from
         ? selectedRange.from.toLocaleDateString("en-CA")

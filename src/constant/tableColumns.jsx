@@ -206,3 +206,77 @@ export const users = [
     key: "email_verified",
   },
 ];
+
+//function hall booking
+export const fhbooking = [
+  {
+    title: "Name",
+    key: "firstname",
+  },
+  {
+    title: "Email",
+    key: "email",
+  },
+  {
+    title: "Function Hall",
+    key: "name",
+  },
+  {
+    title: "Date",
+    key: "date",
+  },
+  {
+    title: "Start Time(mt)",
+    key: "start_time",
+  },
+  {
+    title: "End Time(mt)",
+    key: "end_time",
+  },
+
+  {
+    title: "Price",
+    key: "price",
+  },
+  {
+    title: "Status",
+    key: "status",
+  },
+];
+
+//function hall approved booking
+export const fhbookingApproved = [
+  {
+    title: "Name",
+    key: "firstname",
+  },
+  {
+    title: "Email",
+    key: "email",
+  },
+  {
+    title: "Function Hall",
+    key: "name",
+  },
+  {
+    title: "Date",
+    key: "date",
+  },
+  {
+    title: "Start Time(mt)",
+    key: "start_time",
+  },
+  {
+    title: "End Time(mt)",
+    key: "end_time",
+  },
+
+  {
+    title: "Price",
+    key: "price",
+  },
+  {
+    title: "Status",
+    key: "status",
+  },
+];
