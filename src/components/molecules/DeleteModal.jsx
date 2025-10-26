@@ -12,6 +12,19 @@ function DeleteModal({
   label3,
   onConfirm,
 }) {
+  // Determine message text
+  const message =
+    label2 === "approve post"
+      ? "Approve this post?"
+      : `${
+          label && label !== "Yes, Approve"
+            ? "You are about to set"
+            : "Are you sure you want to set"
+        } 
+        ${name ? ` ${name}` : ""}${
+          label && label !== "Yes, Approve" ? " as" : "'s"
+        } ${label2}`;
+
   return (
     <div className="w-full h-screen bg-black/10 flex justify-center items-start pt-10 fixed inset-0 z-50">
       <motion.div
@@ -22,17 +35,14 @@ function DeleteModal({
       >
         <div className="mt-8">
           <p className="text-center text-sm font-medium dark:text-white text-gray-800">
-            {label && label !== "Yes, Approve"
-              ? "You are about to set"
-              : "Are you sure you want to set"}{" "}
-            <span className="text-green-500">{name}</span>
-            {label && label !== "Yes, Approve" ? " as" : "'s"}{" "}
-            <span className="text-green-500">{label2}</span>
+            {message}
           </p>
 
-          <p className="text-center text-xs dark:text-gray-200 font-medium text-gray-600 mt-5">
-            {label3}
-          </p>
+          {label3 && (
+            <p className="text-center text-xs dark:text-gray-200 font-medium text-gray-600 mt-5">
+              {label3}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-row justify-end items-center gap-2 mt-5">
@@ -45,7 +55,9 @@ function DeleteModal({
             disabled={loading}
             onClick={onConfirm}
             className={`h-[28px] px-2 ${
-              label === "Yes, Approve" ? "bg-green-600" : "bg-red-500"
+              label === "Yes, Approve" || label2 === "approve post"
+                ? "bg-green-600"
+                : "bg-red-500"
             } text-xs text-white font-medium rounded-md w-auto hover:bg-gray-600`}
             label={loading ? "Updating..." : label}
           />

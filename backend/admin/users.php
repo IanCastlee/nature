@@ -14,7 +14,7 @@ if ($method === "GET") {
     $status = $_GET['status'] ?? null;
 
     if($status == 0){
-     $stmt = $conn->prepare("SELECT * FROM users WHERE email_verified = ? AND acc_type  != 0");
+     $stmt = $conn->prepare("SELECT * FROM users WHERE email_verified = ? AND acc_type  != 'admin'");
      $stmt->bind_param('i', $status);
     $stmt->execute();
 
@@ -29,7 +29,7 @@ if ($method === "GET") {
     }
 
      if($status == 1){
-     $stmt = $conn->prepare("SELECT * FROM users WHERE email_verified = ? AND acc_type  != 0");
+     $stmt = $conn->prepare("SELECT * FROM users WHERE email_verified = ? AND acc_type  != 'admin'");
      $stmt->bind_param('i', $status);
     $stmt->execute();
 

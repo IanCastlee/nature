@@ -6,6 +6,7 @@ import useThemeStore from "../../store/themeStore";
 import { dummyRooms } from "../../constant/mockData";
 import useAuthStore from "../../store/authStore";
 import Button from "../atoms/Button";
+import useGetData from "../../hooks/useGetData";
 
 function Header({ isHome }) {
   const { user } = useAuthStore();
@@ -17,6 +18,11 @@ function Header({ isHome }) {
   const [mobileRoomsOpen, setMobileRoomsOpen] = useState(false);
   const { darkMode, toggleDarkMode } = useThemeStore();
   const [showDropdown, setShowDropdown] = useState(false);
+
+  // Fetch data
+  const { data, loading, refetch, error } = useGetData(
+    "/admin/room-category.php"
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,7 +36,7 @@ function Header({ isHome }) {
 
   return (
     <header
-      className={` fixed top-0 left-0 w-full h-[70px] z-50 flex items-center px-4 md:px-10 transition-colors duration-300 ${
+      className={`fixed top-0 left-0 w-full h-[70px] z-50 flex items-center px-4 md:px-10 transition-colors duration-300 ${
         scrolled
           ? "bg-white shadow-md dark:bg-black"
           : isHome
@@ -63,17 +69,19 @@ function Header({ isHome }) {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-10 ml-auto pr-10">
           <ul className="flex items-center gap-10">
-            {["Home", "About", "Services"].map((item) => (
+            {["Home", "About", "Services", "Gallery"].map((item) => (
               <li key={item} className="relative group">
                 <Link
                   to={`/${item === "Home" ? "" : item.toLowerCase()}`}
                   className={`text-sm transition-colors duration-300 group-hover:text-blue-400
-            before:content-[''] before:absolute before:bottom-0 before:left-1/2 
-            before:translate-x-[-50%] before:h-[2px] before:w-0 
-            before:bg-blue-400 before:transition-all before:duration-300 
-            group-hover:before:w-full ${
-              !scrolled && isHome ? "text-white" : "text-black dark:text-white"
-            }`}
+                    before:content-[''] before:absolute before:bottom-0 before:left-1/2 
+                    before:translate-x-[-50%] before:h-[2px] before:w-0 
+                    before:bg-blue-400 before:transition-all before:duration-300 
+                    group-hover:before:w-full ${
+                      !scrolled && isHome
+                        ? "text-white"
+                        : "text-black dark:text-white"
+                    }`}
                 >
                   {item}
                 </Link>
@@ -84,36 +92,43 @@ function Header({ isHome }) {
             <li className="relative group cursor-pointer">
               <span
                 className={`text-sm transition-colors duration-300 group-hover:text-blue-400
-          before:content-[''] before:absolute before:bottom-0 before:left-1/2 
-          before:translate-x-[-50%] before:h-[2px] before:w-0 
-          before:bg-blue-400 before:transition-all before:duration-300 
-          group-hover:before:w-full ${
-            !scrolled && isHome ? "text-white" : "text-black dark:text-white"
-          }`}
+                  before:content-[''] before:absolute before:bottom-0 before:left-1/2 
+                  before:translate-x-[-50%] before:h-[2px] before:w-0 
+                  before:bg-blue-400 before:transition-all before:duration-300 
+                  group-hover:before:w-full ${
+                    !scrolled && isHome
+                      ? "text-white"
+                      : "text-black dark:text-white"
+                  }`}
               >
                 Offer
               </span>
 
+              {/* Offer dropdown menu */}
               <ul
-                className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg opacity-0 invisible 
-        group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out z-50"
+                className="absolute left-0 top-full mt-6 w-48 bg-white shadow-lg opacity-0 invisible 
+                  group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out z-50"
               >
-                <li className="relative group/submenu cursor-pointer">
+                {/* Rooms submenu (appears on hover of Rooms only) */}
+                <li className="relative group/rooms cursor-pointer">
                   <span className="block px-4 py-2 hover:bg-gray-100 text-sm">
                     Rooms
                   </span>
 
+                  {/* Submenu positioned to the LEFT */}
                   <ul
-                    className="absolute right-full top-0 mt-8 mr-1 w-64 bg-white shadow-lg opacity-0 invisible 
-            group-hover/submenu:opacity-100 group-hover/submenu:visible transition-all duration-300 ease-in-out z-50"
+                    className="absolute right-full top-0 mt-2 mr-[1px] w-64 bg-white shadow-lg opacity-0 invisible 
+                      group-hover/rooms:opacity-100 group-hover/rooms:visible transition-all duration-300 ease-in-out z-50"
                   >
-                    {dummyRooms.map((item) => (
+                    {data?.map((item) => (
                       <li
-                        key={item.name}
-                        onClick={() => navigate(`/room-category/${item.name}`)}
+                        key={item.category_id}
+                        onClick={() =>
+                          navigate(`/room-category/${item.category_id}`)
+                        }
                         className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-xs"
                       >
-                        {user?.firstname.split(" ")[0]}
+                        {item.category}
                       </li>
                     ))}
                   </ul>
@@ -127,7 +142,7 @@ function Header({ isHome }) {
                 </li>
                 <li
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                  onClick={() => navigate("/function-hall")}
+                  onClick={() => navigate("/function-halls")}
                 >
                   Function Hall
                 </li>
@@ -145,7 +160,6 @@ function Header({ isHome }) {
                   <span className="text-xs text-white font-medium">
                     {user.firstname.split(" ")[0]}
                   </span>
-
                   <icons.MdOutlineArrowDropDownCircle
                     size={18}
                     className={`${
@@ -180,7 +194,7 @@ function Header({ isHome }) {
                         useAuthStore.getState().logout();
                         navigate("/signin");
                       }}
-                      style="w-full flex flex-row  justify-center items-center px-4 py-2 text-sm text-white hover:bg-gray-500 dark:hover:bg-gray-700 bg-red-600 rounded-full text-center gap-2"
+                      style="w-full flex flex-row justify-center items-center px-4 py-2 text-sm text-white hover:bg-gray-500 dark:hover:bg-gray-700 bg-red-600 rounded-full text-center gap-2"
                       label={
                         <>
                           Logout{" "}
@@ -224,7 +238,7 @@ function Header({ isHome }) {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu (unchanged) */}
       {mobileMenuOpen && (
         <div className="absolute top-full left-0 w-full bg-white dark:bg-gray-800 shadow-lg z-40 md:hidden">
           <ul className="flex flex-col gap-4 p-4 text-sm text-black dark:text-white">
@@ -251,6 +265,7 @@ function Header({ isHome }) {
                 onClick={() => setMobileOfferOpen(!mobileOfferOpen)}
               >
                 <span>Offer</span>
+                <span>Gallery</span>
                 <span>
                   {mobileOfferOpen ? (
                     <icons.MdOutlineKeyboardArrowUp className="text-lg dark:text-white text-black" />
@@ -269,32 +284,34 @@ function Header({ isHome }) {
                     >
                       Room Categories
                       <span>
-                        {mobileOfferOpen ? (
+                        {mobileRoomsOpen ? (
                           <icons.MdOutlineKeyboardArrowUp className="text-lg dark:text-white text-black" />
                         ) : (
                           <icons.MdOutlineKeyboardArrowDown className="text-lg dark:text-white text-black" />
                         )}
                       </span>
                     </button>
+
                     {mobileRoomsOpen && (
                       <ul className="pl-6 mt-2 flex flex-col gap-3">
-                        {dummyRooms.map((item) => (
+                        {data?.map((item) => (
                           <li
-                            key={item.name}
+                            key={item.category_id}
                             onClick={() => {
-                              navigate(`/room-category/${item.name}`);
+                              navigate(`/room-category/${item.category_id}`);
                               setMobileMenuOpen(false);
                               setMobileOfferOpen(false);
                               setMobileRoomsOpen(false);
                             }}
                             className="cursor-pointer text-xs hover:underline py-1"
                           >
-                            {item.name}
+                            {item.category}
                           </li>
                         ))}
                       </ul>
                     )}
                   </li>
+
                   <li
                     className="cursor-pointer hover:underline"
                     onClick={() => {

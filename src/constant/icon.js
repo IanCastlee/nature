@@ -39,6 +39,7 @@ import { GrHistory } from "react-icons/gr";
 import { BsArrowRight } from "react-icons/bs";
 import { IoEyeOutline } from "react-icons/io5";
 import { IoEyeOffOutline } from "react-icons/io5";
+import { FiUpload } from "react-icons/fi";
 
 //admin sidebar
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -51,16 +52,19 @@ import { MdDeleteForever } from "react-icons/md";
 import { MdOutlineMeetingRoom } from "react-icons/md";
 import { MdOutlineCottage } from "react-icons/md";
 import { HiOutlineUserGroup } from "react-icons/hi2";
+import { GoImage } from "react-icons/go";
 
 export const icons = {
   FaPhoneAlt,
   IoEyeOutline,
+  FiUpload,
   IoEyeOffOutline,
   BsArrowRight,
   RiMenuLine,
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowUp,
   GrHistory,
+  GoImage,
   GoChecklist,
   IoIosLogOut,
   HiOutlineUserGroup,

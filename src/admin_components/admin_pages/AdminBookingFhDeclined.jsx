@@ -5,15 +5,26 @@ import useGetData from "../../hooks/useGetData";
 import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
-import { renderActionsBookingHistory } from "../admin_molecules/RenderActions";
-import { booking } from "../../constant/tableColumns";
+import {
+  renderActionsBookingHistory,
+  renderActionsFhBooking,
+} from "../admin_molecules/RenderActions";
+import {
+  booking,
+  fhbooking,
+  fhbookingApproved,
+} from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
+import { useLocation } from "react-router-dom";
 
 function AdminBookingFhDeclined() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
   const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
+
+  const location = useLocation();
+  const isNotAvailablePage = location.pathname.includes("fhbooking-approved");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -72,7 +83,7 @@ function AdminBookingFhDeclined() {
     <>
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
-          Declined Booking
+          Approved Function Hall Booking
         </h1>
 
         {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
@@ -99,12 +110,13 @@ function AdminBookingFhDeclined() {
 
         <div className="overflow-x-auto">
           <GenericTable
-            columns={booking}
+            columns={fhbooking}
             data={currentData}
             loading={loading}
             noDataComponent={<NoData />}
             renderActions={(item) => {
-              return renderActionsBookingHistory({
+              return renderActionsFhBooking({
+                isNotAvailablePage,
                 item,
                 setShowForm,
               });

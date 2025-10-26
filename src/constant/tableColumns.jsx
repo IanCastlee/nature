@@ -5,11 +5,22 @@ export const availableRoomColumns = [
     title: "Image",
     key: "image",
     render: (item) => (
-      <img
-        src={`${uploadUrl.uploadurl}/rooms/${item.image}`}
-        alt={item.room_name}
-        className="w-10 h-10 rounded shadow-sm"
-      />
+      <div className="relative group">
+        <img
+          src={`${uploadUrl.uploadurl}/rooms/${item.image}`}
+          alt={item.room_name}
+          className="w-10 h-10 rounded shadow-sm object-cover"
+        />
+
+        {/* Fixed preview on hover */}
+        <div className="hidden group-hover:flex fixed inset-0 bg-black/70 justify-center items-center z-50">
+          <img
+            src={`${uploadUrl.uploadurl}/rooms/${item.image}`}
+            alt={item.room_name}
+            className="max-w-[90%] max-h-[90%] object-cover rounded-lg shadow-lg border border-white"
+          />
+        </div>
+      </div>
     ),
   },
   {
@@ -274,6 +285,44 @@ export const fhbookingApproved = [
   {
     title: "Price",
     key: "price",
+  },
+  {
+    title: "Status",
+    key: "status",
+  },
+];
+
+export const galleryColumn = [
+  {
+    title: "Posted By",
+    key: "fullname",
+    render: (item) => `${item.firstname} ${item.lastname}`,
+  },
+  {
+    title: "Post",
+    key: "image",
+    render: (item) => (
+      <div className="relative group">
+        <img
+          src={`${uploadUrl.uploadurl}/gallery/${item.image}`}
+          alt={item.room_name}
+          className="w-10 h-10 rounded shadow-sm object-cover"
+        />
+
+        {/* Fixed preview on hover */}
+        <div className="hidden group-hover:flex fixed inset-0 bg-black/70 justify-center items-center z-50">
+          <img
+            src={`${uploadUrl.uploadurl}/gallery/${item.image}`}
+            alt={item.room_name}
+            className="max-w-[90%] max-h-[90%] object-cover rounded-lg shadow-lg border border-white"
+          />
+        </div>
+      </div>
+    ),
+  },
+  {
+    title: "Date Posted",
+    key: "date_posted",
   },
   {
     title: "Status",

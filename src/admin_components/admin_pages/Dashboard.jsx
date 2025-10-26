@@ -10,6 +10,7 @@ import {
   Legend,
   Title,
 } from "chart.js";
+import useGetData from "../../hooks/useGetData";
 
 ChartJS.register(
   LineElement,
@@ -24,11 +25,84 @@ ChartJS.register(
 const Dashboard = () => {
   const [selectedYear, setSelectedYear] = useState("2025");
 
+  // Fetch data count
+  const { data, loading, refetch, error } = useGetData(`/admin/counts.php`);
+
   const stats = [
-    { title: "New Bookings", value: "234", percent: "+234%", color: "green" },
-    { title: "Total Expenses", value: "71%", percent: "-71%", color: "red" },
-    { title: "Revenue", value: "$1.45M", percent: "+18%", color: "yellow" },
-    { title: "New Customers", value: "34", percent: "+34", color: "blue" },
+    {
+      title: "Room Pending Booking",
+      value: data ? data.pendingRoomBookings : "-",
+      //  percent: data ? `+${data.pendingRoomBookings}%` : "-",
+      color: "green",
+    },
+    {
+      title: "Function Hall Bookings",
+      value: data ? data.functionHallBookings : "-",
+      // percent: data ? `+${data.functionHallBookings}%` : "-",
+      color: "red",
+    },
+    {
+      title: "Not Verified Users",
+      value: data ? data.notVerifiedUsers : "-",
+      // percent: data ? `+${data.notVerifiedUsers}%` : "-",
+      color: "blue",
+    },
+    {
+      title: "Verified Users",
+      value: data ? data.verifiedUsers : "-",
+      // percent: data ? `+${data.verifiedUsers}%` : "-",
+      color: "yellow",
+    },
+  ];
+
+  const facilities = [
+    {
+      title: "Rooms",
+      color: "green",
+      details: [
+        { label: "Available Rooms", value: data ? data.availableRooms : "-" },
+        {
+          label: "Not Available Rooms",
+          value: data ? data.notAvailableRooms : "-",
+        },
+      ],
+    },
+    {
+      title: "Function Halls",
+      color: "orange",
+      details: [
+        { label: "Available Rooms", value: data ? data.availableHalls : "-" },
+        {
+          label: "Not Available Rooms",
+          value: data ? data.notAvailableHalls : "-",
+        },
+      ],
+    },
+    {
+      title: "Cottages",
+      color: "red",
+      details: [
+        {
+          label: "Available Rooms",
+          value: data ? data.availableCottages : "-",
+        },
+        {
+          label: "Not Available Rooms",
+          value: data ? data.notAvailableCottages : "-",
+        },
+      ],
+    },
+    {
+      title: "Under Maintenance",
+      color: "blue",
+      details: [
+        { label: "Room(s)", value: data ? data.roomsUnderMaintenance : "-" },
+        {
+          label: "Function Hall(s)",
+          value: data ? data.hallsUnderMaintenance : "-",
+        },
+      ],
+    },
   ];
 
   // Dummy bookings grouped by year
@@ -69,15 +143,12 @@ const Dashboard = () => {
     responsive: true,
     plugins: {
       legend: { position: "top" },
-      title: {
-        display: true,
-        text: `Bookings Per Month - ${selectedYear}`,
-      },
+      title: { display: true, text: `Bookings Per Month - ${selectedYear}` },
     },
   };
 
   return (
-    <div className=" dark:bg-gray-800 bg-gray-100 min-h-screen">
+    <div className="dark:bg-gray-800 bg-gray-100 min-h-screen">
       <h1 className="text-lg font-bold mb-4 dark:text-white text-black">
         Dashboard Overview
       </h1>
@@ -92,18 +163,47 @@ const Dashboard = () => {
             <h2 className="text-sm text-gray-600 dark:text-gray-200 font-medium">
               {item.title}
             </h2>
-            <p
-              className={`text-2xl text-gray-600 dark:text-gray-200 font-bold text-${item.color}-500`}
-            >
+            <p className={`text-2xl font-bold text-${item.color}-500`}>
               {item.value}
             </p>
-            <span
-              className={`text-sm text-gray-600 dark:text-gray-200 text-${item.color}-400`}
-            >
+            <span className={`text-sm text-${item.color}-400`}>
               {item.percent}
             </span>
           </div>
         ))}
+      </div>
+
+      {/* Facilities */}
+      <div>
+        <h2 className="text-lg font-semibold mb-3 dark:text-white text-black">
+          Facilities
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {facilities.map((item, index) => (
+            <div
+              key={index}
+              className="bg-white dark:bg-gray-900 p-4 rounded-md shadow-md flex flex-col justify-between border-l-4"
+              style={{ borderLeftColor: item.color }}
+            >
+              <h2 className="text-sm text-gray-600 dark:text-gray-200 font-semibold">
+                {item.title}
+              </h2>
+              {item.details && (
+                <div className="mt-3 space-y-1">
+                  {item.details.map((detail, i) => (
+                    <div
+                      key={i}
+                      className="flex justify-between text-xs text-gray-600 dark:text-gray-300"
+                    >
+                      <span>{detail.label}</span>
+                      <span className="font-semibold">{detail.value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Year Filter */}

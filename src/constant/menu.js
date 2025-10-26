@@ -107,6 +107,20 @@ export const menuItems = [
     ],
   },
   {
+    name: "Gallery",
+    icon: icons.GoImage,
+    children: [
+      {
+        name: "Pending",
+        to: "/admin/pending-post",
+      },
+      {
+        name: "Posted",
+        to: "/admin/posted-post",
+      },
+    ],
+  },
+  {
     name: "Analytics",
     to: "/admin/analytics",
     icon: icons.GrAnalytics,

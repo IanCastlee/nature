@@ -1,6 +1,6 @@
 import React, { useEffect, Suspense, lazy } from "react";
 import { images } from "../../constant/image";
-import { dummyCottages, freebies } from "../../constant/mockData";
+import { freebies } from "../../constant/mockData";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { icons } from "../../constant/icon";
@@ -52,8 +52,6 @@ function HomePage() {
     refetch: refetchCottage,
     error: errorCottage,
   } = useGetData(`/admin/cottage.php?status=active`);
-
-  console.log("___", dataCottage);
 
   // Preload images
   useEffect(() => {
@@ -269,7 +267,7 @@ function HomePage() {
             <ReadMoreButton
               label={
                 <>
-                  View More{" "}
+                  Show More{" "}
                   <icons.HiArrowSmallRight className="text-white inline" />
                 </>
               }

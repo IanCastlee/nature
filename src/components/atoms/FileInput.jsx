@@ -1,12 +1,15 @@
 import React from "react";
 
-function FileInput({ onChange, isRequired, label }) {
+function FileInput({ onChange, isRequired, label, hide = false, id }) {
   return (
-    <div className="w-full">
-      <label htmlFor="" className="text-xs dark:text-gray-300">
-        {label}
-      </label>
+    <div className={`w-full ${hide ? "hidden" : ""}`}>
+      {label && (
+        <label htmlFor={id} className="text-xs dark:text-gray-300">
+          {label}
+        </label>
+      )}
       <input
+        id={id}
         type="file"
         onChange={onChange}
         required={isRequired}

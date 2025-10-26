@@ -45,7 +45,7 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
     <nav
       className={`${
         isCollapsed ? "w-20" : "w-64"
-      } fixed top-0 left-0 h-screen bg-white dark:bg-gray-900 text-gray-100 flex flex-col transition-all duration-300 z-50`}
+      } fixed top-0 left-0 h-screen bg-white dark:bg-gray-900 text-gray-100 flex flex-col transition-all duration-300 z-50 overflow-y-auto hide-scrollbar`}
     >
       {/*  Top controls */}
       <div className="flex flex-row items-center gap-1 justify-between dark:bg-gray-800 mb-4 p-1">
@@ -180,7 +180,7 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
 
       {/*  Footer */}
       {!isCollapsed && (
-        <footer className="mt-auto p-2 border-t dark:border-gray-700 border-gray-300 text-sm text-gray-400 text-center flex flex-col items-center justify-center">
+        <footer className="mt-auto p-2 border-t dark:border-gray-700 border-gray-300 text-sm text-gray-600 text-center flex flex-col items-center justify-center">
           © {currentYear} Nature Hot Spring. All rights reserved.
         </footer>
       )}

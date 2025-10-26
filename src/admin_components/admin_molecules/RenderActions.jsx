@@ -319,3 +319,39 @@ export const renderActionsFhBooking = ({
     </div>
   );
 };
+
+//render action gallery
+export const renderActionsGallery = ({
+  item,
+  onSetReject,
+  onSetApprove,
+  isNotAvailablePage,
+}) => {
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <div className="flex flex-row items-center gap-2">
+        {!isNotAvailablePage && (
+          <button
+            onClick={() => onSetApprove(item)}
+            className="bg-yellow-600 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center items-center"
+            title="Approve"
+          >
+            Approve
+          </button>
+        )}
+
+        <button
+          onClick={() => onSetReject(item)}
+          className="bg-red-500 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center items-center "
+          title={
+            isNotAvailablePage?.isNotAvailablePage
+              ? "Set as available"
+              : "Set as not in-active"
+          }
+        >
+          Reject
+        </button>
+      </div>
+    </div>
+  );
+};

@@ -27,7 +27,6 @@ function VerifiedUsers() {
   const { data, loading, refetch, error } = useGetData(
     `/admin/users.php?status=1`
   );
-  console.log(data);
   //handlePageChange
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);

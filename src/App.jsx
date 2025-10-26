@@ -43,6 +43,10 @@ import TermsAndConditions from "./components/pages/TermsAndConditions";
 import AdminFhBooking from "./admin_components/admin_pages/AdminFhBooking";
 import AdminBookingFhApproved from "./admin_components/admin_pages/AdminBookingFhApproved";
 import AdminBookingFhDeclined from "./admin_components/admin_pages/AdminBookingFhDeclined";
+import FunctionHallsPage from "./components/pages/FunctionHallsPage";
+import Gallery from "./components/pages/Gallery";
+import PendingPost from "./admin_components/admin_pages/PendingPost";
+import PostedPost from "./admin_components/admin_pages/PostedPost";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -52,6 +56,7 @@ const UserLayout = () => {
     "/signin",
     "/room-deatails",
     "/booking",
+    "/gallery",
     "/other-facilities-booking",
   ];
   const shouldHideLayout = hideLayoutPaths.some((path) =>
@@ -86,6 +91,7 @@ const UserLayout = () => {
           element={<ViewCottagePage />}
         />
         <Route path="/cottages" element={<CottagesPage />} />
+        <Route path="/function-halls" element={<FunctionHallsPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/test" element={<Test />} />
         <Route path="/room-view/:photo" element={<RoomViewTest />} />
@@ -94,6 +100,7 @@ const UserLayout = () => {
         <Route path="/signin" element={<SignIn />} />
 
         <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/gallery" element={<Gallery />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -163,6 +170,9 @@ const AdminLayout = () => {
 
           <Route path="/verified-users" element={<VerifiedUsers />} />
           <Route path="/notverified-users" element={<NotVerifiedUsers />} />
+
+          <Route path="/pending-post" element={<PendingPost />} />
+          <Route path="/posted-post" element={<PostedPost />} />
         </Routes>
       </main>
     </div>

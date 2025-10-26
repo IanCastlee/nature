@@ -104,7 +104,7 @@ function ViewRoomPage() {
                 label="View House Rules"
               />
               <Button
-                onClick={() => navigate(`/booking/${room_id}`)} // ✅ Correct
+                onClick={() => navigate(`/booking/${room_id}`)} // ✅ Correc
                 style="h-[30px] bg-green-600 text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
                 label="Reserve Now"
               />

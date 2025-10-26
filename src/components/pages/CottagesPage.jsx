@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { images } from "../../constant/image";
-import { dummyCottages } from "../../constant/mockData";
 import useGetData from "../../hooks/useGetData";
 import CattageCard from "../molecules/CattageCard"; // No lazy loading
 

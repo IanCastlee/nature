@@ -67,9 +67,9 @@ function AdminBookingPage() {
   const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  //============================//
+  //==========================//
   //   HANDLE DELETE/INACTIVE //
-  //=========================//
+  //==========================//
 
   //set approved
   const {

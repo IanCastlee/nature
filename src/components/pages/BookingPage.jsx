@@ -16,8 +16,6 @@ import "react-day-picker/dist/style.css";
 function BookingPage() {
   const { user } = useAuthStore();
 
-  console.log("______:", user);
-
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [addedExtras, setAddedExtras] = useState([]);
