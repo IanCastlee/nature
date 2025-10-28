@@ -284,21 +284,21 @@ function BookingPage() {
         />
       )}
       <div className="w-full dark:bg-black">
-        <div className="w-full flex flex-row">
+        <div className="w-full flex flex-col md:flex-col lg:flex-row">
           <LazyLoadImage
             src={`${uploadUrl.uploadurl}/rooms/${image}`}
             alt="Project image"
             effect="blur"
-            wrapperClassName="w-1/2 h-screen"
+            wrapperClassName="lg:w-1/2 md:w-full w-full lg:h-screen md:h-[150px] h-[150px]"
             className="w-full h-full object-cover"
           />
-          <div className="w-1/2  p-6 overflow-y-auto h-screen">
+          <div className="w-full md:w-full lg:w-1/2  p-6 overflow-y-auto h-screen">
             <div className="w-full flex flex-row justify-between items-center mb-5 pb-1 border-b dark:border-gray-600 border-gray-300 ">
               <h2 className="font-semibold text-sm dark:text-gray-200 text-gray-800">
                 Room Details
               </h2>
 
-              <div className="flex flex-row items-center gap-10">
+              <div className="flex flex-row items-center lg:gap-10 md:gap-10 gap-4">
                 <Button
                   onClick={handlePreviousRoom}
                   label={
@@ -333,11 +333,11 @@ function BookingPage() {
             </p>
 
             {/*  Extras Dropdown */}
-            <div className="mt-4 border-t pt-4 dark:border-gray-600 border-gray-300 pb-4">
+            <div className=" mt-4 border-t pt-4 dark:border-gray-600 border-gray-300 pb-4">
               <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-sm">
                 Select your prepared date
               </h3>
-              <div className="flex flex-row gap-6 items-center">
+              <div className="flex lg:flex-row md:flex-col flex-col gap-6 items-center">
                 <div className="scale-90  md:scale-100 w-fit border p-2 rounded-lg">
                   <DayPicker
                     mode="range"
@@ -393,11 +393,11 @@ function BookingPage() {
 
             {extras && (
               <div className="w-full flex flex-row justify-start items-center  border-t dark:border-gray-600 border-gray-300 pb-4">
-                <div className="w-[60%] mt-5 ">
+                <div className="lg:w-[60%] md:w-full w-full mt-5 ">
                   <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-sm">
                     Add Extras
                   </h3>
-                  <div className="flex flex-row gap-2 justify-center items-center">
+                  <div className="flex flex-col  md:flex-row lg:flex-row  gap-2 justify-center items-center">
                     <div className="w-[70%]">
                       <CustomDropDownn
                         label="Extras"
@@ -410,32 +410,35 @@ function BookingPage() {
                         labelKey="extras"
                       />
                     </div>
-                    <div className="w-[30%]">
-                      <Input
-                        label="Quantity"
-                        type="number"
-                        name="qty"
-                        min="1"
-                        value={extraQty}
-                        onChange={(e) => {
-                          const val = Number(e.target.value);
-                          if (!isNaN(val) && val > 0) {
-                            setExtraQty(val);
-                          }
-                        }}
+
+                    <div className="flex flex-row justify-center items-center gap-1">
+                      <div className="w-[30%]">
+                        <Input
+                          label="Quantity"
+                          type="number"
+                          name="qty"
+                          min="1"
+                          value={extraQty}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            if (!isNaN(val) && val > 0) {
+                              setExtraQty(val);
+                            }
+                          }}
+                        />
+                      </div>
+
+                      <Button
+                        disabled={isSubmitDisabled}
+                        label="Add"
+                        style={`bg-blue-600 text-white px-4 py-1 h-[35px] rounded text-sm mt-6 ${
+                          isSubmitDisabled
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-blue-600"
+                        }`}
+                        onClick={handleAddExtra}
                       />
                     </div>
-
-                    <Button
-                      disabled={isSubmitDisabled}
-                      label="Add"
-                      style={`bg-blue-600 text-white px-4 py-1 h-[35px] rounded text-sm mt-6 ${
-                        isSubmitDisabled
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-blue-600"
-                      }`}
-                      onClick={handleAddExtra}
-                    />
                   </div>
                 </div>
               </div>

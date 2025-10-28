@@ -9,7 +9,6 @@ import { uploadUrl } from "../../utils/fileURL";
 import useGetData from "../../hooks/useGetData";
 function ViewCottagePage() {
   const { cottageId } = useParams();
-  console.log("first___ :", cottageId);
 
   const [showHouseRules, setShowHouseRules] = useState(false);
   const navigate = useNavigate();
@@ -83,7 +82,7 @@ function ViewCottagePage() {
 
               <icons.FaStreetView
                 onClick={() => navigate(`/room-view/${photosphere}`)}
-                title="View Room"
+                title="View Facility"
                 className="text-[40px] text-blue-400 cursor-pointer transform transition-transform duration-300 hover:scale-125"
               />
             </div>
@@ -112,7 +111,7 @@ function ViewCottagePage() {
             <span className="inline-flex items-center text-lg dark:text-gray-100 text-gray-700">
               <icons.IoIosTimer className="mr-1 text-blue-400 dark:text-blue-400" />{" "}
               <span className="text-sm dark:text-gray-100 text-gray-800 mr-2">
-                Duration:{" "}
+                Duration:
               </span>
               {duration} hrs
             </span>

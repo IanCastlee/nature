@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { images } from "../../constant/image";
 import { icons } from "../../constant/icon";
 import useThemeStore from "../../store/themeStore";
-import { dummyRooms } from "../../constant/mockData";
 import useAuthStore from "../../store/authStore";
 import Button from "../atoms/Button";
 import useGetData from "../../hooks/useGetData";

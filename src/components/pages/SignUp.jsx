@@ -161,7 +161,7 @@ function SignUp() {
         >
           {/* Left side */}
           <section
-            className="h-full w-1/2 bg-cover bg-center bg-no-repeat flex justify-center items-center p-4"
+            className="h-full w-1/2 bg-cover bg-center bg-no-repeat  justify-center items-center p-4 hidden md:hidden lg:flex"
             style={{ backgroundImage: `url(${images.signupbg})` }}
           >
             <figcaption className="h-full w-full flex flex-col items-center justify-center">
@@ -180,8 +180,10 @@ function SignUp() {
           </section>
 
           {/* Right side */}
-          <section className="w-1/2 h-full flex flex-col justify-center items-center p-4 overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-5">Create your account</h3>
+          <section className="lg:w-1/2 w-full h-full flex flex-col justify-center items-center p-4 dark: bg-gray-800">
+            <h3 className="text-lg font-semibold mb-5 dark:text-gray-200 text-gray-700">
+              Create your account
+            </h3>
 
             <form
               onSubmit={(e) =>
@@ -309,7 +311,9 @@ function SignUp() {
                       onChange={(e) => setTermsAgreed(e.target.checked)}
                     />
                     <label htmlFor="terms">
-                      I agree to the{" "}
+                      <span className="dark:text-gray-200 text-gray-700">
+                        I agree to the{" "}
+                      </span>
                       <span
                         className="text-blue-600 cursor-pointer"
                         onClick={() => navigate("/terms")}
@@ -329,7 +333,7 @@ function SignUp() {
               )}
             </form>
 
-            <div className="mt-2 text-xs">
+            <div className="mt-2 text-xs dark:text-gray-200 text-gray-700">
               Already have an account?{" "}
               <span
                 onClick={() => navigate("/signin")}

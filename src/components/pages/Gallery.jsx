@@ -131,14 +131,18 @@ function Gallery() {
                 onChange={handleFileChange}
                 className="hidden"
               />
-              <label
-                htmlFor="file"
-                className="cursor-pointer flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md w-fit hover:bg-blue-600 transition"
-              >
-                <icons.FiUpload size={20} />
-                Select Images
-              </label>
-
+              <div>
+                <span className="text-xs dark:text-gray-400 text-gray-600">
+                  Upload your catptured
+                </span>
+                <label
+                  htmlFor="file"
+                  className="cursor-pointer flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md w-fit hover:bg-blue-600 transition"
+                >
+                  <icons.FiUpload size={20} />
+                  Select Images
+                </label>
+              </div>
               <button
                 disabled={formLoading || files.length < 1}
                 onClick={handleUpload}
@@ -146,7 +150,7 @@ function Gallery() {
                   files.length >= 1 && files.length <= 5
                     ? "bg-green-600 hover:bg-green-700"
                     : "bg-gray-400 cursor-not-allowed"
-                } transition`}
+                } transition mt-6`}
               >
                 {formLoading ? "Uploading..." : "Upload"}
               </button>

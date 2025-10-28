@@ -53,10 +53,12 @@ import { MdOutlineMeetingRoom } from "react-icons/md";
 import { MdOutlineCottage } from "react-icons/md";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { GoImage } from "react-icons/go";
+import { IoSearch } from "react-icons/io5";
 
 export const icons = {
   FaPhoneAlt,
   IoEyeOutline,
+  IoSearch,
   FiUpload,
   IoEyeOffOutline,
   BsArrowRight,

@@ -47,6 +47,7 @@ import FunctionHallsPage from "./components/pages/FunctionHallsPage";
 import Gallery from "./components/pages/Gallery";
 import PendingPost from "./admin_components/admin_pages/PendingPost";
 import PostedPost from "./admin_components/admin_pages/PostedPost";
+import SearchRoomResult from "./components/pages/SearchRoomResult";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -75,6 +76,8 @@ const UserLayout = () => {
           path="/room-category/:categoryId"
           element={<RoomCategoriesPage />}
         />
+        <Route path="/search-result" element={<SearchRoomResult />} />
+
         <Route path="/room-deatails/:roomId" element={<ViewRoomPage />} />
         <Route path="/booking/:roomId" element={<BookingPage />} />
         <Route

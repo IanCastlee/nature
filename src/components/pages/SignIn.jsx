@@ -110,7 +110,7 @@ function SignIn() {
         >
           {/* Left: Image and Info */}
           <section
-            className="h-full w-1/2 bg-cover bg-center bg-no-repeat flex justify-center items-center p-4"
+            className="h-full w-1/2 bg-cover bg-center bg-no-repeat  justify-center items-center p-4  hidden md:hidden lg:flex"
             style={{ backgroundImage: `url(${images.signupbg})` }}
           >
             <figcaption className="h-full w-full flex flex-col items-center justify-center">
@@ -129,8 +129,8 @@ function SignIn() {
           </section>
 
           {/* Right: Form */}
-          <section className="w-1/2 h-full flex flex-col justify-center items-center p-4">
-            <h3 className="text-lg font-semibold mb-5">
+          <section className="lg:w-1/2 w-full h-full flex flex-col justify-center items-center p-4 dark: bg-gray-800">
+            <h3 className="text-lg font-semibold mb-5 dark:text-gray-200 text-gray-700">
               Login to your account
             </h3>
 
@@ -172,11 +172,11 @@ function SignIn() {
               />
             </form>
 
-            <div className="mt-2 text-xs">
+            <div className="mt-2 text-xs dark:text-gray-200 text-gray-700">
               Don’t have an account?
               <span
                 onClick={() => navigate("/signup")}
-                className="text-blue-600 cursor-pointer font-medium ml-1"
+                className="text-blue-600 cursor-pointer font-medium ml-1 "
               >
                 Sign Up
               </span>

@@ -36,16 +36,16 @@ function CattageCard({ item }) {
           <icons.IoPricetagsOutline /> P {item.price}
         </span>
         <span className="flex flex-row items-center text-sm text-white font-medium gap-2">
-          <icons.LuUsers /> {item.capacity}
+          <icons.LuUsers /> Capacity : {item.capacity}
         </span>
         <span className="flex flex-row items-center text-sm text-white font-medium gap-2">
           <icons.IoIosTimer />
-          {item.duration}
+          Duration : {item.duration}
         </span>
       </motion.div>
 
       <button
-        onClick={() => navigate(`/cottage-details/2`)}
+        onClick={() => navigate(`/cottage-details/${item.cottage_id}`)}
         className="group text-blue-500 text-sm cursor-pointer absolute right-12 bottom-2 rounded-full py-1 px-2 transition-colors duration-300 hover:text-blue-400"
       >
         <span

@@ -14,6 +14,7 @@ import SubtTitle from "../molecules/SubtTitle";
 import Title from "../molecules/Title";
 import ReadMoreButton from "../atoms/ReadMoreButton";
 import useGetData from "../../hooks/useGetData";
+import SearchBox from "../molecules/SearchBox";
 
 const About = lazy(() => import("../organisms/About"));
 const ChatBot = lazy(() => import("../molecules/ChatBot"));
@@ -112,20 +113,8 @@ function HomePage() {
             ))}
           </Swiper>
 
-          {/* Freebies */}
-          <Suspense
-            fallback={
-              <div className="text-center py-10 text-gray-400">Loading...</div>
-            }
-          >
-            <div className="absolute left-4 lg:left-16 bottom-4 flex gap-4 z-30">
-              {freebies.length > 0 ? (
-                freebies.map((item) => <Freebie item={item} key={item.name} />)
-              ) : (
-                <p className="text-white">No Data</p>
-              )}
-            </div>
-          </Suspense>
+          {/* Search Box */}
+          <SearchBox />
         </section>
 
         <Suspense

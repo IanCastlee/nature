@@ -5,6 +5,7 @@ function CustomDropDownn({
   options,
   label,
   value,
+  top,
   onChange,
   valueKey = "id",
   labelKey = "name",
@@ -45,13 +46,16 @@ function CustomDropDownn({
             {selectedOption[labelKey]}
           </span>
         ) : (
-          <span className="text-gray-400">-- Select an option --</span>
+          <span className="text-gray-400">-- Select Category --</span>
         )}
         <icons.MdOutlineArrowDropDownCircle className="ml-2 text-gray-400 text-lg" />
       </button>
 
       {isOpen && (
-        <ul className="absolute z-10 mt-1 w-full max-h-60 overflow-auto rounded-md bg-white dark:bg-gray-700 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-sm">
+        <ul
+          className={`absolute z-50 w-full max-h-60 overflow-auto rounded-md bg-white dark:bg-gray-700 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-sm
+      ${top ? "bottom-full mb-1" : "mt-1"}`}
+        >
           {options?.map((option) => (
             <li
               key={option[valueKey]}

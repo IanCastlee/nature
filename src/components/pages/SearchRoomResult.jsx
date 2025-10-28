@@ -1,0 +1,79 @@
+// SearchRoomResult.jsx
+import React, { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { images } from "../../constant/image";
+import RoomCard from "../molecules/RoomCard";
+import useGetData from "../../hooks/useGetData";
+import { uploadUrl } from "../../utils/fileURL";
+
+function SearchRoomResult() {
+  const [searchParams] = useSearchParams();
+
+  const checkIn = searchParams.get("checkIn");
+  const checkOut = searchParams.get("checkOut");
+  const guests = searchParams.get("guests");
+  const categoryId = searchParams.get("categoryId");
+  console.log("searchParams : ", checkIn, checkOut, guests, categoryId);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  }, []);
+
+  const {
+    data: roomDetails,
+    loading,
+    error,
+  } = useGetData(
+    `/booking/search-rooms.php?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&categoryId=${categoryId}`
+  );
+
+  console.log("____: ", roomDetails);
+
+  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (error)
+    return (
+      <p className="text-center text-red-500">Error loading room details.</p>
+    );
+  if (!roomDetails) return null;
+
+  const title =
+    roomDetails.length > 0 ? roomDetails[0].category : "NO ROOM AVAILABLE";
+
+  return (
+    <main className="w-full min-h-screen dark:bg-black scroll-smooth pb-20 mt-[50px]">
+      <section className="w-full h-[270px] relative">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${images.aboutbg})` }}
+        ></div>
+
+        <div className="absolute inset-0">
+          <div className="w-full h-full bg-gradient-to-b from-black/70 via-black/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-black/50 blur-3xl opacity-40"></div>
+        </div>
+
+        <div className="relative z-10 flex flex-col justify-center items-center h-full">
+          <h1 className="text-white text-3xl mb-4 font-semibold text-center max-w-[550px] mt-[100px]">
+            {title}
+          </h1>
+        </div>
+      </section>
+
+      <section className="w-full px-2 md:px-2 lg:px-[130px] pt-10">
+        <div className="flex flex-row justify-center items-center gap-2 mb-2">
+          <div className="h-[1px] w-[50px] bg-blue-400"></div>
+
+          <span className="text-blue-400 font-medium text-sm md:text-sm lg:text-lg">
+            AVAILABLE ROOMS
+          </span>
+          <div className="h-[1px] w-[50px] bg-blue-400"></div>
+        </div>
+        <div className="w-full flex flex-row flex-wrap gap-2 justify-start">
+          <RoomCard rooms={roomDetails} />
+        </div>
+      </section>
+    </main>
+  );
+}
+
+export default SearchRoomResult;
