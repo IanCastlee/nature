@@ -48,6 +48,10 @@ import Gallery from "./components/pages/Gallery";
 import PendingPost from "./admin_components/admin_pages/PendingPost";
 import PostedPost from "./admin_components/admin_pages/PostedPost";
 import SearchRoomResult from "./components/pages/SearchRoomResult";
+import Verified from "./components/pages/Verified";
+import ResendVerification from "./components/pages/ResendVerification";
+import ForgotPassword from "./components/pages/ForgotPassword";
+import ResetPassword from "./components/pages/ResetPassword";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -59,6 +63,9 @@ const UserLayout = () => {
     "/booking",
     "/gallery",
     "/other-facilities-booking",
+    "/verified",
+    "/resend-verification",
+    "/forgot",
   ];
   const shouldHideLayout = hideLayoutPaths.some((path) =>
     location.pathname.startsWith(path)
@@ -101,11 +108,15 @@ const UserLayout = () => {
 
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/forgot" element={<ForgotPassword />} />
+        <Route path="/reset" element={<ResetPassword />} />
 
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/gallery" element={<Gallery />} />
 
         <Route path="*" element={<NotFound />} />
+        <Route path="/verified" element={<Verified />} />
+        <Route path="/resend-verification" element={<ResendVerification />} />
       </Routes>
       {!shouldHideLayout && <Footer />}
     </>

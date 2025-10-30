@@ -87,7 +87,13 @@ function HomePage() {
 
                   {/* Overlay & caption */}
                   <div className="absolute inset-0 bg-black bg-opacity-40" />
-                  <figcaption className="absolute inset-0 flex flex-col justify-center items-start text-white pl-4 lg:pl-20 z-20">
+                  <figcaption
+                    className="
+    relative flex flex-col justify-start items-start text-white
+    pl-4 lg:pl-20 pt-44 sm:pt-28
+    md:absolute md:inset-0 md:justify-center md:pt-0 z-20
+  "
+                  >
                     <h1 className="text-5xl font-playfair max-w-2xl mb-6 px-2 lg:px-0">
                       Experience the Serenity of{" "}
                       <span className="text-blue-400 relative inline-block">
@@ -112,7 +118,6 @@ function HomePage() {
               </SwiperSlide>
             ))}
           </Swiper>
-
           {/* Search Box */}
           <SearchBox />
         </section>

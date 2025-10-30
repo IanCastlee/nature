@@ -21,6 +21,10 @@ function SignUp() {
   // Password strength
   const [passwordStrength, setPasswordStrength] = useState("");
 
+  const [verified, setVerified] = useState(false);
+  const [verificationToken, setVerificationToken] = useState(null);
+
+  // Form state
   const [form, setForm] = useState({
     firstname: "",
     lastname: "",
@@ -31,13 +35,39 @@ function SignUp() {
     cpassword: "",
   });
 
+  // Poll for email verification status when on step 3 and token is set
+  useEffect(() => {
+    if (step === 3 && verificationToken) {
+      const interval = setInterval(() => {
+        fetch(`/auth/verify.php?token=${verificationToken}`)
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) {
+              setVerified(true);
+              setToast({ message: "Successfully verified!", type: "success" });
+              clearInterval(interval);
+            }
+          })
+          .catch(console.error);
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [step, verificationToken]);
+
   const {
     submit,
     loading,
     error: formError,
-  } = useFormSubmit("/auth/signup.php", () => {
-    setToast({ message: "Account created successfully!", type: "success" });
-    setTimeout(() => navigate("/signin"), 2000);
+  } = useFormSubmit("/auth/signup.php", (response) => {
+    if (response.success) {
+      setVerificationToken(response.verification_token); // <-- Save the token here
+      setToast({
+        message: `Please verify your email: ${response.email}`,
+        type: "success",
+      });
+      setStep(3); // Move to verification step
+    }
   });
 
   useEffect(() => {
@@ -161,7 +191,7 @@ function SignUp() {
         >
           {/* Left side */}
           <section
-            className="h-full w-1/2 bg-cover bg-center bg-no-repeat  justify-center items-center p-4 hidden md:hidden lg:flex"
+            className="h-full w-1/2 bg-cover bg-center bg-no-repeat justify-center items-center p-4 hidden md:hidden lg:flex"
             style={{ backgroundImage: `url(${images.signupbg})` }}
           >
             <figcaption className="h-full w-full flex flex-col items-center justify-center">
@@ -180,10 +210,12 @@ function SignUp() {
           </section>
 
           {/* Right side */}
-          <section className="lg:w-1/2 w-full h-full flex flex-col justify-center items-center p-4 dark: bg-gray-800">
-            <h3 className="text-lg font-semibold mb-5 dark:text-gray-200 text-gray-700">
-              Create your account
-            </h3>
+          <section className="lg:w-1/2 w-full h-full flex flex-col justify-center items-center p-4 dark:bg-gray-800">
+            {step !== 3 && (
+              <h3 className="text-lg font-semibold mb-5 dark:text-gray-200 text-gray-700">
+                Create your account
+              </h3>
+            )}
 
             <form
               onSubmit={(e) =>
@@ -294,7 +326,7 @@ function SignUp() {
                       className="absolute right-2 top-[40px] cursor-pointer text-gray-500"
                       onClick={() => setShowCPassword((prev) => !prev)}
                     >
-                      {showPassword ? (
+                      {showCPassword ? (
                         <icons.IoEyeOffOutline />
                       ) : (
                         <icons.IoEyeOutline />
@@ -330,6 +362,34 @@ function SignUp() {
                     disabled={loading}
                   />
                 </>
+              )}
+
+              {step === 3 && (
+                <div className="flex flex-col items-center justify-center gap-3 text-center p-4">
+                  <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                    Email Verification
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    We have sent a verification link to{" "}
+                    <strong>{form.email}</strong>.
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Please check your inbox and click the link to verify your
+                    email.
+                  </p>
+
+                  {verified && (
+                    <p className="text-green-600 font-semibold mt-2">
+                      ✅ Successfully verified!
+                    </p>
+                  )}
+
+                  <Button
+                    label="Back to Sign In"
+                    style="mt-4 w-full bg-blue-400 text-white rounded"
+                    onClick={() => navigate("/signin")}
+                  />
+                </div>
               )}
             </form>
 

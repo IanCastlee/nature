@@ -31,6 +31,12 @@ try {
         exit;
     }
 
+    // Check if email is verified - adjust field name if yours differs
+    if (empty($user["email_verified"]) || $user["email_verified"] != 1) {
+        echo json_encode(["success" => false, "message" => "Email not verified. Please check your inbox."]);
+        exit;
+    }
+
     // Generate JWT token
     $payload = [
         "user_id" => $user["user_id"],

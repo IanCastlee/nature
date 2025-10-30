@@ -7,6 +7,7 @@ import useAuthStore from "../../store/authStore";
 import useGetData from "../../hooks/useGetData";
 import { useNavigate } from "react-router-dom";
 import Toaster from "../molecules/Toaster";
+import Button from "../atoms/Button";
 
 function Gallery() {
   const navigate = useNavigate();
@@ -20,7 +21,6 @@ function Gallery() {
     data: dataImg,
     loading: loadingImg,
     refetch: refetchImg,
-    error: errorFetchImg,
   } = useGetData(`/gallery/gallery.php?status=posted`);
 
   const {
@@ -33,7 +33,6 @@ function Gallery() {
     refetchImg();
   });
 
-  // Show any formError from the hook itself
   useEffect(() => {
     if (formError) {
       setToast({
@@ -86,17 +85,12 @@ function Gallery() {
       formData.append(`file${index}`, file);
     });
 
-    // Call submit and capture backend response
     const res = await submit(formData);
-
-    // Show toast if backend returned error
     if (res?.success === false) {
       setToast({ message: res.message || "Upload failed.", type: "error" });
     }
-    // success handled in useFormSubmit callback
   };
 
-  // Skeleton component
   const SkeletonCard = () => (
     <div className="w-full h-40 bg-gray-300 animate-pulse rounded mb-4"></div>
   );
@@ -111,19 +105,21 @@ function Gallery() {
         />
       )}
 
-      <div className="w-full min-h-screen px-[100px] mt-[70px]">
-        <div className="w-full flex flex-col gap-6">
+      <div className="w-full min-h-screen px-4 sm:px-6 md:px-10 lg:px-16 pt-[70px] dark:bg-gray-800">
+        <div className="flex flex-col gap-6">
           {/* Header + Upload */}
-          <div className="flex justify-between items-center">
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-800">Gallery</h1>
-              <p className="text-gray-600 mt-2">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
+            <div className=" w-full lg:w-auto lg:border-none border-b pb-2 dark:border-gray-600 border-gray-400">
+              <h1 className="text-2xl sm:text-3xl font-bold dark:text-gray-100 text-gray-800">
+                Gallery
+              </h1>
+              <p className=" mt-2 text-sm sm:text-base dark:text-gray-400 text-gray-800">
                 These images are shared by the visitors who have come to see us.
                 Enjoy browsing their contributions!
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-row sm:flex-row justify-start items-end sm:items-end gap-3 w-full sm:w-auto">
               <input
                 id="file"
                 type="file"
@@ -131,29 +127,29 @@ function Gallery() {
                 onChange={handleFileChange}
                 className="hidden"
               />
-              <div>
-                <span className="text-xs dark:text-gray-400 text-gray-600">
-                  Upload your catptured
+              <div className="flex flex-col  gap-2">
+                <span className="text-xs text-gray-600 dark:text-gray-400 mb-1 sm:mb-0">
+                  Upload your captured
                 </span>
                 <label
                   htmlFor="file"
-                  className="cursor-pointer flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md w-fit hover:bg-blue-600 transition"
+                  className="cursor-pointer flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition w-fit"
                 >
                   <icons.FiUpload size={20} />
                   Select Images
                 </label>
               </div>
-              <button
-                disabled={formLoading || files.length < 1}
+
+              <Button
                 onClick={handleUpload}
-                className={`px-4 py-2 rounded-md text-white ${
+                style={`px-4 py-2  rounded-md text-white ${
                   files.length >= 1 && files.length <= 5
                     ? "bg-green-600 hover:bg-green-700"
                     : "bg-gray-400 cursor-not-allowed"
-                } transition mt-6`}
-              >
-                {formLoading ? "Uploading..." : "Upload"}
-              </button>
+                } transition sm:mt-0`}
+                label={formLoading ? "Uploading..." : "Upload"}
+                disabled={formLoading || files.length < 1}
+              />
             </div>
           </div>
 
@@ -161,11 +157,11 @@ function Gallery() {
 
           {/* Selected Images Preview */}
           {files.length > 0 && (
-            <div className="flex flex-wrap justify-end gap-4 mt-4">
+            <div className="flex flex-wrap justify-start gap-4 mt-4">
               {files.map((file, index) => (
                 <div
                   key={index}
-                  className="relative w-14 h-14 border rounded overflow-hidden"
+                  className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 border rounded overflow-hidden"
                 >
                   <img
                     src={URL.createObjectURL(file)}
@@ -185,7 +181,7 @@ function Gallery() {
           )}
 
           {/* Image Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {loadingImg ? (
               Array.from({ length: 8 }).map((_, index) => (
                 <SkeletonCard key={index} />
@@ -193,7 +189,7 @@ function Gallery() {
             ) : dataImg?.length > 0 ? (
               dataImg.map((item) => <ImageCard key={item.id} item={item} />)
             ) : (
-              <div className="w-full h-screen flex flex-row justify-center items-center">
+              <div className="w-full h-[60vh] flex justify-center items-center">
                 <NoData />
               </div>
             )}
@@ -202,7 +198,7 @@ function Gallery() {
       </div>
 
       <icons.FiArrowLeftCircle
-        className="text-2xl dark:text-white text-gray-600 cursor-pointer absolute top-8 left-8 z-20"
+        className="text-2xl dark:text-white text-gray-600 cursor-pointer fixed top-4 left-4 z-20"
         onClick={() => navigate(-1)}
       />
     </>

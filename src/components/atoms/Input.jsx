@@ -6,7 +6,7 @@ function Input({ label, type, onChange, value, ...rest }) {
       {label && (
         <label
           htmlFor={rest.id || rest.name}
-          className="text-xs  text-gray-700 dark:text-gray-200"
+          className="text-xs  text-gray-600 dark:text-gray-200"
         >
           {label}
         </label>

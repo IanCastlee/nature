@@ -241,58 +241,52 @@ function Header({ isHome }) {
       {mobileMenuOpen && (
         <div className="absolute top-full left-0 w-full bg-white dark:bg-gray-800 shadow-lg z-40 md:hidden">
           <ul className="flex flex-col gap-4 p-4 text-sm text-black dark:text-white">
-            <li>
-              <Link to="/" onClick={() => setMobileMenuOpen(false)}>
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link to="/about" onClick={() => setMobileMenuOpen(false)}>
-                About
-              </Link>
-            </li>
-            <li>
-              <Link to="/services" onClick={() => setMobileMenuOpen(false)}>
-                Services
-              </Link>
-            </li>
+            {/* Main Links */}
+            {["Home", "About", "Services", "Gallery"].map((item) => (
+              <li key={item}>
+                <Link
+                  to={`/${item === "Home" ? "" : item.toLowerCase()}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block w-full py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                >
+                  {item}
+                </Link>
+              </li>
+            ))}
 
-            {/* Mobile Offer Dropdown */}
+            {/* Offer Dropdown */}
             <li>
               <button
-                className="w-full text-left flex items-center justify-between"
+                className="w-full flex items-center justify-between py-2 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                 onClick={() => setMobileOfferOpen(!mobileOfferOpen)}
               >
                 <span>Offer</span>
-                <span>Gallery</span>
-                <span>
-                  {mobileOfferOpen ? (
-                    <icons.MdOutlineKeyboardArrowUp className="text-lg dark:text-white text-black" />
-                  ) : (
-                    <icons.MdOutlineKeyboardArrowDown className="text-lg dark:text-white text-black" />
-                  )}
-                </span>
+                {mobileOfferOpen ? (
+                  <icons.MdOutlineKeyboardArrowUp className="text-lg" />
+                ) : (
+                  <icons.MdOutlineKeyboardArrowDown className="text-lg" />
+                )}
               </button>
 
+              {/* Offer Submenu */}
               {mobileOfferOpen && (
-                <ul className="pl-6 mt-2 flex flex-col gap-2">
+                <ul className="pl-4 mt-2 flex flex-col gap-2">
+                  {/* Room Categories */}
                   <li>
                     <button
-                      className="w-full text-left flex items-center justify-between"
+                      className="w-full flex items-center justify-between py-1 hover:underline rounded"
                       onClick={() => setMobileRoomsOpen(!mobileRoomsOpen)}
                     >
                       Room Categories
-                      <span>
-                        {mobileRoomsOpen ? (
-                          <icons.MdOutlineKeyboardArrowUp className="text-lg dark:text-white text-black" />
-                        ) : (
-                          <icons.MdOutlineKeyboardArrowDown className="text-lg dark:text-white text-black" />
-                        )}
-                      </span>
+                      {mobileRoomsOpen ? (
+                        <icons.MdOutlineKeyboardArrowUp className="text-lg" />
+                      ) : (
+                        <icons.MdOutlineKeyboardArrowDown className="text-lg" />
+                      )}
                     </button>
 
                     {mobileRoomsOpen && (
-                      <ul className="pl-6 mt-2 flex flex-col gap-3">
+                      <ul className="pl-4 mt-1 flex flex-col gap-1">
                         {data?.map((item) => (
                           <li
                             key={item.category_id}
@@ -311,8 +305,9 @@ function Header({ isHome }) {
                     )}
                   </li>
 
+                  {/* Other Offer Links */}
                   <li
-                    className="cursor-pointer hover:underline"
+                    className="cursor-pointer py-1 hover:underline rounded"
                     onClick={() => {
                       navigate("/cottages");
                       setMobileMenuOpen(false);
@@ -322,7 +317,7 @@ function Header({ isHome }) {
                     Cottages
                   </li>
                   <li
-                    className="cursor-pointer hover:underline"
+                    className="cursor-pointer py-1 hover:underline rounded"
                     onClick={() => {
                       navigate("/function-hall");
                       setMobileMenuOpen(false);
@@ -339,17 +334,22 @@ function Header({ isHome }) {
             <li>
               <button
                 onClick={toggleDarkMode}
-                className="flex items-center gap-2"
+                className="w-full py-2 px-2 flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
               >
                 {darkMode ? "Light Mode" : "Dark Mode"}
+                {darkMode ? (
+                  <icons.IoSunnySharp className="text-yellow-500" />
+                ) : (
+                  <icons.IoMoonSharp className="text-gray-500" />
+                )}
               </button>
             </li>
 
-            {/* Sign In */}
+            {/* Sign In / User */}
             <li>
               {user ? (
-                <span className="text-xs dark:text-white text-black">
-                  {user.fullname}
+                <span className="block py-2 px-2 text-xs">
+                  {user.firstname}
                 </span>
               ) : (
                 <button
@@ -357,7 +357,7 @@ function Header({ isHome }) {
                     navigate("/signin");
                     setMobileMenuOpen(false);
                   }}
-                  className="bg-blue-400 text-white px-3 py-1 rounded-full text-xs"
+                  className="w-full py-2 px-2 bg-blue-400 text-white rounded-full text-xs text-center"
                 >
                   Sign In
                 </button>
