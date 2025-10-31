@@ -2,32 +2,40 @@
 include("../header.php");
 include("../dbConn.php");
 
-$method = $_SERVER['REQUEST_METHOD'];
-
-// Accept raw JSON if sent
-if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
-    $input = json_decode(file_get_contents("php://input"), true);
-    $_POST = $input;
-}
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
 require '../vendor/autoload.php';
 
 header("Content-Type: application/json");
 
-// Accept raw JSON input
-$input = json_decode(file_get_contents("php://input"), true);
-$email = trim($input['email'] ?? "");
+// Only allow POST requests
+if ($_SERVER['REQUEST_METHOD'] !== "POST") {
+    echo json_encode(["success" => false, "message" => "Invalid request method."]);
+    exit;
+}
+
+// --- Handle input (JSON or FormData) ---
+$rawInput = file_get_contents("php://input");
+$input = json_decode($rawInput, true);
+
+$email = "";
+if (!empty($input['email'])) {
+    $email = trim($input['email']);
+} elseif (isset($_POST['email'])) {
+    $email = trim($_POST['email']);
+}
 
 if (empty($email)) {
     echo json_encode(["success" => false, "message" => "Email is required."]);
     exit;
 }
 
-// Check if user exists
+// --- Check if user exists ---
 $stmt = $conn->prepare("SELECT user_id, firstname FROM users WHERE email = ? LIMIT 1");
+if (!$stmt) {
+    echo json_encode(["success" => false, "message" => "Database error."]);
+    exit;
+}
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -39,20 +47,27 @@ if ($result->num_rows === 0) {
 
 $user = $result->fetch_assoc();
 
-// Generate reset token and expiration
+// --- Generate reset token and expiration ---
 $reset_token = bin2hex(random_bytes(16));
 $expires_at = date("Y-m-d H:i:s", strtotime("+1 hour"));
 
-// Store token in DB
+// --- Store token in DB ---
 $update = $conn->prepare("UPDATE users SET reset_token = ?, reset_expires_at = ? WHERE user_id = ?");
+if (!$update) {
+    echo json_encode(["success" => false, "message" => "Database update failed."]);
+    exit;
+}
 $update->bind_param("ssi", $reset_token, $expires_at, $user['user_id']);
 $update->execute();
 
-// Make sure your APP_URL ends without a trailing slash in your .env file
-$reset_link = rtrim($_ENV['APP_URL'], '/') . "/auth/reset_password.php?token=" . urlencode($reset_token);
+// --- Build password reset link (frontend URL) ---
+// Make sure this points to your React app, e.g., localhost:5173 for dev
+$frontendUrl = $_ENV['FRONTEND_URL'] ?? "http://localhost:5173";
+$reset_link = rtrim($frontendUrl, '/') . "/reset-password?token=" . urlencode($reset_token);
 
-// Send email using PHPMailer
+// --- Send email using PHPMailer ---
 $mail = new PHPMailer(true);
+
 try {
     $mail->isSMTP();
     $mail->Host       = $_ENV['MAIL_HOST'];
@@ -82,11 +97,14 @@ try {
                 font-weight: bold;
             '>Reset Password</a>
         </p>
-        <br><p>If you didn’t request this, ignore this email.</p>
+        <br><p>If you didn’t request this, you can safely ignore this email.</p>
     ";
     $mail->send();
 
-    echo json_encode(["success" => true, "message" => "Check your inbox for the reset link."]);
+echo json_encode([
+    "success" => true,
+    "message" => "Check your email inbox. If you don't see it, also check your spam or junk folder."
+]);
 
 } catch (Exception $e) {
     echo json_encode(["success" => false, "message" => "Failed to send email. Error: " . $mail->ErrorInfo]);

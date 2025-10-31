@@ -66,6 +66,7 @@ const UserLayout = () => {
     "/verified",
     "/resend-verification",
     "/forgot",
+    "/reset",
   ];
   const shouldHideLayout = hideLayoutPaths.some((path) =>
     location.pathname.startsWith(path)
@@ -109,7 +110,7 @@ const UserLayout = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/forgot" element={<ForgotPassword />} />
-        <Route path="/reset" element={<ResetPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/gallery" element={<Gallery />} />
