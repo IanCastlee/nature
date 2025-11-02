@@ -54,9 +54,11 @@ import { MdOutlineCottage } from "react-icons/md";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { GoImage } from "react-icons/go";
 import { IoSearch } from "react-icons/io5";
+import { IoMdNotifications } from "react-icons/io";
 
 export const icons = {
   FaPhoneAlt,
+  IoMdNotifications,
   IoEyeOutline,
   IoSearch,
   FiUpload,

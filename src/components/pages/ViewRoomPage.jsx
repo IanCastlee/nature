@@ -43,9 +43,29 @@ function ViewRoomPage() {
     photo_sphere,
   } = roomDetails;
 
-  const parsedAmenities = amenities?.split(",") || [];
-  const parsedInclusions = inclusion?.split(",") || [];
-  const parsedExtras = extras?.split(",") || [];
+  const parsedAmenities =
+    amenities && amenities.trim() !== ""
+      ? amenities
+          .split(",")
+          .map((a) => a.trim())
+          .filter((a) => a)
+      : [];
+
+  const parsedInclusions =
+    inclusion && inclusion.trim() !== ""
+      ? inclusion
+          .split(",")
+          .map((i) => i.trim())
+          .filter((i) => i)
+      : [];
+
+  const parsedExtras =
+    extras && extras.trim() !== ""
+      ? extras
+          .split(",")
+          .map((e) => e.trim())
+          .filter((e) => e)
+      : [];
 
   return (
     <>
@@ -135,65 +155,60 @@ function ViewRoomPage() {
         </section>
         <section className="w-full flex flex-row justify-between px-2 md:px-2 lg:px-[130px] mt-4">
           <div className="w-full flex flex-row gap-x-8 mt-6">
-            <ul className="flex-1">
-              <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">
-                Amenities
-              </h3>
-              {parsedAmenities.length ? (
-                parsedAmenities.map((amenity, idx) => (
-                  <li
-                    key={idx}
-                    className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
-                  >
-                    {amenity.trim()}
-                  </li>
-                ))
-              ) : (
-                <li className="text-sm text-gray-500 italic">
-                  No amenities listed.
-                </li>
-              )}
-            </ul>
+            {parsedAmenities.filter((a) => a && a.trim() !== "").length > 0 && (
+              <ul className="flex-1">
+                <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">
+                  Amenities
+                </h3>
+                {parsedAmenities
+                  .filter((a) => a && a.trim() !== "")
+                  .map((amenity, idx) => (
+                    <li
+                      key={idx}
+                      className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
+                    >
+                      {amenity}
+                    </li>
+                  ))}
+              </ul>
+            )}
 
-            <ul className="flex-1">
-              <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">
-                Room Inclusions
-              </h3>
-              {parsedInclusions.length ? (
-                parsedInclusions.map((inclusion, idx) => (
-                  <li
-                    key={idx}
-                    className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
-                  >
-                    {inclusion.trim()}
-                  </li>
-                ))
-              ) : (
-                <li className="text-sm text-gray-500 italic">
-                  No inclusions listed.
-                </li>
-              )}
-            </ul>
+            {parsedInclusions.filter((i) => i && i.trim() !== "").length >
+              0 && (
+              <ul className="flex-1">
+                <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">
+                  Room Inclusions
+                </h3>
+                {parsedInclusions
+                  .filter((i) => i && i.trim() !== "")
+                  .map((inclusion, idx) => (
+                    <li
+                      key={idx}
+                      className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
+                    >
+                      {inclusion}
+                    </li>
+                  ))}
+              </ul>
+            )}
 
-            <ul className="flex-1">
-              <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">
-                Room Extras
-              </h3>
-              {parsedExtras.length ? (
-                parsedExtras.map((extras, idx) => (
-                  <li
-                    key={idx}
-                    className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
-                  >
-                    {extras.trim()}
-                  </li>
-                ))
-              ) : (
-                <li className="text-sm text-gray-500 italic">
-                  No extras listed.
-                </li>
-              )}
-            </ul>
+            {parsedExtras.filter((e) => e && e.trim() !== "").length > 0 && (
+              <ul className="flex-1">
+                <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">
+                  Room Extras
+                </h3>
+                {parsedExtras
+                  .filter((e) => e && e.trim() !== "")
+                  .map((extra, idx) => (
+                    <li
+                      key={idx}
+                      className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
+                    >
+                      {extra}
+                    </li>
+                  ))}
+              </ul>
+            )}
           </div>
         </section>
 

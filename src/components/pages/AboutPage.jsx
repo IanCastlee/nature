@@ -23,7 +23,7 @@ function AboutPage() {
 
         <div className="relative z-10 flex flex-col justify-center items-center h-full">
           <div className="relative">
-            <h1 className="text-white text-3xl font-semibold text-center">
+            <h1 className="text-white mt-16 lg:mt-0 text-3xl font-semibold text-center">
               About{" "}
               <span className="text-blue-400 text-3xl font-semibold">
                 Nature Hot Spring
@@ -41,7 +41,7 @@ function AboutPage() {
         </div>
       </section>
 
-      <section className="w-full sm:px-[10px] md:px-[10px] lg:px-[100px] flex flex-col py-[50px] space-y-6 gap-10">
+      <section className="w-full px-2 lg:px-0 sm:px-[10px] md:px-[10px] lg:px-[100px] flex flex-col py-[50px] space-y-6 gap-10">
         <article className="flex flex-col  md:flex-row lg:flex-row gap-4">
           <img
             src={images.aboutbg}

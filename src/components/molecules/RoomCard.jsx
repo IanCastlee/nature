@@ -25,7 +25,7 @@ function RoomCard({ rooms }) {
     <>
       {rooms &&
         rooms.map((item, index) => {
-          const isUnderMaintenance = item.status === "under maintenance";
+          const isUnderMaintenance = item.status === "under_maintenance";
 
           return (
             <motion.article

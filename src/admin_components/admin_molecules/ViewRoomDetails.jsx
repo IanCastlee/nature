@@ -21,7 +21,7 @@ function ViewRoomDetails({ roomId }) {
   if (!roomDetails) return null;
 
   const {
-    image,
+    images,
     room_name,
     price,
     capacity,
@@ -37,6 +37,8 @@ function ViewRoomDetails({ roomId }) {
   const parsedAmenities = amenities?.split(",") || [];
   const parsedInclusions = inclusion?.split(",") || [];
   const parsedExtras = extras?.split(",") || [];
+
+  console.log("OEJJFH: ", images);
 
   return (
     <div className="w-full h-screen bg-black/10 flex justify-center items-center  fixed inset-0 z-50">
@@ -59,7 +61,11 @@ function ViewRoomDetails({ roomId }) {
 
         <div className="w-full flex flex-row gap-4 mb-4">
           <img
-            src={`${uploadUrl.uploadurl}/rooms/${image}`}
+            src={
+              images && images.length > 0
+                ? `${uploadUrl.uploadurl}/rooms/${images[0]}`
+                : "/default-room.jpg"
+            }
             alt={room_name}
             className="w-[30%] rounded object-cover border"
           />

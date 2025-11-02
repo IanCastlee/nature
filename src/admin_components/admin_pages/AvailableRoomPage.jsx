@@ -27,6 +27,8 @@ function AvailableRoomPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  console.log("ROOMS: ", availableRoomColumns);
+
   //==============//
   //   FORMS      //
   //==============//
@@ -39,15 +41,16 @@ function AvailableRoomPage() {
     price: "",
   });
 
-  //room form
+  // Room form
   const [form, setForm] = useState({
+    room_id: "",
     room_name: "",
     category: "",
     price: "",
     capacity: "",
     duration: "",
     description: "",
-    image: null,
+    images: [], // ✅ multiple images
     photo_sphere: null,
   });
 
@@ -59,6 +62,7 @@ function AvailableRoomPage() {
   const { data, loading, refetch, error } = useGetData(
     `/admin/room.php?status=active`
   );
+  console.log("DATA : ", data);
 
   //fethc room categories
   const { data: roomCategoryData } = useGetData("/admin/room-category.php");
@@ -144,10 +148,16 @@ function AvailableRoomPage() {
     loading: formLoading,
     error: formError,
   } = useFormSubmit("/admin/room.php", () => {
+    window.location.reload(); // reload the page
+
     refetch();
     setShowForm(null);
     clealAddModalField();
+
+    setPreviews([]); // clear previews
+    setForm((prev) => ({ ...prev, images: [] })); // reset images in form
   });
+
   //amenity
   const {
     submit: submitAmenity,
@@ -197,7 +207,11 @@ function AvailableRoomPage() {
     formData.append("duration", form.duration);
     formData.append("description", form.description);
 
-    if (form.image) formData.append("image", form.image);
+    // ✅ Multiple image upload
+    if (form.images && form.images.length > 0) {
+      form.images.forEach((file) => formData.append("images[]", file));
+    }
+
     if (form.photo_sphere) formData.append("photo_sphere", form.photo_sphere);
 
     if (isUpdate) {
@@ -413,7 +427,7 @@ function AvailableRoomPage() {
       capacity: "",
       duration: "",
       description: "",
-      image: null,
+      images: [], // ✅ clear multiple images
       photo_sphere: null,
     });
   };

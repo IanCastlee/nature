@@ -338,7 +338,28 @@ function BookingPage() {
                 Select your prepared date
               </h3>
               <div className="flex lg:flex-row md:flex-col flex-col gap-6 items-center">
-                <div className="scale-90  md:scale-100 w-fit border p-2 rounded-lg">
+                {/* <div className="scale-90  md:scale-100 w-fit border p-2 rounded-lg">
+                  <DayPicker
+                    mode="range"
+                    selected={selectedRange}
+                    onSelect={(range) => {
+                      if (range?.from && !range?.to) {
+                        setSelectedRange({ from: range.from, to: undefined });
+                      } else if (range?.from && range?.to) {
+                        setSelectedRange(range);
+                      } else {
+                        setSelectedRange({ from: undefined, to: undefined });
+                      }
+                    }}
+                    disabled={disabledRanges}
+                    modifiersClassNames={{
+                      selected: "bg-blue-500 text-white",
+                      today: "text-blue-500",
+                      disabled: "text-gray-400 line-through",
+                    }}
+                  />
+                </div> */}
+                <div className="scale-90 md:scale-100 w-fit border p-2 rounded-lg text-black dark:text-white bg-white dark:bg-gray-900">
                   <DayPicker
                     mode="range"
                     selected={selectedRange}

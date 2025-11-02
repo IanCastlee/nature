@@ -7,7 +7,7 @@ export const availableRoomColumns = [
     render: (item) => (
       <div className="relative group">
         <img
-          src={`${uploadUrl.uploadurl}/rooms/${item.image}`}
+          src={`${uploadUrl.uploadurl}/rooms/${item.images[0]}`}
           alt={item.room_name}
           className="w-10 h-10 rounded shadow-sm object-cover"
         />
@@ -15,7 +15,7 @@ export const availableRoomColumns = [
         {/* Fixed preview on hover */}
         <div className="hidden group-hover:flex fixed inset-0 bg-black/70 justify-center items-center z-50">
           <img
-            src={`${uploadUrl.uploadurl}/rooms/${item.image}`}
+            src={`${uploadUrl.uploadurl}/rooms/${item.images[0]}`}
             alt={item.room_name}
             className="max-w-[90%] max-h-[90%] object-cover rounded-lg shadow-lg border border-white"
           />
@@ -38,6 +38,10 @@ export const availableRoomColumns = [
   {
     title: "Duration",
     key: "duration",
+  },
+  {
+    title: "Last Maintenance",
+    key: "last_maintenance",
   },
   {
     title: "Status",

@@ -1,10 +1,13 @@
 import { icons } from "../../constant/icon";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useGetData from "../../hooks/useGetData";
 import BookingCard from "../molecules/BookingCard";
+import NoData from "../molecules/NoData";
+import Button from "../atoms/Button";
 
 function MyBookingPage() {
   const { userId } = useParams();
+  const navigate = useNavigate();
 
   // useGetData already returns an array (based on your console log)
   const {
@@ -32,8 +35,13 @@ function MyBookingPage() {
   //  Check if bookings array is empty
   if (!bookings || bookings.length === 0)
     return (
-      <div className="text-center text-gray-500 dark:text-gray-300 mt-20">
-        No bookings found.
+      <div className="text-center min-h-screen flex flex-col justify-center items-center text-gray-500 dark:text-gray-300">
+        <NoData />
+        <Button
+          onClick={() => navigate("/")}
+          style="bg-blue-600 h-[30px] text-white text-xs rounded-sm cursor-pointer px-4 mt-4"
+          label="Reserve Now"
+        />
       </div>
     );
 

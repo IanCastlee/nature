@@ -39,8 +39,8 @@ function RoomCategoriesPage() {
           <div className="absolute inset-0 bg-black/50 blur-3xl opacity-40"></div>
         </div>
 
-        <div className="relative z-10 flex flex-col justify-center items-center h-full">
-          <h1 className="text-white text-3xl mb-4 font-semibold text-center max-w-[550px] mt-[100px]">
+        <div className="relative z-10 flex flex-col justify-center items-center h-full px-4">
+          <h1 className="text-white lg:text-3xl md:text-2xl text-2xl mb-4 font-semibold text-center max-w-[550px] mt-[100px]">
             {title}
           </h1>
         </div>
