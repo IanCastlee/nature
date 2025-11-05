@@ -1,29 +1,25 @@
 <?php
 include("../header.php");
 include("../dbConn.php");
+require_once("../auth/auth_middleware.php"); 
 
+// ==========================
+// 1. AUTHENTICATE USER
+// ==========================
+
+// ==========================
+// 2. HANDLE REQUEST
+// ==========================
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Accept raw JSON body if sent
+// Accept raw JSON if sent
 if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
-    $input = json_decode(file_get_contents("php://input"), true);
-    $_POST = $input;
+    $_POST = json_decode(file_get_contents("php://input"), true);
+  
 }
 
-if ($method === "GET") {
-    // Get only active categories
-    $stmt = $conn->prepare("SELECT * FROM room_categories WHERE status = 'active'");
-    $stmt->execute();
 
-    $result = $stmt->get_result();
-    $data = $result->fetch_all(MYSQLI_ASSOC);
 
-    echo json_encode([
-        "success" => true,
-        "data" => $data
-    ]);
-    exit;
-}
 
 if ($method === "POST") {
     $category = $_POST['category'] ?? '';
@@ -134,6 +130,22 @@ if ($method === "POST") {
     echo json_encode([
         "success" => false,
         "message" => "Invalid action or missing required data"
+    ]);
+    exit;
+}
+
+//$user = require_auth($conn); 
+if ($method === "GET") {
+    // Get only active categories
+    $stmt = $conn->prepare("SELECT * FROM room_categories WHERE status = 'active'");
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $data = $result->fetch_all(MYSQLI_ASSOC);
+
+    echo json_encode([
+        "success" => true,
+        "data" => $data
     ]);
     exit;
 }

@@ -18,7 +18,6 @@ import SearchBox from "../molecules/SearchBox";
 
 const About = lazy(() => import("../organisms/About"));
 const ChatBot = lazy(() => import("../molecules/ChatBot"));
-const Freebie = lazy(() => import("../molecules/Freebie"));
 const RoomCategoryCard = lazy(() => import("../molecules/RoomCategoryCard"));
 const CattageCard = lazy(() => import("../molecules/CattageCard"));
 const FunctionHallCard = lazy(() => import("../molecules/FunctionHallCard"));
@@ -41,9 +40,31 @@ function HomePage() {
     error: errorFh,
   } = useGetData(`/admin/functionhall.php?status=active`);
 
-  // Fetch data
+  // Kunin yung JSON string mula sa sessionStorage gamit 'auth-storage' na key
+  // Get token from sessionStorage
+  const authStorage = sessionStorage.getItem("auth-storage");
+
+  // if (!authStorage) {
+  //   console.error("No auth-storage found in sessionStorage");
+  //   return;
+  // }
+
+  const parsedStorage = JSON.parse(authStorage);
+  const token = parsedStorage?.state?.token;
+
+  // if (!token) {
+  //   console.error("No token found in state");
+  //   return;
+  // }
+
+  // Pass token in Axios headers
   const { data, loading, refetch, error } = useGetData(
-    "/admin/room-category.php"
+    "/admin/room-category.php",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
 
   // fetch cottage data
@@ -217,7 +238,7 @@ function HomePage() {
                     <icons.HiArrowSmallRight className="text-white inline" />
                   </>
                 }
-                onClick={() => navigate("/cottages")}
+                onClick={() => navigate("/function-halls")}
               />
             </div>
           )}
@@ -296,6 +317,12 @@ function HomePage() {
         alt="Street View Icon"
         className="h-[60px] w-[60px] fixed bottom-4 right-28 z-30"
       />
+
+      {/* <img
+        src={images.announcement}
+        className=" top-[80px] right-14 z-50 absolute h-auto w-[40px] "
+        alt="announcement"
+      /> */}
     </>
   );
 }

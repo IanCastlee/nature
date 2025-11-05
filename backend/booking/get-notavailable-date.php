@@ -1,14 +1,19 @@
 <?php
 include("../header.php");
 include("../dbConn.php");
+require_once("../auth/auth_middleware.php"); 
+$user = require_auth($conn); 
 
 $method = $_SERVER['REQUEST_METHOD'];
+
 
 // Accept raw JSON if sent
 if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
     $input = json_decode(file_get_contents("php://input"), true);
     $_POST = $input;
 }
+
+
 
 $facilityId = intval($_GET['facility_id'] ?? 0);
 

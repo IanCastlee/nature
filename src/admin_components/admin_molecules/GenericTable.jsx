@@ -13,7 +13,10 @@ function GenericTable({
             {columns.map((col, index) => (
               <th
                 key={index}
-                className="p-2 dark:text-gray-100 text-left font-medium text-sm"
+                className={`p-2 dark:text-gray-100 text-left font-medium text-sm ${
+                  col.className || ""
+                }`}
+                style={col.width ? { width: col.width } : {}}
               >
                 {col.title}
               </th>
@@ -35,7 +38,10 @@ function GenericTable({
                 {columns.map((col, colIndex) => (
                   <td
                     key={colIndex}
-                    className="p-2 border text-xs dark:border-gray-700 dark:text-gray-100 border-gray-300"
+                    className={`p-2 border text-xs dark:border-gray-700 dark:text-gray-100 border-gray-300 ${
+                      col.className || ""
+                    }`}
+                    style={col.width ? { width: col.width } : {}}
                   >
                     {typeof col.render === "function"
                       ? col.render(item)

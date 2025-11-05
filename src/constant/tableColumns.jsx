@@ -296,6 +296,7 @@ export const fhbookingApproved = [
   },
 ];
 
+//gallery
 export const galleryColumn = [
   {
     title: "Posted By",
@@ -331,5 +332,26 @@ export const galleryColumn = [
   {
     title: "Status",
     key: "status",
+  },
+];
+
+//announcement column
+export const announcementColumn = [
+  {
+    title: "Title",
+    key: "title",
+    width: "180px",
+    className: "truncate",
+  },
+  {
+    title: "Announcement",
+    key: "message",
+    className: "whitespace-pre-line break-words",
+  },
+  {
+    title: "Date Posted",
+    key: "createdAt",
+    width: "150px",
+    className: "text-center",
   },
 ];

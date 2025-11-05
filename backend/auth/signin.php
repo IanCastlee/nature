@@ -43,6 +43,8 @@ try {
         "email" => $user["email"],
         "acc_type" => $user["acc_type"],
         "exp" => time() + (60 * 60 * 4) // 4 hours
+        //"exp" => time() + 60 // 1 minute (60 seconds)
+
     ];
 
     $jwt = create_jwt($payload); // from jwt.php

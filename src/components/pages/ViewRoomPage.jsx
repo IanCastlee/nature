@@ -1,7 +1,6 @@
 import React from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
-import dummyImage from "../../assets/dummyImages/rooma.jpg";
 import { icons } from "../../constant/icon";
 import HouseRules from "../organisms/HouseRules";
 import { useState } from "react";
@@ -9,11 +8,51 @@ import { useNavigate, useParams } from "react-router-dom";
 import { uploadUrl } from "../../utils/fileURL";
 import useGetData from "../../hooks/useGetData";
 import Button from "../atoms/Button";
+import Toaster from "../molecules/Toaster";
 function ViewRoomPage() {
   const { roomId } = useParams();
 
   const [showHouseRules, setShowHouseRules] = useState(false);
+  const [toast, setToast] = useState(null);
+
   const navigate = useNavigate();
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handlePrev = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  //  Check if user is logged in
+  const isLoggedIn = () => {
+    const authStorage = sessionStorage.getItem("auth-storage");
+    try {
+      const parsed = JSON.parse(authStorage);
+      return parsed?.state?.token ? true : false;
+    } catch {
+      return false;
+    }
+  };
+
+  //  Protected navigation (for buttons that require login)
+  const handleProtectedNavigation = (path) => {
+    if (!isLoggedIn()) {
+      setToast({
+        message: "Please sign in first before continuing.",
+        type: "warning",
+      });
+      return;
+    }
+    navigate(path);
+  };
 
   const {
     data: roomDetails,
@@ -30,7 +69,7 @@ function ViewRoomPage() {
 
   const {
     room_id,
-    image,
+    images,
     room_name,
     price,
     capacity,
@@ -69,32 +108,61 @@ function ViewRoomPage() {
 
   return (
     <>
+      {toast && (
+        <Toaster
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <main className="min-h-screen w-full dark:bg-black pb-20">
-        <section className="w-full flex flex-row gap-1  h-[450px]">
-          <div className="w-[60%] h-full">
+        <section className="w-full flex flex-row gap-1 lg:h-screen md:h-[400px] h-[400px] m-0 p-0 relative overflow-hidden">
+          <div className="relative w-full h-full overflow-hidden rounded-lg">
+            {/* 🔹 Blurred Background — visible only on lg */}
+            <div
+              className="absolute inset-0 bg-center bg-cover blur-2xl scale-110 hidden lg:block"
+              style={{
+                backgroundImage: `url(${uploadUrl.uploadurl}/rooms/${images[currentIndex]})`,
+              }}
+            ></div>
+
+            {/* 🔹 Foreground Image (always visible) */}
             <LazyLoadImage
-              src={`${uploadUrl.uploadurl}/rooms/${image}`}
-              alt="Project image"
+              src={`${uploadUrl.uploadurl}/rooms/${images[currentIndex]}`}
+              alt={`Room image ${currentIndex + 1}`}
               effect="blur"
-              wrapperClassName="w-full h-full"
-              className="w-full h-full object-cover"
+              wrapperClassName="w-full h-full relative z-10"
+              className="w-full h-full object-cover transition-all duration-500"
             />
-          </div>
-          <div className="flex flex-col w-[40%] h-full justify-between">
-            <LazyLoadImage
-              src={dummyImage}
-              alt="Project image"
-              effect="blur"
-              wrapperClassName="w-full h-[49%]"
-              className="w-full h-full object-cover"
-            />
-            <LazyLoadImage
-              src={dummyImage}
-              alt="Project image"
-              effect="blur"
-              wrapperClassName="w-full  h-[50%]"
-              className="w-full h-full object-cover"
-            />
+
+            {/* 🔹 Left Button */}
+            <button
+              onClick={handlePrev}
+              className="absolute top-1/2 left-2 -translate-y-1/2 z-20 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition"
+            >
+              &#10094;
+            </button>
+
+            {/* 🔹 Right Button */}
+            <button
+              onClick={handleNext}
+              className="absolute top-1/2 right-2 -translate-y-1/2 z-20 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition"
+            >
+              &#10095;
+            </button>
+
+            {/* 🔹 Dots Indicator */}
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+              {images.map((_, index) => (
+                <div
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`w-2.5 h-2.5 rounded-full cursor-pointer ${
+                    currentIndex === index ? "bg-white" : "bg-white/40"
+                  }`}
+                ></div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -120,25 +188,16 @@ function ViewRoomPage() {
 
             <div className="flex flex-col gap-2">
               <Button
+                onClick={() => setShowHouseRules(true)}
                 style="h-[30px] bg-gray-700 text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
                 label="View House Rules"
               />
               <Button
-                onClick={() => navigate(`/booking/${room_id}`)} // ✅ Correc
+                onClick={() => handleProtectedNavigation(`/booking/${room_id}`)}
                 style="h-[30px] bg-green-600 text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
                 label="Reserve Now"
               />
             </div>
-            {/* <button
-              onClick={() => setShowHouseRules(true)}
-              className="dark:bg-blue-400 bg-gray-900 dark:border-blue-400 border border-gray-700 
-  text-white dark:text-white py-1 px-2 rounded-lg text-sm 
-  flex flex-row items-center gap-2 transition-all duration-300 
-  hover:bg-blue-500 hover:text-white dark:hover:bg-blue-400 dark:hover:text-gray-900"
-            >
-              <icons.GrNotes className="text-sm" />
-              View House Rules
-            </button> */}
           </div>
 
           <div className=" flex flex-flex-row flex-wrap justify-start gap-5">

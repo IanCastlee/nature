@@ -19,6 +19,7 @@ import line from "../assets/icons/line.png";
 import animationImg from "../assets/icons/beach.png";
 import location from "../../src/assets/icons/street-view.png";
 import empty from "../../src/assets/icons/empty.png";
+import announcement from "../../src/assets/icons/marketing.png";
 
 //offers
 import fish from "../assets/icons/fish.png";
@@ -38,6 +39,7 @@ export const images = {
 
   aboutbg,
   messageIcons,
+  announcement,
   ebike,
   wifi,
   aircon,

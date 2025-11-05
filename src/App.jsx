@@ -52,6 +52,8 @@ import Verified from "./components/pages/Verified";
 import ResendVerification from "./components/pages/ResendVerification";
 import ForgotPassword from "./components/pages/ForgotPassword";
 import ResetPassword from "./components/pages/ResetPassword";
+import AdminAnnouncementPage from "./admin_components/admin_pages/AdminAnnouncementPage";
+import AdminAnnouncementHistory from "./admin_components/admin_pages/AdminAnnouncementHistory";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -188,6 +190,12 @@ const AdminLayout = () => {
 
           <Route path="/pending-post" element={<PendingPost />} />
           <Route path="/posted-post" element={<PostedPost />} />
+
+          <Route path="/announcement" element={<AdminAnnouncementPage />} />
+          <Route
+            path="/announcement-history"
+            element={<AdminAnnouncementHistory />}
+          />
         </Routes>
       </main>
     </div>

@@ -4,7 +4,7 @@ import { icons } from "../../constant/icon";
 import { motion } from "framer-motion";
 import { uploadUrl } from "../../utils/fileURL";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "../atoms/Button";
 import Toaster from "../molecules/Toaster";
 
@@ -12,19 +12,24 @@ function FunctionHallCard({ item, index }) {
   const navigate = useNavigate();
   const [toast, setToast] = useState(null);
 
+  // ✅ Check if user is logged in (same logic as RoomCard)
+  const isLoggedIn = () => {
+    const authStorage = sessionStorage.getItem("auth-storage");
+    try {
+      const parsed = JSON.parse(authStorage);
+      return parsed?.state?.token ? true : false;
+    } catch {
+      return false;
+    }
+  };
+
+  // ✅ Handles protected reserve action
   const handleReserveClick = () => {
-    const user = localStorage.getItem("user");
-
-    if (!user) {
+    if (!isLoggedIn()) {
       setToast({
-        message: "Please sign in to reserve a function hall.",
-        type: "error",
+        message: "Please sign in first before continuing.",
+        type: "warning",
       });
-
-      // Delay 2 seconds before redirect
-      setTimeout(() => {
-        navigate("/signin");
-      }, 3000);
 
       return;
     }
@@ -32,8 +37,17 @@ function FunctionHallCard({ item, index }) {
     navigate(`/other-facilities-booking/${item.fh_id}`);
   };
 
+  // ✅ Auto-hide toast after 3 seconds
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   return (
     <>
+      {/* Toast */}
       {toast && (
         <Toaster
           message={toast.message}

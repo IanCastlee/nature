@@ -121,6 +121,20 @@ export const menuItems = [
     ],
   },
   {
+    name: "Announcement",
+    icon: icons.VscMegaphone,
+    children: [
+      {
+        name: "Annoucement",
+        to: "/admin/announcement",
+      },
+      {
+        name: "History",
+        to: "/admin/announcement-history",
+      },
+    ],
+  },
+  {
     name: "Analytics",
     to: "/admin/analytics",
     icon: icons.GrAnalytics,

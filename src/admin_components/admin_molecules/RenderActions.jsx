@@ -355,3 +355,26 @@ export const renderActionsGallery = ({
     </div>
   );
 };
+
+//render Action for announcement
+export const renderActionsAnnouncement = ({ item, onEdit, onSetInactive }) => {
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <button
+        onClick={() => onEdit(item)}
+        className="bg-blue-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="Edit"
+      >
+        <icons.FaRegEdit />
+      </button>
+
+      <button
+        onClick={() => onSetInactive(item)}
+        className="bg-red-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="Set as inactive"
+      >
+        <icons.TbRefresh className="text-white" />
+      </button>
+    </div>
+  );
+};

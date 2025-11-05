@@ -27,8 +27,9 @@ function FunctionHallsPage() {
           <div className="w-full h-full bg-gradient-to-b from-black/70 via-black/40 to-transparent"></div>
           <div className="absolute inset-0 bg-black/50 blur-3xl opacity-40"></div>
         </div>
-        <div className="relative z-10 flex flex-col justify-center items-center h-full">
-          <h1 className="text-white text-3xl font-semibold text-center max-w-[550px] mt-[100px]">
+
+        <div className="relative z-10 flex flex-col justify-center items-center h-full px-4">
+          <h1 className="text-white lg:text-3xl md:text-2xl text-2xl mb-4 font-semibold text-center max-w-[550px] mt-[100px]">
             SPACIOUS AND STYLISH FUNCTION HALLS FOR YOU
           </h1>
         </div>
@@ -39,7 +40,7 @@ function FunctionHallsPage() {
         <div className="flex flex-row justify-center items-center gap-2 mb-2">
           <div className="h-[1px] w-[50px] bg-blue-400"></div>
           <span className="text-blue-400 font-medium text-sm md:text-sm lg:text-lg">
-            AVAILABLE COTTAGES
+            AVAILABLE FUNCTION HALLS
           </span>
           <div className="h-[1px] w-[50px] bg-blue-400"></div>
         </div>

@@ -54,14 +54,19 @@ import { MdOutlineCottage } from "react-icons/md";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { GoImage } from "react-icons/go";
 import { IoSearch } from "react-icons/io5";
+import { BiSolidMegaphone } from "react-icons/bi";
+import { VscMegaphone } from "react-icons/vsc";
+
 import { IoMdNotifications } from "react-icons/io";
 
 export const icons = {
   FaPhoneAlt,
   IoMdNotifications,
   IoEyeOutline,
+  VscMegaphone,
   IoSearch,
   FiUpload,
+  BiSolidMegaphone,
   IoEyeOffOutline,
   BsArrowRight,
   RiMenuLine,

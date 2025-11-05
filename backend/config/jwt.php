@@ -10,10 +10,18 @@ $dotenv->safeLoad();
 // Use $_ENV for secret
 $secretKey = $_ENV['JWT_SECRET'] ?? 'default_secret_key';
 
+/**
+ * Create a JWT token
+ * 
+ * If caller provides an "exp" in $payload (like 1 minute for testing),
+ * this function will use that. Otherwise, defaults to 4 hours.
+ */
 function create_jwt($payload) {
     global $secretKey;
     $issuedAt = time();
-    $expire = $issuedAt + (60 * 60 * 4); // 4 hours
+
+    // ✅ Respect provided "exp", otherwise fallback to 4 hours
+    $expire = $payload["exp"] ?? ($issuedAt + (60 * 60 * 4));
 
     $token = JWT::encode(
         array_merge($payload, [
@@ -23,9 +31,13 @@ function create_jwt($payload) {
         $secretKey,
         'HS256'
     );
+
     return $token;
 }
 
+/**
+ * Decode and verify a JWT token
+ */
 function decode_jwt($token) {
     global $secretKey;
     return JWT::decode($token, new Key($secretKey, 'HS256'));

@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import { motion } from "framer-motion";
 import dummyImage from "../../assets/dummyImages/rooma.jpg";
 import { LazyLoadImage } from "react-lazy-load-image-component";
@@ -7,11 +7,36 @@ import { icons } from "../../constant/icon";
 import { useNavigate } from "react-router-dom";
 import { uploadUrl } from "../../utils/fileURL";
 import Button from "../atoms/Button";
+import Toaster from "./Toaster";
 
 function RoomCard({ rooms }) {
   const navigate = useNavigate();
+  const [toast, setToast] = useState(null);
 
-  // Animation variants
+  //  Check if user is logged in
+  const isLoggedIn = () => {
+    const authStorage = sessionStorage.getItem("auth-storage");
+    try {
+      const parsed = JSON.parse(authStorage);
+      return parsed?.state?.token ? true : false;
+    } catch {
+      return false;
+    }
+  };
+
+  //  Protected navigation (for buttons that require login)
+  const handleProtectedNavigation = (path) => {
+    if (!isLoggedIn()) {
+      setToast({
+        message: "Please sign in first before continuing.",
+        type: "warning",
+      });
+      return;
+    }
+    navigate(path);
+  };
+
+  //  Animation variants
   const cardVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: (index) => ({
@@ -23,6 +48,15 @@ function RoomCard({ rooms }) {
 
   return (
     <>
+      {/*  Toast message */}
+      {toast && (
+        <Toaster
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       {rooms &&
         rooms.map((item, index) => {
           const isUnderMaintenance = item.status === "under_maintenance";
@@ -50,8 +84,10 @@ function RoomCard({ rooms }) {
                 >
                   <LazyLoadImage
                     src={
-                      item.image
-                        ? `${uploadUrl.uploadurl}/rooms/${item.image}`
+                      item.images
+                        ? `${uploadUrl.uploadurl}/rooms/${
+                            item.images[item.images.length - 1]
+                          }`
                         : dummyImage
                     }
                     alt="Room image"
@@ -144,7 +180,9 @@ function RoomCard({ rooms }) {
                 <div className="flex flex-row justify-between mt-8">
                   <motion.div whileTap={{ scale: 0.95 }}>
                     <Button
-                      onClick={() => navigate(`/booking/${item.room_id}`)}
+                      onClick={() =>
+                        handleProtectedNavigation(`/booking/${item.room_id}`)
+                      }
                       disabled={isUnderMaintenance}
                       style={`${
                         isUnderMaintenance

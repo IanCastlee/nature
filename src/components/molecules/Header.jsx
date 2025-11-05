@@ -8,6 +8,8 @@ import Button from "../atoms/Button";
 import useGetData from "../../hooks/useGetData";
 import Notification from "../organisms/Notification";
 import { useForm } from "../../store/useRoomStore";
+import Announcement from "../pages/Announcement";
+import HouseRules from "../organisms/HouseRules";
 
 function Header({ isHome }) {
   const { user } = useAuthStore();
@@ -151,6 +153,38 @@ function Header({ isHome }) {
                     Function Hall
                   </li>
                 </ul>
+              </li>
+              <li className="relative group">
+                <Link
+                  title="House Rules"
+                  onClick={() => setShowForm("house_rules")}
+                  className={`text-sm transition-colors duration-300 group-hover:text-blue-400
+                  
+                    before:bg-blue-400 before:transition-all before:duration-300 
+                    group-hover:before:w-full ${
+                      !scrolled && isHome
+                        ? "text-white"
+                        : "text-gray-500 dark:text-white"
+                    }`}
+                >
+                  House Rules
+                </Link>
+              </li>
+              <li className="relative group">
+                <Link
+                  title="Announcement"
+                  onClick={() => setShowForm("announcement")}
+                  className={`text-sm transition-colors duration-300 group-hover:text-blue-400
+                  
+                    before:bg-blue-400 before:transition-all before:duration-300 
+                    group-hover:before:w-full ${
+                      !scrolled && isHome
+                        ? "text-white"
+                        : "text-gray-500 dark:text-white"
+                    }`}
+                >
+                  <icons.BiSolidMegaphone className="text-2xl" />
+                </Link>
               </li>
 
               {/* Sign In / User Dropdown */}
@@ -400,6 +434,14 @@ function Header({ isHome }) {
 
       {showForm === "notification" && (
         <Notification close={() => setShowForm(null)} />
+      )}
+
+      {showForm === "announcement" && (
+        <Announcement close={() => setShowForm(null)} />
+      )}
+
+      {showForm === "house_rules" && (
+        <HouseRules close={() => setShowForm(null)} />
       )}
     </>
   );
