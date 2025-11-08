@@ -29,7 +29,22 @@ import spring from "../assets/icons/hot-spring.png";
 import waterBike from "../assets/icons/juggling.png";
 import service from "../assets/icons/transportation.png";
 
+//why choose us
+import first from "../assets/icons/herb.png";
+import second from "../assets/icons/hot-water.png";
+import third from "../assets/icons/soft.png";
+import fourth from "../assets/icons/meeting.png";
+import fith from "../assets/icons/deal.png";
+import sixth from "../assets/icons/eco-friendly.png";
+
 export const images = {
+  first,
+  second,
+  third,
+  fourth,
+  fith,
+  sixth,
+
   hero1,
   hero2,
   hero3,

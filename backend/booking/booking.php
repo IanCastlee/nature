@@ -31,7 +31,7 @@ if ($action === "set_approve") {
         exit;
     }
 
-    $stmt = $conn->prepare("UPDATE room_booking SET status = 'done' WHERE booking_id = ?");
+    $stmt = $conn->prepare("UPDATE room_booking SET status = 'approved' WHERE booking_id = ?");
     $stmt->bind_param("i", $id);
 
     if ($stmt->execute()) {

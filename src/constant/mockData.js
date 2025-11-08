@@ -166,3 +166,43 @@ export const roomInclusions = [
   "Toothbrush and Toothpaste",
   "Toiletries",
 ];
+
+//why choose us
+export const offerToChoose = [
+  {
+    id: 1,
+    image: images.first,
+    title: "Relax in Nature’s Embrace",
+    desc: "Nestled amid lush greenery and natural landscapes, our hot spring offers a peaceful escape from the hustle and bustle of daily life. Reconnect with nature while enjoying the soothing warmth of our mineral-rich waters.",
+  },
+  {
+    id: 2,
+    image: images.second,
+    title: "Authentic Hot Spring Experience",
+    desc: "Our pools are naturally heated and packed with therapeutic minerals that help relieve stress, improve circulation, and rejuvenate your body and mind — a true spa experience, straight from nature.",
+  },
+  {
+    id: 3,
+    image: images.third,
+    title: "Comfort Meets Serenity",
+    desc: "Whether you’re staying overnight or for a weekend getaway, our cozy rooms and private cottages provide modern comfort in a rustic, nature-inspired setting. Wake up to the sound of birds and fresh mountain air.",
+  },
+  {
+    id: 4,
+    image: images.fourth,
+    title: "Perfect Venue for Every Occasion",
+    desc: "From intimate gatherings to grand celebrations, our function halls and open spaces are ideal for weddings, corporate events, reunions, and family milestones — all surrounded by stunning natural scenery.",
+  },
+  {
+    id: 5,
+    image: images.fith,
+    title: "Easy Reservations & Warm Hospitality",
+    desc: "Booking your stay or event is simple through our online reservation system. Our friendly staff is always ready to assist you, ensuring every visit is smooth, relaxing, and memorable.",
+  },
+  {
+    id: 6,
+    image: images.sixth,
+    title: "Eco-Friendly Commitment",
+    desc: "We believe in preserving the beauty that surrounds us. Our resort practices sustainability through responsible waste management and eco-conscious operations — so you can unwind with peace of mind.",
+  },
+];

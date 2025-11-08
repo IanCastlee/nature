@@ -10,7 +10,7 @@ function AboutPage() {
   }, []);
   return (
     <main className="w-full bg-white dark:bg-black pb-20">
-      <section className="w-full h-[270px] relative">
+      <section className="w-full h-[270px] relative mt-[70px]">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${images.aboutbg})` }}

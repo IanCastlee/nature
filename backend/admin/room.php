@@ -53,6 +53,7 @@ if ($method === "GET") {
             if (empty($roomData)) {
                 $roomData = [
                     "room_id" => $row["room_id"],
+                    "status" => $row["status"],
                     "room_name" => $row["room_name"],
                     "price" => $row["price"],
                     "capacity" => $row["capacity"],

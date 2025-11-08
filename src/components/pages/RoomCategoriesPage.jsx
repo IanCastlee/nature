@@ -64,7 +64,7 @@ function RoomCategoriesPage() {
         <div className="flex flex-row justify-center items-center gap-2 mb-2">
           <div className="h-[1px] w-[50px] bg-blue-400" />
           <span className="text-blue-400 font-medium text-sm md:text-sm lg:text-lg">
-            AVAILABLE ROOMS
+            ROOMS
           </span>
           <div className="h-[1px] w-[50px] bg-blue-400" />
         </div>

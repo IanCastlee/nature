@@ -80,6 +80,7 @@ function ViewRoomPage() {
     inclusion,
     extras,
     photo_sphere,
+    status,
   } = roomDetails;
 
   const parsedAmenities =
@@ -187,16 +188,25 @@ function ViewRoomPage() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <Button
+              <button
                 onClick={() => setShowHouseRules(true)}
-                style="h-[30px] bg-gray-700 text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
-                label="View House Rules"
-              />
-              <Button
-                onClick={() => handleProtectedNavigation(`/booking/${room_id}`)}
-                style="h-[30px] bg-green-600 text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
-                label="Reserve Now"
-              />
+                className="dark:bg-blue-400 bg-gray-900 dark:border-blue-400 border border-gray-700 
+  text-white dark:text-white py-1 px-2 rounded-lg text-sm 
+  flex flex-row items-center gap-2 transition-all duration-300 
+  hover:bg-blue-500 hover:text-white dark:hover:bg-blue-400 dark:hover:text-gray-900"
+              >
+                <icons.GrNotes className="text-sm" />
+                View House Rules
+              </button>
+              {status !== "under_maintenance" && (
+                <Button
+                  onClick={() =>
+                    handleProtectedNavigation(`/booking/${room_id}`)
+                  }
+                  style="h-[30px] bg-green-600 text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
+                  label="Reserve Now"
+                />
+              )}
             </div>
           </div>
 

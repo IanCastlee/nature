@@ -75,14 +75,14 @@ function Header({ isHome }) {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-10 ml-auto pr-10">
             <ul className="flex items-center gap-10">
-              {["Home", "About", "Services", "Gallery"].map((item) => (
+              {["Home", "About", "Gallery"].map((item) => (
                 <li key={item} className="relative group">
                   <Link
                     to={`/${item === "Home" ? "" : item.toLowerCase()}`}
                     className={`text-sm transition-colors duration-300 group-hover:text-blue-400
-                    before:content-[''] before:absolute before:bottom-0 before:left-1/2 
-                    before:translate-x-[-50%] before:h-[2px] before:w-0 
-                    before:bg-blue-400 before:transition-all before:duration-300 
+                    before:content-[''] before:absolute before:bottom-0 before:left-1/2
+                    before:translate-x-[-50%] before:h-[2px] before:w-0
+                    before:bg-blue-400 before:transition-all before:duration-300
                     group-hover:before:w-full ${
                       !scrolled && isHome
                         ? "text-white"
@@ -98,9 +98,9 @@ function Header({ isHome }) {
               <li className="relative group cursor-pointer">
                 <span
                   className={`text-sm transition-colors duration-300 group-hover:text-blue-400
-                  before:content-[''] before:absolute before:bottom-0 before:left-1/2 
-                  before:translate-x-[-50%] before:h-[2px] before:w-0 
-                  before:bg-blue-400 before:transition-all before:duration-300 
+                  before:content-[''] before:absolute before:bottom-0 before:left-1/2
+                  before:translate-x-[-50%] before:h-[2px] before:w-0
+                  before:bg-blue-400 before:transition-all before:duration-300
                   group-hover:before:w-full ${
                     !scrolled && isHome
                       ? "text-white"
@@ -112,7 +112,7 @@ function Header({ isHome }) {
 
                 {/* Offer dropdown menu */}
                 <ul
-                  className="absolute left-0 top-full mt-6 w-48 bg-white shadow-lg opacity-0 invisible 
+                  className="absolute left-0 top-full mt-6 w-48 bg-white shadow-lg opacity-0 invisible
                   group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-in-out z-50"
                 >
                   {/* Rooms submenu (appears on hover of Rooms only) */}
@@ -123,7 +123,7 @@ function Header({ isHome }) {
 
                     {/* Submenu positioned to the LEFT */}
                     <ul
-                      className="absolute right-full top-0 mt-2 mr-[1px] w-64 bg-white shadow-lg opacity-0 invisible 
+                      className="absolute right-full top-0 mt-2 mr-[1px] w-64 bg-white shadow-lg opacity-0 invisible
                       group-hover/rooms:opacity-100 group-hover/rooms:visible transition-all duration-300 ease-in-out z-50"
                     >
                       {data?.map((item) => (
@@ -159,8 +159,8 @@ function Header({ isHome }) {
                   title="House Rules"
                   onClick={() => setShowForm("house_rules")}
                   className={`text-sm transition-colors duration-300 group-hover:text-blue-400
-                  
-                    before:bg-blue-400 before:transition-all before:duration-300 
+
+                    before:bg-blue-400 before:transition-all before:duration-300
                     group-hover:before:w-full ${
                       !scrolled && isHome
                         ? "text-white"
@@ -175,8 +175,8 @@ function Header({ isHome }) {
                   title="Announcement"
                   onClick={() => setShowForm("announcement")}
                   className={`text-sm transition-colors duration-300 group-hover:text-blue-400
-                  
-                    before:bg-blue-400 before:transition-all before:duration-300 
+
+                    before:bg-blue-400 before:transition-all before:duration-300
                     group-hover:before:w-full ${
                       !scrolled && isHome
                         ? "text-white"
@@ -187,6 +187,34 @@ function Header({ isHome }) {
                 </Link>
               </li>
 
+              {user && (
+                <li>
+                  <div
+                    className="relative"
+                    onClick={() => setShowForm("notification")}
+                  >
+                    <icons.IoMdNotifications
+                      className={`text-2xl ${
+                        scrolled
+                          ? "dark:text-gray-300 text-gray-400"
+                          : " text-gray-400"
+                      } cursor-pointer`}
+                    />
+                    <div className="h-4 w-4 rounded-full bg-red-600 flex flex-row justify-center items-center absolute -top-2 -right-1">
+                      <p className="text-xs text-white">9</p>
+                    </div>
+                  </div>
+                </li>
+              )}
+
+              {/* Theme Toggle */}
+              <button onClick={toggleDarkMode}>
+                {darkMode ? (
+                  <icons.IoSunnySharp className="text-yellow-500 text-lg" />
+                ) : (
+                  <icons.IoMoonSharp className="text-gray-500 text-lg" />
+                )}
+              </button>
               {/* Sign In / User Dropdown */}
               {user ? (
                 <div className="relative">
@@ -209,7 +237,7 @@ function Header({ isHome }) {
                   {showDropdown && (
                     <div className="absolute flex flex-col gap-1 top-full right-0 mt-5 w-64 bg-white dark:bg-gray-800 shadow-lg rounded-md p-4 z-50">
                       <Button
-                        onClick={() => navigate(`/my-booking/${user.id}`)}
+                        onClick={() => navigate(`/my-booking/${user.user_id}`)}
                         style="w-full flex flex-row items-center gap-2 text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                         label={
                           <>
@@ -251,45 +279,36 @@ function Header({ isHome }) {
                   Sign In <icons.PiSignIn className="text-lg" />
                 </button>
               )}
-              {user && (
-                <li>
-                  <div
-                    className="relative"
-                    onClick={() => setShowForm("notification")}
-                  >
-                    <icons.IoMdNotifications
-                      className={`text-2xl ${
-                        scrolled
-                          ? "dark:text-gray-300 text-gray-400"
-                          : " text-gray-400"
-                      } cursor-pointer`}
-                    />
-                    <div className="h-4 w-4 rounded-full bg-red-600 flex flex-row justify-center items-center absolute -top-2 -right-1">
-                      <p className="text-xs text-white">9</p>
-                    </div>
-                  </div>
-                </li>
-              )}
-
-              {/* Theme Toggle */}
-              <button onClick={toggleDarkMode}>
-                {darkMode ? (
-                  <icons.IoSunnySharp className="text-yellow-500 text-lg" />
-                ) : (
-                  <icons.IoMoonSharp className="text-gray-500 text-lg" />
-                )}
-              </button>
             </ul>
           </nav>
 
           {/* Mobile Hamburger Icon */}
-          <div className="md:hidden ml-auto pr-4">
+          <div className="flex flex-row gap-4 items-center md:hidden ml-auto pr-4">
+            {user && (
+              <li>
+                <div
+                  className="relative"
+                  onClick={() => setShowForm("notification")}
+                >
+                  <icons.IoMdNotifications
+                    className={`text-2xl ${
+                      scrolled
+                        ? "dark:text-gray-300 text-gray-400"
+                        : " text-gray-400"
+                    } cursor-pointer`}
+                  />
+                  <div className="h-4 w-4 rounded-full bg-red-600 flex flex-row justify-center items-center absolute -top-2 -right-1">
+                    <p className="text-xs text-white">9</p>
+                  </div>
+                </div>
+              </li>
+            )}
             <icons.RiMenuLine
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className={`${
                 scrolled
-                  ? "dark:text-white text-black"
-                  : "bg-transparent text-black dark:text-white"
+                  ? "dark:text-gray-400 text-black"
+                  : "bg-transparent text-gray-400 "
               } text-3xl cursor-pointer`}
             />
           </div>
@@ -298,14 +317,38 @@ function Header({ isHome }) {
         {/* Mobile Menu (unchanged) */}
         {mobileMenuOpen && (
           <div className="absolute top-full left-0 w-full bg-white dark:bg-gray-800 shadow-lg z-40 md:hidden">
+            {user && (
+              <div className="mt-8 px-4 w-full flex flex-row justify-between">
+                <div className="flex flex-row justify-start items-center gap-2">
+                  <icons.FaUserCircle className=" text-[40px] text-blue-600" />
+                  <span className="text-sm text-black dark:text-white font-medium">
+                    {user?.firstname.split(" ")[0]}
+                  </span>
+                </div>
+
+                <icons.IoSettingsOutline className="text-lg text-black cursor-pointer dark:text-gray-300" />
+              </div>
+            )}
             <ul className="flex flex-col gap-4 p-4 text-sm text-black dark:text-white">
+              {user && (
+                <li>
+                  <Link
+                    to={`/my-booking/${user?.user_id}`}
+                    onClick={() => setMobileMenuOpen(false)} // close menu after click
+                    className="block w-full py-2 hover:bg-gray-100 pl-2 dark:hover:bg-gray-700 rounded"
+                  >
+                    My Booking
+                  </Link>
+                </li>
+              )}
+
               {/* Main Links */}
-              {["Home", "About", "Services", "Gallery"].map((item) => (
+              {["Home", "About", "Gallery"].map((item) => (
                 <li key={item}>
                   <Link
                     to={`/${item === "Home" ? "" : item.toLowerCase()}`}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    className="block w-full py-2 pl-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                   >
                     {item}
                   </Link>
@@ -388,12 +431,6 @@ function Header({ isHome }) {
                 )}
               </li>
 
-              <li>
-                <div>
-                  <icons.IoMdNotifications />
-                  <div></div>
-                </div>
-              </li>
               {/* Theme Toggle */}
               <li>
                 <button
@@ -412,9 +449,19 @@ function Header({ isHome }) {
               {/* Sign In / User */}
               <li>
                 {user ? (
-                  <span className="block py-2 px-2 text-xs">
-                    {user.firstname}
-                  </span>
+                  <Button
+                    onClick={() => {
+                      useAuthStore.getState().logout();
+                      navigate("/signin");
+                    }}
+                    style="w-full flex flex-row justify-center items-center px-4 py-2 text-sm text-white hover:bg-gray-500 dark:hover:bg-gray-700 bg-red-600 rounded-full text-center gap-2"
+                    label={
+                      <>
+                        Logout{" "}
+                        <icons.IoIosLogOut className="text-lg text-white" />
+                      </>
+                    }
+                  />
                 ) : (
                   <button
                     onClick={() => {

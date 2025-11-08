@@ -26,9 +26,15 @@ if ($method === "GET") {
     $stmt = $conn->prepare("SELECT * FROM extras WHERE room_id = ?");
     $stmt->bind_param("i", $room_id_get);
     $stmt->execute();
-
     $result = $stmt->get_result();
     $data = $result->fetch_all(MYSQLI_ASSOC);
+
+    // Optional: Add default price if it doesn't exist
+    foreach ($data as &$extra) {
+        if (!isset($extra['price']) || $extra['price'] === null) {
+            $extra['price'] = 0; // Default price
+        }
+    }
 
     echo json_encode([
         "success" => true,
@@ -36,6 +42,7 @@ if ($method === "GET") {
     ]);
     exit;
 }
+
 
 
 if ($method === 'POST') {

@@ -21,6 +21,7 @@ const ChatBot = lazy(() => import("../molecules/ChatBot"));
 const RoomCategoryCard = lazy(() => import("../molecules/RoomCategoryCard"));
 const CattageCard = lazy(() => import("../molecules/CattageCard"));
 const FunctionHallCard = lazy(() => import("../molecules/FunctionHallCard"));
+const WhyChooseUs = lazy(() => import("../organisms/WhyChooseUs"));
 
 const imageKeys = ["hero1", "hero1_m", "hero2", "hero2_m", "hero3", "hero3_m"];
 
@@ -40,22 +41,11 @@ function HomePage() {
     error: errorFh,
   } = useGetData(`/admin/functionhall.php?status=active`);
 
-  // Kunin yung JSON string mula sa sessionStorage gamit 'auth-storage' na key
   // Get token from sessionStorage
   const authStorage = sessionStorage.getItem("auth-storage");
 
-  // if (!authStorage) {
-  //   console.error("No auth-storage found in sessionStorage");
-  //   return;
-  // }
-
   const parsedStorage = JSON.parse(authStorage);
   const token = parsedStorage?.state?.token;
-
-  // if (!token) {
-  //   console.error("No token found in state");
-  //   return;
-  // }
 
   // Pass token in Axios headers
   const { data, loading, refetch, error } = useGetData(
@@ -151,6 +141,14 @@ function HomePage() {
           }
         >
           <About />
+        </Suspense>
+
+        <Suspense
+          fallback={
+            <div className="text-center py-10 text-gray-400">Loading...</div>
+          }
+        >
+          <WhyChooseUs />
         </Suspense>
 
         <section className="w-full dark:bg-black mt-10">
@@ -292,7 +290,7 @@ function HomePage() {
         </section>
       </main>
 
-      <img
+      {/* <img
         onClick={() => setShowChatBox(true)}
         src={images.messageIcons}
         alt="Chat Icon"
@@ -308,14 +306,14 @@ function HomePage() {
         >
           <ChatBot close={() => setShowChatBox(false)} />
         </Suspense>
-      )}
+      )} */}
 
       <img
         onClick={() => navigate("/test")}
         title="Street View"
         src={images.location}
         alt="Street View Icon"
-        className="h-[60px] w-[60px] fixed bottom-4 right-28 z-30"
+        className="h-[60px] w-[60px] fixed bottom-4 right-10 z-30"
       />
 
       {/* <img

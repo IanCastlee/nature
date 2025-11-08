@@ -121,9 +121,9 @@ function RoomCard({ rooms }) {
                     <p className="dark:text-white text-sm font-medium">
                       ₱ {item.price} / Night
                     </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 h-5 flex justify-center items-center px-1 rounded-full text-center mt-1">
+                    {/* <p className="text-xs text-gray-600 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 h-5 flex justify-center items-center px-1 rounded-full text-center mt-1">
                       156 booking
-                    </p>
+                    </p> */}
                   </div>
 
                   <motion.div

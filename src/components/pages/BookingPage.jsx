@@ -246,7 +246,7 @@ function BookingPage() {
 
   const {
     room_id,
-    image,
+    images,
     room_name,
     price,
     capacity,
@@ -260,7 +260,7 @@ function BookingPage() {
 
   const parsedAmenities = amenities?.split(",") || [];
   const parsedInclusions = inclusion?.split(",") || [];
-  const parsedExtras = extras?.split(",") || [];
+  const parsedExtras = extrasData?.data || [];
 
   const nights = getNumberOfNights();
   const roomTotal = nights * Number(price);
@@ -274,6 +274,8 @@ function BookingPage() {
   const isSubmitDisabled =
     formLoading || !selectedRange.from || !selectedRange.to || nights === 0;
 
+  console.log("EXTRAS: ", extrasData);
+
   return (
     <>
       {toast && (
@@ -286,7 +288,7 @@ function BookingPage() {
       <div className="w-full dark:bg-black">
         <div className="w-full flex flex-col md:flex-col lg:flex-row">
           <LazyLoadImage
-            src={`${uploadUrl.uploadurl}/rooms/${image}`}
+            src={`${uploadUrl.uploadurl}/rooms/${images[0]}`}
             alt="Project image"
             effect="blur"
             wrapperClassName="lg:w-1/2 md:w-full w-full lg:h-screen md:h-[150px] h-[150px]"
@@ -415,9 +417,11 @@ function BookingPage() {
             {extras && (
               <div className="w-full flex flex-row justify-start items-center  border-t dark:border-gray-600 border-gray-300 pb-4">
                 <div className="lg:w-[60%] md:w-full w-full mt-5 ">
+                  {/* Label + Icon */}
                   <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-sm">
                     Add Extras
                   </h3>
+
                   <div className="flex flex-col  md:flex-row lg:flex-row  gap-2 justify-center items-center">
                     <div className="w-[70%]">
                       <CustomDropDownn

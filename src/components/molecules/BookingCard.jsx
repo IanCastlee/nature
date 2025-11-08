@@ -26,76 +26,94 @@ function BookingCard({ booking }) {
     });
   };
 
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-700";
+      case "confirmed":
+        return "bg-green-100 text-green-700";
+      case "cancelled":
+        return "bg-red-100 text-red-700";
+      default:
+        return "bg-gray-100 text-gray-600";
+    }
+  };
+
   return (
-    <div className="p-5 rounded-2xl shadow-md bg-gray-50 dark:bg-gray-900">
-      {/* Room Details */}
-      <h2 className="text-sm dark:text-gray-200 font-medium text-gray-800 mb-2 tracking-wide">
-        Room Details
-      </h2>
-      <div className="mb-3">
-        <h3 className="text-sm dark:text-gray-300 text-gray-800">
-          <span className="text-xs dark:text-gray-400 text-gray-700 mr-2 tracking-wide">
-            Room:
-          </span>
-          {room.room_name || "N/A"}
-        </h3>
-        <p className="text-sm dark:text-gray-300 text-gray-800">
-          <span className="text-xs dark:text-gray-400 text-gray-700 mr-2 tracking-wide">
+    <div className="p-6 rounded-2xl shadow-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 transition hover:shadow-xl">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+          {room.room_name || "Room"}
+        </h2>
+        <span
+          className={`text-xs px-3 py-1 rounded-full font-medium ${getStatusColor(
+            booking.status
+          )}`}
+        >
+          {booking.status || "Unknown"}
+        </span>
+      </div>
+
+      {/* Divider */}
+      <hr className="border-gray-200 dark:border-gray-700 mb-4" />
+
+      {/* Room Info */}
+      <div className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+        <p>
+          <span className="font-medium text-gray-600 dark:text-gray-400">
             Price:
-          </span>
-          {room.price ? `${formatCurrency(room.price)} / per night` : "N/A"}
+          </span>{" "}
+          {room.price ? `${formatCurrency(room.price)} / night` : "N/A"}
         </p>
-        <p className="text-sm dark:text-gray-300 text-gray-800">
-          <span className="text-xs dark:text-gray-400 text-gray-700 mr-2 tracking-wide">
+        <p>
+          <span className="font-medium text-gray-600 dark:text-gray-400">
             Capacity:
-          </span>
+          </span>{" "}
           {room.capacity || "N/A"} persons
         </p>
-        <p className="text-sm dark:text-gray-300 text-gray-800">
-          <span className="text-xs dark:text-gray-400 text-gray-700 mr-2 tracking-wide">
+        <p>
+          <span className="font-medium text-gray-600 dark:text-gray-400">
             Duration:
-          </span>
+          </span>{" "}
           {room.duration ? `${room.duration} hours` : "N/A"}
         </p>
       </div>
 
-      {/* Booking Details */}
-      <div className="mt-5 mb-3">
-        <h2 className="text-sm dark:text-gray-200 font-medium text-gray-800 mb-1 tracking-wide">
+      {/* Booking Info */}
+      <div className="mt-5 space-y-1 text-sm text-gray-700 dark:text-gray-300">
+        <h3 className="text-gray-800 dark:text-gray-200 font-medium mb-1">
           Booking Details
-        </h2>
-        <h3 className="text-sm dark:text-gray-300 text-gray-800">
-          <span className="text-xs dark:text-gray-400 text-gray-700 mr-2 tracking-wide">
-            Check In:
-          </span>
-          {formatDate(booking.start_date)}
         </h3>
-        <p className="text-sm dark:text-gray-300 text-gray-800">
-          <span className="text-xs dark:text-gray-400 text-gray-700 mr-2 tracking-wide">
-            Check Out:
-          </span>
+        <p>
+          <span className="font-medium text-gray-600 dark:text-gray-400">
+            Check-In:
+          </span>{" "}
+          {formatDate(booking.start_date)}
+        </p>
+        <p>
+          <span className="font-medium text-gray-600 dark:text-gray-400">
+            Check-Out:
+          </span>{" "}
           {formatDate(booking.end_date)}
         </p>
-        <p className="text-sm dark:text-gray-300 text-gray-800">
-          <span className="text-xs dark:text-gray-400 text-gray-700 mr-2 tracking-wide">
+        <p>
+          <span className="font-medium text-gray-600 dark:text-gray-400">
             Nights:
-          </span>
-          {booking.nights} night(s)
+          </span>{" "}
+          {booking.nights || "N/A"}
         </p>
       </div>
 
       {/* Extras */}
       {extras.length > 0 && (
         <div className="mt-5">
-          <h2 className="text-sm dark:text-gray-200 font-medium text-gray-800 mb-1 tracking-wide">
+          <h3 className="text-gray-800 dark:text-gray-200 font-medium mb-2">
             Extras
-          </h2>
-          <ul className="list-disc pl-5 space-y-1">
+          </h3>
+          <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700 dark:text-gray-300">
             {extras.map((extra, index) => (
-              <li
-                key={index}
-                className="text-sm dark:text-gray-300 text-gray-800"
-              >
+              <li key={index}>
                 {extra.name} — {extra.quantity} × {formatCurrency(extra.price)}
               </li>
             ))}
@@ -103,19 +121,15 @@ function BookingCard({ booking }) {
         </div>
       )}
 
-      {/* Status & Total */}
-      <p className="text-sm dark:text-gray-300 text-gray-800 mt-3">
-        <span className="text-xs dark:text-gray-400 text-gray-700 mr-2 tracking-wide">
-          Status:
-        </span>
-        {booking.status}
-      </p>
-      <p className="text-sm dark:text-gray-300 text-gray-800 font-semibold mt-1 bg-gray-200 py-1 px-2 rounded-full w-fit">
-        <span className="text-xs dark:text-gray-400 text-gray-700 mr-2 tracking-wide">
+      {/* Total */}
+      <div className="mt-6 p-3 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/20 rounded-xl flex justify-between items-center">
+        <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
           Total Price:
         </span>
-        {formatCurrency(booking.price)}
-      </p>
+        <span className="text-lg font-semibold text-blue-700 dark:text-blue-400">
+          {formatCurrency(booking.price)}
+        </span>
+      </div>
     </div>
   );
 }

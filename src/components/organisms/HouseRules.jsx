@@ -1,45 +1,61 @@
 import React from "react";
 import { icons } from "../../constant/icon";
 import { motion } from "framer-motion";
+
 function HouseRules({ close }) {
   return (
-    <div className="w-full h-screen bg-black/50 fixed top-0 left-0 z-50 flex justify-center items-center">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
       <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-[500px] max-h-[80%] bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 overflow-y-auto"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="relative w-[95%] max-w-[500px] max-h-[85%] overflow-y-auto rounded-xl shadow-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6"
       >
-        <div className="w-full  flex flex-row justify-between">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">
-            House Rules
+        {/* Header */}
+        <div className="flex justify-between items-center border-b border-gray-300 dark:border-gray-700 pb-3 mb-4">
+          <h3 className="text-2xl font-semibold text-blue-700 dark:text-blue-400">
+            🏠 House Rules
           </h3>
-
           <icons.MdOutlineClose
             onClick={close}
-            className="dark:text-gray-100 cursor-pointer text-lg"
+            className="text-2xl cursor-pointer text-gray-600 hover:text-red-500 dark:text-gray-300 transition-all"
           />
         </div>
 
-        <ul className="list-disc list-inside text-sm space-y-2 text-gray-700 dark:text-gray-300">
-          <li>No smoking inside the room and in any area of the resort.</li>
+        {/* Rules List */}
+        <ul className="list-disc list-inside space-y-3 text-gray-700 dark:text-gray-300 leading-relaxed text-sm sm:text-base">
+          <li>No smoking inside the room or any area of the resort.</li>
           <li>
-            Bringing of alcoholic drinks is strictly <strong>PROHIBITED</strong>
+            Bringing of alcoholic drinks is strictly{" "}
+            <strong className="text-red-600 dark:text-red-400">
+              PROHIBITED
+            </strong>
             .
           </li>
-          <li>Bringing of speaker/videoke is not allowed.</li>
-          <li>No tent allowed.</li>
-          <li>No pets allowed.</li>
-          <li>No bringing of mattress, foam, or pillows.</li>
+          <li>Loud music, speakers, and videoke systems are not allowed.</li>
+          <li>No tents or camping setups permitted.</li>
+          <li>No pets allowed within the premises.</li>
+          <li>Outside mattresses, foams, or pillows are not allowed.</li>
           <li>
-            No bringing of cooking equipment/appliances (e.g. gas stove, butane,
-            rice cooker, portable griller, and electric kettle).
+            Cooking equipment or appliances such as gas stoves, butane, rice
+            cookers, portable grillers, and electric kettles are{" "}
+            <strong className="text-red-600 dark:text-red-400">
+              not permitted
+            </strong>
+            .
           </li>
         </ul>
 
-        <p className="mt-6 text-sm text-blue-700 dark:text-blue-400 font-medium">
-          Please coordinate with us to avoid check-in delays. THANK YOU!
-        </p>
+        {/* Footer Message */}
+        <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md text-center">
+          <p className="text-sm text-blue-800 dark:text-blue-400 font-medium">
+            Please coordinate with us to avoid check-in delays. <br />
+            <span className="font-semibold">
+              Thank you for your cooperation!
+            </span>{" "}
+            💙
+          </p>
+        </div>
       </motion.div>
     </div>
   );

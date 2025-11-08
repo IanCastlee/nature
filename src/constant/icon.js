@@ -58,9 +58,11 @@ import { BiSolidMegaphone } from "react-icons/bi";
 import { VscMegaphone } from "react-icons/vsc";
 
 import { IoMdNotifications } from "react-icons/io";
+import { IoIosInformationCircleOutline } from "react-icons/io";
 
 export const icons = {
   FaPhoneAlt,
+  IoIosInformationCircleOutline,
   IoMdNotifications,
   IoEyeOutline,
   VscMegaphone,

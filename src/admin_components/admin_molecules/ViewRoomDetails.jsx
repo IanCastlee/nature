@@ -38,8 +38,6 @@ function ViewRoomDetails({ roomId }) {
   const parsedInclusions = inclusion?.split(",") || [];
   const parsedExtras = extras?.split(",") || [];
 
-  console.log("OEJJFH: ", images);
-
   return (
     <div className="w-full h-screen bg-black/10 flex justify-center items-center  fixed inset-0 z-50">
       <motion.div
