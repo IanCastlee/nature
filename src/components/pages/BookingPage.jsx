@@ -104,23 +104,35 @@ function BookingPage() {
     }
   }, [notAvailableDates]);
 
-  //submit booking form
   const {
     submit,
     loading: formLoading,
     error: formError,
-  } = useFormSubmit("/booking/booking.php", () => {
-    setToast({
-      message: "Booking submitted successfully!!",
-      type: "success",
-    });
+  } = useFormSubmit("/booking/booking.php", (response) => {
+    // `response` contains the JSON sent by PHP
+    if (response.success) {
+      setToast({
+        message: `Booking #${response.booking_id} submitted successfully!`,
+        type: "success",
+      });
 
-    //  Reset all fields
-    setSelectedRange({ from: undefined, to: undefined });
-    setAddedExtras([]);
-    setSelectedExtraId("");
-    setExtraQty(1);
-    refetchNAD();
+      // You can now display server-calculated totals
+      console.log("Base price:", response.base_price);
+      console.log("Extras total:", response.extras_total);
+      console.log("Total price:", response.total_price);
+
+      // Reset all fields
+      setSelectedRange({ from: undefined, to: undefined });
+      setAddedExtras([]);
+      setSelectedExtraId("");
+      setExtraQty(1);
+      refetchNAD();
+    } else {
+      setToast({
+        message: response.message || "Failed to submit booking",
+        type: "error",
+      });
+    }
   });
 
   const handleSubmitBooking = () => {
@@ -519,7 +531,7 @@ function BookingPage() {
                         })}
                       </div>
                       <Button
-                        label={formLoading ? "Submitting..." : "Submit Booking"}
+                        label={formLoading ? "Submitting..." : "Save"}
                         style={`${
                           isSubmitDisabled
                             ? "bg-gray-400 cursor-not-allowed"

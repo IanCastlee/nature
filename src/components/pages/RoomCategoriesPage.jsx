@@ -4,6 +4,7 @@ import { images } from "../../constant/image";
 import RoomCard from "../molecules/RoomCard";
 import useGetData from "../../hooks/useGetData";
 import { motion } from "framer-motion";
+import SearchBox from "../molecules/SearchBox";
 
 function SkeletonRoomCard() {
   return (
@@ -59,6 +60,8 @@ function RoomCategoriesPage() {
           </h1>
         </div>
       </section>
+
+      {/* <SearchBox /> */}
 
       <section className="w-full px-2 md:px-2 lg:px-[130px] pt-10">
         <div className="flex flex-row justify-center items-center gap-2 mb-2">

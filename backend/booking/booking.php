@@ -95,11 +95,10 @@ if ($action === "set_decline" || $action === "set_declined") {
     exit;
 }
 
-
 /**---------------------------------------------------------
- * 3. CREATE BOOKING
+ * 3. CREATE BOOKING (NO USER ID)
  *--------------------------------------------------------*/
-$requiredFields = ["userId", "facility_id", "extras", "check_in", "check_out"];
+$requiredFields = ["facility_id", "extras", "check_in", "check_out", "fullname", "phone", "address"];
 foreach ($requiredFields as $field) {
     if (!isset($_POST[$field])) {
         http_response_code(400);
@@ -108,7 +107,10 @@ foreach ($requiredFields as $field) {
     }
 }
 
-$userId = intval($_POST['userId']);
+$fullname = $_POST['fullname'];
+$phone = $_POST['phone'];
+$address = $_POST['address'];
+
 $facilityId = intval($_POST['facility_id']);
 $extras = $_POST['extras'] ?? [];
 $checkIn = $_POST['check_in'];
@@ -123,7 +125,7 @@ if (!$checkIn || !$checkOut) {
     exit;
 }
 
-// Get room price
+// Get base room price
 $facilityQuery = $conn->prepare("SELECT price FROM rooms WHERE room_id = ?");
 $facilityQuery->bind_param("i", $facilityId);
 $facilityQuery->execute();
@@ -167,12 +169,21 @@ foreach ($extras as $extra) {
 
 $totalPrice = $basePrice + $extrasTotal;
 
-// Save booking
+// INSERT BOOKING
 $insertBooking = $conn->prepare("
-    INSERT INTO room_booking (user_id, facility_id, start_date, end_date, nights, status, price)
-    VALUES (?, ?, ?, ?, ?, 'pending', ?)
+    INSERT INTO room_booking (fullname, phone, address, facility_id, start_date, end_date, nights, status, price)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)
 ");
-$insertBooking->bind_param("iissid", $userId, $facilityId, $checkIn, $checkOut, $nights, $totalPrice);
+$insertBooking->bind_param("sssissid", 
+    $fullname, 
+    $phone, 
+    $address, 
+    $facilityId, 
+    $checkIn, 
+    $checkOut, 
+    $nights, 
+    $totalPrice
+);
 
 if (!$insertBooking->execute()) {
     http_response_code(500);
@@ -183,7 +194,7 @@ if (!$insertBooking->execute()) {
 $bookingId = $insertBooking->insert_id;
 $insertBooking->close();
 
-// Insert extras
+// INSERT EXTRAS
 if (!empty($sanitizedExtras)) {
     $insertExtra = $conn->prepare("
         INSERT INTO booking_extras (booking_id, extra_id, name, quantity, price)
@@ -205,11 +216,20 @@ if (!empty($sanitizedExtras)) {
     $insertExtra->close();
 }
 
+// RETURN FULL DATA
 echo json_encode([
     "success" => true,
     "booking_id" => $bookingId,
+    "fullname" => $fullname,
+    "phone" => $phone,
+    "address" => $address,
+    "facility_id" => $facilityId,
+    "start_date" => $checkIn,
+    "end_date" => $checkOut,
+    "nights" => $nights,
     "base_price" => $basePrice,
     "extras_total" => $extrasTotal,
-    "total_price" => $totalPrice
+    "total_price" => $totalPrice,
+    "extras" => $sanitizedExtras
 ]);
 exit;

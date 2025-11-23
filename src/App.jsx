@@ -54,6 +54,8 @@ import ForgotPassword from "./components/pages/ForgotPassword";
 import ResetPassword from "./components/pages/ResetPassword";
 import AdminAnnouncementPage from "./admin_components/admin_pages/AdminAnnouncementPage";
 import AdminAnnouncementHistory from "./admin_components/admin_pages/AdminAnnouncementHistory";
+import Tester from "./components/pages/Tester";
+import BookWithoutSigningIn from "./components/pages/BookWithoutSigningIn";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -69,6 +71,7 @@ const UserLayout = () => {
     "/resend-verification",
     "/forgot",
     "/reset",
+    "/reserve-without-signin",
   ];
   const shouldHideLayout = hideLayoutPaths.some((path) =>
     location.pathname.startsWith(path)
@@ -120,6 +123,12 @@ const UserLayout = () => {
         <Route path="*" element={<NotFound />} />
         <Route path="/verified" element={<Verified />} />
         <Route path="/resend-verification" element={<ResendVerification />} />
+
+        <Route path="/tester" element={<Tester />} />
+        <Route
+          path="/reserve-without-signin/:roomId"
+          element={<BookWithoutSigningIn />}
+        />
       </Routes>
       {!shouldHideLayout && <Footer />}
     </>

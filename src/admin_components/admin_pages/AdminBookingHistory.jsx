@@ -8,6 +8,8 @@ import GenericTable from "../admin_molecules/GenericTable";
 import { renderActionsBookingHistory } from "../admin_molecules/RenderActions";
 import { booking } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
+import Button from "../admin_atoms/Button";
+import { icons } from "../../constant/icon";
 
 function AdminBookingHistory() {
   const showForm = useForm((state) => state.showForm);
@@ -93,6 +95,15 @@ function AdminBookingHistory() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               disabled={loading}
+            />
+            <Button
+              className="flex flex-row items-center h-[35px] bg-blue-600 text-white text-xs font-medium px-2 rounded-md whitespace-nowrap"
+              label={
+                <>
+                  Add Booking
+                  <icons.IoAddOutline className="text-lg text-white ml-1" />
+                </>
+              }
             />
           </div>
         </div>

@@ -8,8 +8,11 @@ import { useNavigate } from "react-router-dom";
 import { uploadUrl } from "../../utils/fileURL";
 import Button from "../atoms/Button";
 import Toaster from "./Toaster";
+import useAuthStore from "../../store/authStore";
 
 function RoomCard({ rooms }) {
+  const { user } = useAuthStore();
+
   const navigate = useNavigate();
   const [toast, setToast] = useState(null);
 
@@ -26,13 +29,13 @@ function RoomCard({ rooms }) {
 
   //  Protected navigation (for buttons that require login)
   const handleProtectedNavigation = (path) => {
-    if (!isLoggedIn()) {
-      setToast({
-        message: "Please sign in first before continuing.",
-        type: "warning",
-      });
-      return;
-    }
+    // if (!isLoggedIn()) {
+    //   setToast({
+    //     message: "Please sign in first before continuing.",
+    //     type: "warning",
+    //   });
+    //   return;
+    // }
     navigate(path);
   };
 
@@ -126,18 +129,36 @@ function RoomCard({ rooms }) {
                     </p> */}
                   </div>
 
-                  <motion.div
-                    whileHover={{ scale: 1.2, rotate: 10 }}
-                    transition={{ type: "spring", stiffness: 200 }}
-                  >
-                    <icons.FaStreetView
-                      onClick={() =>
-                        navigate(`/room-view/${item.photo_sphere}`)
-                      }
-                      title="View Room"
-                      className="text-2xl text-blue-600 cursor-pointer"
-                    />
-                  </motion.div>
+                  <div className="flex flex-col items-end justify-end">
+                    <motion.div
+                      whileHover={{ scale: 1.2, rotate: 10 }}
+                      transition={{ type: "spring", stiffness: 200 }}
+                    >
+                      <icons.FaStreetView
+                        onClick={() =>
+                          navigate(`/room-view/${item.photo_sphere}`)
+                        }
+                        title="View Room"
+                        className="text-2xl text-blue-600 cursor-pointer"
+                      />
+                    </motion.div>
+                    <motion.button
+                      whileHover={{ x: 5 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => navigate(`/room-deatails/${item.room_id}`)}
+                      className="group relative flex flex-row items-center text-blue-500 text-sm font-medium rounded-sm h-[30px] self-end ml-auto transition-colors duration-300 hover:text-blue-400"
+                    >
+                      <span
+                        className="relative before:content-[''] before:absolute before:bottom-0 before:left-1/2 
+                        before:translate-x-[-50%] before:h-[2px] before:w-0 
+                        before:bg-blue-400 before:transition-all before:duration-300 
+                        group-hover:before:w-full text-xs"
+                      >
+                        More Details
+                      </span>
+                      <icons.FiArrowUpRight className="ml-1 text-blue-600 text-lg font-bold" />
+                    </motion.button>
+                  </div>
                 </div>
 
                 {/* Room Info */}
@@ -189,26 +210,36 @@ function RoomCard({ rooms }) {
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-green-600 hover:scale-105"
                       } text-xs text-white font-medium rounded-sm h-[30px] px-2 transition-all duration-300 transform`}
-                      label={isUnderMaintenance ? "Unavailable" : "Reserve Now"}
+                      label={
+                        isUnderMaintenance
+                          ? "Unavailable"
+                          : user
+                          ? "Reserve Now"
+                          : "Choose Date to Reserve"
+                      }
                     />
                   </motion.div>
 
-                  <motion.button
-                    whileHover={{ x: 5 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => navigate(`/room-deatails/${item.room_id}`)}
-                    className="group relative flex flex-row items-center text-blue-500 text-sm font-medium rounded-sm h-[30px] self-end ml-auto transition-colors duration-300 hover:text-blue-400"
-                  >
-                    <span
-                      className="relative before:content-[''] before:absolute before:bottom-0 before:left-1/2 
+                  {!user && (
+                    <motion.button
+                      whileHover={{ x: 5 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() =>
+                        navigate(`/reserve-without-signin/${item.room_id}`)
+                      }
+                      className="group relative flex flex-row items-center text-blue-500 text-sm font-medium rounded-sm h-[30px] self-end ml-auto transition-colors duration-300 hover:text-blue-400"
+                    >
+                      <span
+                        className="relative before:content-[''] before:absolute before:bottom-0 before:left-1/2 
                         before:translate-x-[-50%] before:h-[2px] before:w-0 
                         before:bg-blue-400 before:transition-all before:duration-300 
                         group-hover:before:w-full text-xs"
-                    >
-                      More Details
-                    </span>
-                    <icons.FiArrowUpRight className="ml-1 text-blue-600 text-lg font-bold" />
-                  </motion.button>
+                      >
+                        Reserve without Signing In
+                      </span>
+                      <icons.FiArrowUpRight className="ml-1 text-blue-600 text-lg font-bold" />
+                    </motion.button>
+                  )}
                 </div>
               </div>
             </motion.article>
