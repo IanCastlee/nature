@@ -56,6 +56,7 @@ import AdminAnnouncementPage from "./admin_components/admin_pages/AdminAnnouncem
 import AdminAnnouncementHistory from "./admin_components/admin_pages/AdminAnnouncementHistory";
 import Tester from "./components/pages/Tester";
 import BookWithoutSigningIn from "./components/pages/BookWithoutSigningIn";
+import AdminBookingHistoryLog from "./admin_components/admin_pages/AdminBookingHistoryLog";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -181,8 +182,9 @@ const AdminLayout = () => {
           />
 
           <Route path="/booking" element={<AdminBookingPage />} />
-          <Route path="/booking-history" element={<AdminBookingHistory />} />
+          <Route path="/booking-approved" element={<AdminBookingHistory />} />
           <Route path="/declined-booking" element={<AdminBookingDeclined />} />
+          <Route path="/booking-history" element={<AdminBookingHistoryLog />} />
 
           <Route path="/fh-booking" element={<AdminFhBooking />} />
           <Route

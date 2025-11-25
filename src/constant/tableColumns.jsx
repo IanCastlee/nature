@@ -155,39 +155,95 @@ export const availableCottageColumns = [
 ];
 
 //booking
+export const bookingPending = [
+  { title: "Name", key: "fullname" },
+  { title: "Phone", key: "phone" },
+  { title: "Room Name", key: "room_name" },
+  { title: "Check-In", key: "start_date" },
+  { title: "Check-Out", key: "end_date" },
+  { title: "Night(s)", key: "nights" },
+  {
+    title: "Extras",
+    key: "extras",
+    width: "150px",
+  },
+  { title: "Total Amount", key: "price" },
+  { title: "Required Payment", key: "half_price" },
+
+  { title: "Status", key: "status" },
+];
+
+export const bookingApproved = [
+  { title: "Name", key: "fullname" },
+  { title: "Phone", key: "phone" },
+  { title: "Room Name", key: "room_name" },
+  { title: "Check-In", key: "start_date" },
+  { title: "Check-Out", key: "end_date" },
+  { title: "Night(s)", key: "nights" },
+  {
+    title: "Extras",
+    key: "extras",
+    width: "150px",
+  },
+  { title: "Total Amount", key: "price" },
+  { title: "Paid", key: "paid" },
+  { title: "Balance to Pay", key: "half_price" },
+
+  { title: "Status", key: "status" },
+];
+
+export const bookingHistory = [
+  { title: "Name", key: "fullname" },
+  { title: "Phone", key: "phone" },
+  { title: "Room Name", key: "room_name" },
+  { title: "Check-In", key: "start_date" },
+  { title: "Check-Out", key: "end_date" },
+  { title: "Night(s)", key: "nights" },
+  {
+    title: "Extras",
+    key: "extras",
+    width: "150px",
+  },
+  { title: "Total Amount", key: "price" },
+  { title: "Paid", key: "paid" },
+  // { title: "Balance to Pay", key: "half_price" },
+
+  { title: "Status", key: "status" },
+];
+
+export const bookingDeclined = [
+  { title: "Name", key: "fullname" },
+  { title: "Phone", key: "phone" },
+  { title: "Room Name", key: "room_name" },
+  { title: "Check-In", key: "start_date" },
+  { title: "Check-Out", key: "end_date" },
+  { title: "Night(s)", key: "nights" },
+  {
+    title: "Extras",
+    key: "extras",
+    width: "150px",
+  },
+  { title: "Total Amount", key: "price" },
+  { title: "Paid", key: "paid" },
+
+  { title: "Status", key: "status" },
+];
+
 export const booking = [
+  { title: "Name", key: "fullname" },
+  { title: "Email", key: "email" },
+  { title: "Room Name", key: "room_name" },
+  { title: "Check-In", key: "start_date" },
+  { title: "Check-Out", key: "end_date" },
+  { title: "Night(s)", key: "nights" },
+  { title: "Price", key: "price" },
+
   {
-    title: "Name",
-    key: "firstname",
+    title: "Extras",
+    key: "extras",
+    width: "200px",
   },
-  {
-    title: "Email",
-    key: "email",
-  },
-  {
-    title: "Room Name",
-    key: "room_name",
-  },
-  {
-    title: "Check-In",
-    key: "start_date",
-  },
-  {
-    title: "Check-Out",
-    key: "end_date",
-  },
-  {
-    title: "Night(s)",
-    key: "nights",
-  },
-  {
-    title: "Price",
-    key: "price",
-  },
-  {
-    title: "Status",
-    key: "status",
-  },
+  { title: "Status", key: "status" },
 ];
 
 //users

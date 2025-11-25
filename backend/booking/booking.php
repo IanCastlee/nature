@@ -13,7 +13,10 @@ if ($method !== "POST") {
 }
 
 // Accept JSON body
-if (strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
+if (
+    isset($_SERVER["CONTENT_TYPE"]) && 
+    strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false
+) {
     $input = json_decode(file_get_contents("php://input"), true);
     $_POST = $input;
 }
@@ -21,9 +24,11 @@ if (strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
 $action = $_POST['action'] ?? 'create';
 $id = $_POST['id'] ?? null;
 
-/**---------------------------------------------------------
- * 1. APPROVE BOOKING
- *--------------------------------------------------------*/
+/**
+ * ========================================================
+ *  APPROVE BOOKING
+ * ========================================================
+ */
 if ($action === "set_approve") {
     if (!$id) {
         http_response_code(400);
@@ -31,21 +36,51 @@ if ($action === "set_approve") {
         exit;
     }
 
-    $stmt = $conn->prepare("UPDATE room_booking SET status = 'approved' WHERE booking_id = ?");
+    $stmt = $conn->prepare("
+        UPDATE room_booking 
+        SET status = 'approved', paid = price / 2 
+        WHERE booking_id = ?
+    ");
     $stmt->bind_param("i", $id);
 
-    if ($stmt->execute()) {
-        echo json_encode(["success" => true, "message" => "Booking approved."]);
-    } else {
-        echo json_encode(["success" => false, "message" => "Database error: " . $stmt->error]);
-    }
+    echo $stmt->execute()
+        ? json_encode(["success" => true, "message" => "Booking approved."])
+        : json_encode(["success" => false, "message" => $stmt->error]);
+
     exit;
 }
 
+/**
+ * ========================================================
+ *  DECLINE BOOKING
+ * ========================================================
+ */
+if ($action === "set_decline") {
+    if (!$id) {
+        http_response_code(400);
+        echo json_encode(["error" => "Missing booking id"]);
+        exit;
+    }
 
-/**---------------------------------------------------------
- * 2. DECLINE BOOKING + INSERT NOTIFICATION
- *--------------------------------------------------------*/
+    $stmt = $conn->prepare("
+        UPDATE room_booking 
+        SET status = 'declined'
+        WHERE booking_id = ?
+    ");
+    $stmt->bind_param("i", $id);
+
+    echo $stmt->execute()
+        ? json_encode(["success" => true, "message" => "Booking declined."])
+        : json_encode(["success" => false, "message" => $stmt->error]);
+
+    exit;
+}
+
+/**
+ * ========================================================
+ *  DECLINE BOOKING + NOTIFY USER
+ * ========================================================
+ */
 if ($action === "set_decline" || $action === "set_declined") {
     if (!$id) {
         http_response_code(400);
@@ -53,177 +88,266 @@ if ($action === "set_decline" || $action === "set_declined") {
         exit;
     }
 
-    // 1. Update booking status
+    // 1. Update booking
     $stmt = $conn->prepare("UPDATE room_booking SET status = 'declined' WHERE booking_id = ?");
     $stmt->bind_param("i", $id);
     if (!$stmt->execute()) {
-        echo json_encode(["success" => false, "message" => "Failed to decline booking."]);
+        echo json_encode(["success" => false, "message" => "Failed to decline booking"]);
         exit;
     }
 
-    // 2. Fetch user_id to notify
+    // 2. Get user ID
     $userStmt = $conn->prepare("SELECT user_id FROM room_booking WHERE booking_id = ?");
     $userStmt->bind_param("i", $id);
     $userStmt->execute();
     $userResult = $userStmt->get_result();
 
     if ($userResult->num_rows === 0) {
-        echo json_encode(["success" => false, "message" => "Booking not found."]);
+        echo json_encode(["success" => false, "message" => "Booking not found"]);
         exit;
     }
 
-    $row = $userResult->fetch_assoc();
-    $userId = $row['user_id'];
+    $userId = $userResult->fetch_assoc()['user_id'];
 
     // 3. Insert notification
     $reason = trim($_POST['reason'] ?? "Your booking has been declined.");
     $from = 'admin';
-    $to = $userId;
 
     $notifStmt = $conn->prepare("
         INSERT INTO notifications (`from_`, `to_`, `message`, `is_read`, `created_at`)
         VALUES (?, ?, ?, 0, NOW())
     ");
-    $notifStmt->bind_param("sis", $from, $to, $reason);
+    $notifStmt->bind_param("sis", $from, $userId, $reason);
 
-    if (!$notifStmt->execute()) {
-        echo json_encode(["success" => false, "message" => "Booking declined, but failed to notify user."]);
-        exit;
-    }
+    echo $notifStmt->execute()
+        ? json_encode(["success" => true, "message" => "Booking declined and user notified"])
+        : json_encode(["success" => false, "message" => "Failed to notify user"]);
 
-    echo json_encode(["success" => true, "message" => "Booking declined and user notified."]);
     exit;
 }
 
-/**---------------------------------------------------------
- * 3. CREATE BOOKING (NO USER ID)
- *--------------------------------------------------------*/
-$requiredFields = ["facility_id", "extras", "check_in", "check_out", "fullname", "phone", "address"];
-foreach ($requiredFields as $field) {
-    if (!isset($_POST[$field])) {
+/**
+ * ========================================================
+ * 1. CLIENT ARRIVED BOOKING
+ * ========================================================
+ */
+if ($action === "set_arrived") {
+    if (!$id) {
         http_response_code(400);
-        echo json_encode(["error" => "Missing required field: $field"]);
+        echo json_encode(["error" => "Missing booking id"]);
+        exit;
+    }
+
+    $stmt = $conn->prepare("
+        UPDATE room_booking 
+        SET status = 'arrived', 
+            paid = price 
+        WHERE booking_id = ?
+    ");
+    $stmt->bind_param("i", $id);
+
+    echo $stmt->execute()
+        ? json_encode(["success" => true, "message" => "Client arrived, payment completed."])
+        : json_encode(["success" => false, "message" => $stmt->error]);
+
+    exit;
+}
+
+
+/**
+ * ========================================================
+ *  SET BACK TO PENDING + NOTIFY
+ * ========================================================
+ */
+if ($action === "set_pending") {
+    if (!$id) {
+        http_response_code(400);
+        echo json_encode(["error" => "Missing booking id"]);
+        exit;
+    }
+
+    $stmt = $conn->prepare("
+        UPDATE room_booking SET status = 'pending', paid = 0 WHERE booking_id = ?
+    ");
+    $stmt->bind_param("i", $id);
+    if (!$stmt->execute()) {
+        echo json_encode(["success" => false, "message" => "Failed to update booking"]);
+        exit;
+    }
+
+    $userStmt = $conn->prepare("SELECT user_id FROM room_booking WHERE booking_id = ?");
+    $userStmt->bind_param("i", $id);
+    $userStmt->execute();
+    $userResult = $userStmt->get_result();
+
+    if ($userResult->num_rows === 0) {
+        echo json_encode(["success" => false, "message" => "Booking not found"]);
+        exit;
+    }
+
+    $userId = $userResult->fetch_assoc()['user_id'];
+    $reason = trim($_POST['reason'] ?? "Your booking is pending again.");
+    $from = 'admin';
+
+    $notifStmt = $conn->prepare("
+        INSERT INTO notifications (`from_`, `to_`, `message`, `is_read`, `created_at`)
+        VALUES (?, ?, ?, 0, NOW())
+    ");
+    $notifStmt->bind_param("sis", $from, $userId, $reason);
+
+    echo $notifStmt->execute()
+        ? json_encode(["success" => true, "message" => "Status updated and user notified"])
+        : json_encode(["success" => false, "message" => "Notification failed"]);
+
+    exit;
+}
+
+/**
+ * ========================================================
+ *  SET BACK TO APPROVED (FROM ARRIVED)
+ * ========================================================
+ */
+if ($action === "set_backtoapproved") {
+    if (!$id) {
+        http_response_code(400);
+        echo json_encode(["error" => "Missing booking id"]);
+        exit;
+    }
+
+    // Set status back to approved and reset paid to half the price
+    $stmt = $conn->prepare("
+        UPDATE room_booking 
+        SET status = 'approved',
+            paid = price / 2
+        WHERE booking_id = ?
+    ");
+    $stmt->bind_param("i", $id);
+
+    echo $stmt->execute()
+        ? json_encode(["success" => true, "message" => "Booking moved back to approved."])
+        : json_encode(["success" => false, "message" => $stmt->error]);
+
+    exit;
+}
+
+
+/**
+ * ========================================================
+ * CREATE BOOKING (GUEST MODE, NO USER ID)
+ * ========================================================
+ */
+$requiredFields = ["facility_id", "check_in", "check_out", "fullname", "phone"];
+foreach ($requiredFields as $field) {
+    if (empty($_POST[$field])) {
+        http_response_code(400);
+        echo json_encode(["error" => "Missing field: $field"]);
         exit;
     }
 }
 
 $fullname = $_POST['fullname'];
 $phone = $_POST['phone'];
-$address = $_POST['address'];
 
 $facilityId = intval($_POST['facility_id']);
-$extras = $_POST['extras'] ?? [];
 $checkIn = $_POST['check_in'];
 $checkOut = $_POST['check_out'];
 $nights = intval($_POST['nights'] ?? 1);
-$frontendTotalPrice = floatval($_POST['total_price'] ?? 0);
 
-// Validate dates
-if (!$checkIn || !$checkOut) {
-    http_response_code(400);
-    echo json_encode(["error" => "Check-in and check-out dates are required"]);
-    exit;
-}
+$frontendTotalPrice = floatval($_POST['total_price'] ?? 0);
+$extras = $_POST['extras'] ?? [];
+
+// Convert date format if needed (ensures valid MySQL date)
+$checkIn = date("Y-m-d", strtotime($checkIn));
+$checkOut = date("Y-m-d", strtotime($checkOut));
 
 // Get base room price
 $facilityQuery = $conn->prepare("SELECT price FROM rooms WHERE room_id = ?");
 $facilityQuery->bind_param("i", $facilityId);
 $facilityQuery->execute();
-$facilityResult = $facilityQuery->get_result();
 
+$facilityResult = $facilityQuery->get_result();
 if ($facilityResult->num_rows === 0) {
     http_response_code(404);
     echo json_encode(["error" => "Room not found"]);
     exit;
 }
 
-$facility = $facilityResult->fetch_assoc();
-$basePrice = floatval($facility['price']) * $nights;
+$basePrice = floatval($facilityResult->fetch_assoc()['price']) * $nights;
 
 // Calculate extras
 $extrasTotal = 0;
 $sanitizedExtras = [];
 
 foreach ($extras as $extra) {
-    $extraId = intval($extra['id']);
-    $quantity = intval($extra['quantity']);
-    if ($quantity <= 0) continue;
+    $eid = intval($extra['id']);
+    $qty = intval($extra['quantity']);
+
+    if ($qty <= 0) continue;
 
     $extraQuery = $conn->prepare("SELECT price, extras FROM extras WHERE extra_id = ?");
-    $extraQuery->bind_param("i", $extraId);
+    $extraQuery->bind_param("i", $eid);
     $extraQuery->execute();
     $extraResult = $extraQuery->get_result();
+
     if ($extraResult->num_rows === 0) continue;
 
     $extraRow = $extraResult->fetch_assoc();
-    $lineTotal = floatval($extraRow['price']) * $quantity * $nights;
-    $extrasTotal += $lineTotal;
+    $line = floatval($extraRow['price']) * $qty * $nights;
+
+    $extrasTotal += $line;
 
     $sanitizedExtras[] = [
-        'id' => $extraId,
-        'name' => $extraRow['extras'],
-        'quantity' => $quantity,
-        'price' => $extraRow['price']
+        "id" => $eid,
+        "name" => $extraRow['extras'],
+        "quantity" => $qty,
+        "price" => $extraRow['price']
     ];
 }
 
 $totalPrice = $basePrice + $extrasTotal;
 
-// INSERT BOOKING
+// INSERT MAIN BOOKING
 $insertBooking = $conn->prepare("
-    INSERT INTO room_booking (fullname, phone, address, facility_id, start_date, end_date, nights, status, price)
-    VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+    INSERT INTO room_booking 
+    (fullname, phone, facility_id, start_date, end_date, nights, status, price)
+    VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)
 ");
-$insertBooking->bind_param("sssissid", 
-    $fullname, 
-    $phone, 
-    $address, 
-    $facilityId, 
-    $checkIn, 
-    $checkOut, 
-    $nights, 
+
+$insertBooking->bind_param(
+    "ssissid",
+    $fullname,
+    $phone,
+    $facilityId,
+    $checkIn,
+    $checkOut,
+    $nights,
     $totalPrice
 );
 
 if (!$insertBooking->execute()) {
     http_response_code(500);
-    echo json_encode(["error" => "Failed to save booking"]);
+    echo json_encode(["error" => "Booking failed"]);
     exit;
 }
 
 $bookingId = $insertBooking->insert_id;
-$insertBooking->close();
 
 // INSERT EXTRAS
 if (!empty($sanitizedExtras)) {
-    $insertExtra = $conn->prepare("
+    $ins = $conn->prepare("
         INSERT INTO booking_extras (booking_id, extra_id, name, quantity, price)
         VALUES (?, ?, ?, ?, ?)
     ");
 
-    foreach ($sanitizedExtras as $extra) {
-        $insertExtra->bind_param(
-            "iisid",
-            $bookingId,
-            $extra['id'],
-            $extra['name'],
-            $extra['quantity'],
-            $extra['price']
-        );
-        $insertExtra->execute();
+    foreach ($sanitizedExtras as $ex) {
+        $ins->bind_param("iisid", $bookingId, $ex['id'], $ex['name'], $ex['quantity'], $ex['price']);
+        $ins->execute();
     }
-
-    $insertExtra->close();
 }
 
-// RETURN FULL DATA
 echo json_encode([
     "success" => true,
     "booking_id" => $bookingId,
-    "fullname" => $fullname,
-    "phone" => $phone,
-    "address" => $address,
-    "facility_id" => $facilityId,
     "start_date" => $checkIn,
     "end_date" => $checkOut,
     "nights" => $nights,

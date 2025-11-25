@@ -201,8 +201,11 @@ function RoomCard({ rooms }) {
                 <div className="flex flex-row justify-between mt-8">
                   <motion.div whileTap={{ scale: 0.95 }}>
                     <Button
+                      // onClick={() =>
+                      //   handleProtectedNavigation(`/booking/${item.room_id}`)
+                      // }
                       onClick={() =>
-                        handleProtectedNavigation(`/booking/${item.room_id}`)
+                        navigate(`/reserve-without-signin/${item.room_id}`)
                       }
                       disabled={isUnderMaintenance}
                       style={`${
@@ -220,7 +223,7 @@ function RoomCard({ rooms }) {
                     />
                   </motion.div>
 
-                  {!user && (
+                  {/* {!user && (
                     <motion.button
                       whileHover={{ x: 5 }}
                       whileTap={{ scale: 0.95 }}
@@ -239,7 +242,7 @@ function RoomCard({ rooms }) {
                       </span>
                       <icons.FiArrowUpRight className="ml-1 text-blue-600 text-lg font-bold" />
                     </motion.button>
-                  )}
+                  )} */}
                 </div>
               </div>
             </motion.article>

@@ -27,7 +27,7 @@ function BookWithoutSigningIn() {
   const [addedExtras, setAddedExtras] = useState([]);
   const [extraQty, setExtraQty] = useState(1);
 
-  const [showNote, setShowNote] = useState(true);
+  // const [showNote, setShowNote] = useState(true);
 
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [bookingSummary, setBookingSummary] = useState(null);
@@ -36,10 +36,10 @@ function BookWithoutSigningIn() {
 
   // Form state
   const [form, setForm] = useState({
-    firstname: "",
-    lastname: "",
-    phone: "",
-    address: "",
+    firstname: localStorage.getItem("firstname") || "",
+    lastname: localStorage.getItem("lastname") || "",
+    phone: localStorage.getItem("phone") || "",
+    remember: localStorage.getItem("remember_info") === "true" ? true : false,
   });
 
   const handleScreenshot = () => {
@@ -69,11 +69,11 @@ function BookWithoutSigningIn() {
     }));
   };
 
-  const handleContinue = () => {
-    // User proceeds without signing in
-    setShowNote(false);
-    // Proceed to booking flow, but backend should know user is guest
-  };
+  // const handleContinue = () => {
+  //   // User proceeds without signing in
+  //   setShowNote(false);
+  //   // Proceed to booking flow, but backend should know user is guest
+  // };
 
   const [toast, setToast] = useState(null);
 
@@ -196,10 +196,23 @@ function BookWithoutSigningIn() {
       0
     );
 
+    //  REMEMBER ME — Save or Remove Local Storage
+    if (form.remember) {
+      localStorage.setItem("firstname", form.firstname);
+      localStorage.setItem("lastname", form.lastname);
+      localStorage.setItem("phone", form.phone);
+      localStorage.setItem("remember_info", "true");
+    } else {
+      localStorage.removeItem("firstname");
+      localStorage.removeItem("lastname");
+      localStorage.removeItem("phone");
+      localStorage.removeItem("address");
+      localStorage.removeItem("remember_info");
+    }
+
     const payload = {
       fullname: `${form.firstname} ${form.lastname}`,
       phone: form.phone,
-      address: form.address,
 
       facility_id: Number(roomId),
 
@@ -224,8 +237,6 @@ function BookWithoutSigningIn() {
 
     submit(payload);
   };
-
-  const handleFillUpInfo = () => {};
 
   // Function to handle adding selected extra to the list
   const handleAddExtra = () => {
@@ -593,7 +604,7 @@ function BookWithoutSigningIn() {
         className="text-2xl text-white cursor-pointer absolute top-8 left-8 z-20"
         onClick={() => navigate(-1)}
       />
-      {showNote && <Note onContinue={handleContinue} />}
+      {/* {showNote && <Note onContinue={handleContinue} />} */}
       {showForm === "add_user_details" && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
           {/* MODAL BOX */}
@@ -726,7 +737,7 @@ function BookWithoutSigningIn() {
                       type="checkbox"
                       id="remember"
                       name="remember"
-                      className="h-5 w-5 rounded border-gray-300 focus:ring-blue-500"
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       checked={form.remember}
                       onChange={(e) =>
                         setForm((prev) => ({
@@ -735,6 +746,7 @@ function BookWithoutSigningIn() {
                         }))
                       }
                     />
+
                     <label
                       htmlFor="remember"
                       className="ml-3 mt-2 block text-sm text-gray-700 select-none cursor-pointer"
@@ -1008,14 +1020,14 @@ function BookWithoutSigningIn() {
                     required
                   />
 
-                  <Input
+                  {/* <Input
                     label="Address"
                     name="address"
                     placeholder="Optional"
                     value={form.address}
                     onChange={handleChange}
                     className="w-full mb-4"
-                  />
+                  /> */}
 
                   <div className="flex items-center mb-6">
                     <input

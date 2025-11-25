@@ -8,9 +8,10 @@ import GenericTable from "../admin_molecules/GenericTable";
 import { renderActionsBooking } from "../admin_molecules/RenderActions";
 import useSetInactive from "../../hooks/useSetInactive";
 import DeleteModal from "../../components/molecules/DeleteModal";
-import { booking } from "../../constant/tableColumns";
+import { bookingPending } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import ModalDeclinedForm from "../admin_molecules/ModalDeclinedForm";
+import Toaster from "../../components/molecules/Toaster";
 
 function AdminBookingPage() {
   const showForm = useForm((state) => state.showForm);
@@ -22,6 +23,8 @@ function AdminBookingPage() {
   const [deleteItem, setDeleteItem] = useState(null);
   const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
 
+  const [toast, setToast] = useState(null);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -30,12 +33,10 @@ function AdminBookingPage() {
   //  DATA FETCH  //
   //==============//
 
-  // fetch booking data
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-booking.php?status=pending`
   );
 
-  //handlePageChange
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -44,7 +45,6 @@ function AdminBookingPage() {
   // DATA FILTERING //
   //===============//
 
-  //Filtered data
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
@@ -68,10 +68,9 @@ function AdminBookingPage() {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   //==========================//
-  //   HANDLE DELETE/INACTIVE //
+  //   HANDLE APPROVE/ACTIONS //
   //==========================//
 
-  //set approved
   const {
     setInactive,
     loading: approveLoading,
@@ -79,9 +78,13 @@ function AdminBookingPage() {
   } = useSetInactive("/booking/booking.php", () => {
     refetch();
     setApproveItem(null);
+    setToast({ message: "Booking set as approved", type: "success" });
   });
 
-  //set declined
+  //==========================//
+  //   HANDLE DECLINE         //
+  //==========================//
+
   const {
     setInactive: setDeclined,
     loading: declinedLoading,
@@ -99,8 +102,36 @@ function AdminBookingPage() {
     setViewFHDetailsId(item);
   };
 
+  const formattedData = currentData.map((item) => ({
+    ...item,
+    email: item.firstname === "Admin" ? "No Email Provided" : item.email,
+    room_name: item.room?.room_name || "N/A",
+    extras:
+      item.extras && item.extras.length > 0
+        ? item.extras
+            .map((extra) => `${extra.name} (x${extra.quantity})`)
+            .join(", ")
+        : "None",
+    price: `₱${Number(item.price).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    half_price: `₱${Number(item.half_price).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+  }));
+
   return (
     <>
+      {toast && (
+        <Toaster
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
           Booking Record
@@ -130,18 +161,18 @@ function AdminBookingPage() {
 
         <div className="overflow-x-auto">
           <GenericTable
-            columns={booking}
-            data={currentData}
+            columns={bookingPending}
+            data={formattedData}
             loading={loading}
             noDataComponent={<NoData />}
-            renderActions={(item) => {
-              return renderActionsBooking({
+            renderActions={(item) =>
+              renderActionsBooking({
                 item,
                 setShowForm,
                 onSetApprove: (item) => setApproveItem(item),
                 onSetDeClined: (item) => setDeclinedItem(item),
-              });
-            }}
+              })
+            }
           />
         </div>
 
@@ -154,6 +185,7 @@ function AdminBookingPage() {
         )}
       </div>
 
+      {/* APPROVE MODAL */}
       {approveItem?.booking_id && (
         <DeleteModal
           item={approveItem}
@@ -172,21 +204,25 @@ function AdminBookingPage() {
         />
       )}
 
+      {/* DECLINE MODAL */}
       {declinedItem?.booking_id && (
-        <ModalDeclinedForm
-          userId={declinedItem.user_id}
-          bookingId={declinedItem.booking_id}
-          onConfirm={(reason) => {
+        <DeleteModal
+          item={declinedItem}
+          name={declinedItem?.firstname}
+          loading={declinedLoading}
+          onCancel={() => setDeclinedItem(null)}
+          label="Yes, Decline"
+          label2="decline this booking"
+          label3={`Are you sure you want to decline ${declinedItem?.firstname}'s booking?`}
+          onConfirm={() => {
             setDeclined({
-              id: declinedItem.booking_id,
+              id: declinedItem?.booking_id,
               action: "set_decline",
-              reason: reason,
             });
-          }}
-          onClose={() => setDeclinedItem(null)}
-          onSuccess={() => {
-            setDeclinedItem(null);
-            refetch();
+            setToast({
+              message: "Booking has been declined",
+              type: "success",
+            });
           }}
         />
       )}

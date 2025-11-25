@@ -257,11 +257,52 @@ export const renderActionsBooking = ({
 //render Action for booking history
 export const renderActionsBookingHistory = ({
   item,
-
+  onSetArrived,
+  onSetPending,
   onSetViewCottageDetails,
 }) => {
   return (
-    <div className="flex flex-row items-center justify-end">
+    <div className="flex flex-row gap-2 items-center justify-end">
+      <button
+        onClick={() => onSetArrived(item)}
+        className="bg-blue-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center ml-4"
+        title="Set as arrived"
+      >
+        <icons.IoMdCheckmarkCircleOutline />
+      </button>
+      <button
+        onClick={() => onSetPending(item)}
+        className="bg-green-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="Back to Pending"
+      >
+        <icons.TbRefresh />
+      </button>
+      <button
+        onClick={() => onSetViewCottageDetails(item.cottage_id)}
+        className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="View Room Details"
+      >
+        <icons.AiOutlineInfoCircle />
+      </button>
+    </div>
+  );
+};
+
+//render Action for booking history
+export const renderActionsBookingHistoryLog = ({
+  item,
+  onSetBackToApproved,
+  onSetViewCottageDetails,
+}) => {
+  return (
+    <div className="flex flex-row gap-2 items-center justify-end">
+      <button
+        onClick={() => onSetBackToApproved(item)}
+        className="bg-green-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="Back to Approved"
+      >
+        <icons.TbRefresh />
+      </button>
       <button
         onClick={() => onSetViewCottageDetails(item.cottage_id)}
         className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"

@@ -5,8 +5,11 @@ import useGetData from "../../hooks/useGetData";
 import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
-import { renderActionsBookingHistory } from "../admin_molecules/RenderActions";
-import { bookingApproved } from "../../constant/tableColumns";
+import {
+  renderActionsBookingHistory,
+  renderActionsBookingHistoryLog,
+} from "../admin_molecules/RenderActions";
+import { bookingApproved, bookingHistory } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import Button from "../admin_atoms/Button";
 import { icons } from "../../constant/icon";
@@ -14,65 +17,59 @@ import useSetInactive from "../../hooks/useSetInactive";
 import Toaster from "../../components/molecules/Toaster";
 import DeleteModal from "../../components/molecules/DeleteModal";
 
-function AdminBookingHistory() {
+function AdminBookingHistoryLog() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
   const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
   const [toast, setToast] = useState(null);
   const [approveItem, setApproveItem] = useState(null);
-  const [approveAction, setApproveAction] = useState(""); // <-- ADDED
+  const [approveAction, setApproveAction] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  //==============//
-  //  DATA FETCH  //
-  //==============//
-
+  // FETCH BOOKING HISTORY
   const { data, loading, refetch, error } = useGetData(
-    `/booking/get-booking.php?status=approved`
+    `/booking/get-booking.php?status=arrived`
   );
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  //=================//
-  // DATA FILTERING //
-  //===============//
-
+  // FILTERING
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
 
-      const search = searchTerm.toLowerCase();
+      const s = searchTerm.toLowerCase();
 
       return (
-        (item?.firstname || "").toLowerCase().includes(search) ||
-        (item?.lastname || "").toLowerCase().includes(search) ||
-        (item?.room_name || "").toLowerCase().includes(search) ||
-        (item?.start_date || "").toLowerCase().includes(search) ||
-        (item?.end_date || "").toLowerCase().includes(search) ||
-        (item?.nights?.toString() || "").includes(search) ||
-        (item?.status || "").toLowerCase().includes(search)
+        (item?.firstname || "").toLowerCase().includes(s) ||
+        (item?.lastname || "").toLowerCase().includes(s) ||
+        (item?.room_name || "").toLowerCase().includes(s) ||
+        (item?.start_date || "").toLowerCase().includes(s) ||
+        (item?.end_date || "").toLowerCase().includes(s) ||
+        (item?.status || "").toLowerCase().includes(s)
       );
     }) || [];
 
   const indexOfLastData = currentPage * itemsPerPage;
-  const indexOfFirstData = indexOfLastData - itemsPerPage;
-  const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
+  const currentData = filteredData.slice(
+    indexOfLastData - itemsPerPage,
+    indexOfLastData
+  );
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  //=====================//
-  //  view room details  //
-  //=====================//
+  // VIEW FH DETAILS
   const viewFHDetails = (item) => {
     setShowForm("view fh-hall");
     setViewFHDetailsId(item);
   };
 
+  // FORMAT TABLE DATA
   const formattedData = currentData.map((item) => ({
     ...item,
     email: item.user_id === 12 ? "No Email Provided" : item.email,
@@ -85,35 +82,28 @@ function AdminBookingHistory() {
         : "None",
     paid: `₱${Number(item.paid).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
     })}`,
     price: `₱${Number(item.price).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
     })}`,
     half_price: `₱${Number(item.price / 2).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
     })}`,
   }));
 
-  //set approved
-  const {
-    setInactive,
-    loading: approveLoading,
-    error: approveError,
-  } = useSetInactive("/booking/booking.php", () => {
-    refetch();
-    setApproveItem(null);
-    setApproveAction(""); // reset action
-    setToast({
-      message:
-        approveAction === "set_arrived"
-          ? "Booking marked as arrived"
-          : "Booking back to pending",
-      type: "success",
-    });
-  });
+  // SET BACK TO APPROVED
+  const { setInactive, loading: approveLoading } = useSetInactive(
+    "/booking/booking.php",
+    () => {
+      refetch();
+      setApproveItem(null);
+      setApproveAction("");
+      setToast({
+        message: "Booking moved back to approved",
+        type: "success",
+      });
+    }
+  );
 
   return (
     <>
@@ -127,34 +117,33 @@ function AdminBookingHistory() {
 
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
-          Approved Booking
+          Booking History
         </h1>
 
-        {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
+        {loading && <p className="text-blue-500 text-sm">Loading...</p>}
         {error && (
-          <p className="text-red-500 text-sm mb-4">
+          <p className="text-red-500 text-sm">
             {error.message || "Something went wrong."}
           </p>
         )}
 
-        <div className="w-full flex flex-row justify-between items-center mb-2">
+        <div className="w-full flex justify-between items-center mb-2">
           <span className="dark:text-gray-100 text-xs font-medium">
             Showing {filteredData.length} Booking
           </span>
 
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex items-center gap-2">
             <SearchInput
               placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              disabled={loading}
             />
             <Button
-              className="flex flex-row items-center h-[35px] bg-blue-600 text-white text-xs font-medium px-2 rounded-md whitespace-nowrap"
+              className="flex items-center h-[35px] bg-blue-600 text-white text-xs font-medium px-2 rounded-md"
               label={
                 <>
                   Add Booking
-                  <icons.IoAddOutline className="text-lg text-white ml-1" />
+                  <icons.IoAddOutline className="ml-1 text-lg" />
                 </>
               }
             />
@@ -163,26 +152,21 @@ function AdminBookingHistory() {
 
         <div className="overflow-x-auto">
           <GenericTable
-            columns={bookingApproved}
+            columns={bookingHistory}
             data={formattedData}
             loading={loading}
             noDataComponent={<NoData />}
-            renderActions={(item) => {
-              return renderActionsBookingHistory({
+            renderActions={(item) =>
+              renderActionsBookingHistoryLog({
                 item,
                 setShowForm,
 
-                onSetPending: (item) => {
+                onSetBackToApproved: (item) => {
                   setApproveItem(item);
-                  setApproveAction("set_pending");
+                  setApproveAction("set_backtoapproved");
                 },
-
-                onSetArrived: (item) => {
-                  setApproveItem(item);
-                  setApproveAction("set_arrived");
-                },
-              });
-            }}
+              })
+            }
           />
         </div>
 
@@ -204,23 +188,15 @@ function AdminBookingHistory() {
             setApproveItem(null);
             setApproveAction("");
           }}
-          label={
-            approveAction === "set_pending"
-              ? "Yes, Back to pending"
-              : "Yes, Mark as Arrived"
-          }
-          label2={approveAction === "set_pending" ? "pending" : "arrived"}
-          label3={
-            approveAction === "set_pending"
-              ? "Are you sure you want to back this booking to pending?"
-              : "Are you sure you want to mark this booking as arrived?"
-          }
-          onConfirm={() => {
+          label="Yes, Back to Approved"
+          label2="approved"
+          label3="Are you sure you want to move this booking back to approved?"
+          onConfirm={() =>
             setInactive({
               id: approveItem?.booking_id,
-              action: approveAction, // DYNAMIC ACTION
-            });
-          }}
+              action: approveAction,
+            })
+          }
         />
       )}
 
@@ -229,4 +205,4 @@ function AdminBookingHistory() {
   );
 }
 
-export default AdminBookingHistory;
+export default AdminBookingHistoryLog;

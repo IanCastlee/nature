@@ -5,110 +5,138 @@ import useGetData from "../../hooks/useGetData";
 import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
-import { renderActionsBookingHistory } from "../admin_molecules/RenderActions";
-import { booking } from "../../constant/tableColumns";
+import {
+  renderActionsBookingHistory,
+  renderActionsBookingHistoryLog,
+} from "../admin_molecules/RenderActions";
+import {
+  bookingApproved,
+  bookingDeclined,
+  bookingHistory,
+} from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
+import Button from "../admin_atoms/Button";
+import { icons } from "../../constant/icon";
+import useSetInactive from "../../hooks/useSetInactive";
+import Toaster from "../../components/molecules/Toaster";
+import DeleteModal from "../../components/molecules/DeleteModal";
 
 function AdminBookingDeclined() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
   const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [approveItem, setApproveItem] = useState(null);
+  const [approveAction, setApproveAction] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  //==============//
-  //  DATA FETCH  //
-  //==============//
-
-  // fetch booking data
+  // FETCH BOOKING HISTORY
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-booking.php?status=declined`
   );
 
-  //handlePageChange
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  //=================//
-  // DATA FILTERING //
-  //===============//
-
-  //Filtered data
+  // FILTERING
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
 
-      const search = searchTerm.toLowerCase();
+      const s = searchTerm.toLowerCase();
 
       return (
-        (item?.firstname || "").toLowerCase().includes(search) ||
-        (item?.lastname || "").toLowerCase().includes(search) ||
-        (item?.room_name || "").toLowerCase().includes(search) ||
-        (item?.start_date || "").toLowerCase().includes(search) ||
-        (item?.end_date || "").toLowerCase().includes(search) ||
-        (item?.nights?.toString() || "").includes(search) ||
-        (item?.status || "").toLowerCase().includes(search)
+        (item?.firstname || "").toLowerCase().includes(s) ||
+        (item?.lastname || "").toLowerCase().includes(s) ||
+        (item?.room_name || "").toLowerCase().includes(s) ||
+        (item?.start_date || "").toLowerCase().includes(s) ||
+        (item?.end_date || "").toLowerCase().includes(s) ||
+        (item?.status || "").toLowerCase().includes(s)
       );
     }) || [];
 
   const indexOfLastData = currentPage * itemsPerPage;
-  const indexOfFirstData = indexOfLastData - itemsPerPage;
-  const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
+  const currentData = filteredData.slice(
+    indexOfLastData - itemsPerPage,
+    indexOfLastData
+  );
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  //=====================//
-  //  view room details  //
-  //=====================//
+  // VIEW FH DETAILS
   const viewFHDetails = (item) => {
     setShowForm("view fh-hall");
     setViewFHDetailsId(item);
   };
 
+  // FORMAT TABLE DATA
+  const formattedData = currentData.map((item) => ({
+    ...item,
+    email: item.user_id === 12 ? "No Email Provided" : item.email,
+    room_name: item.room?.room_name || "N/A",
+    extras:
+      item.extras && item.extras.length > 0
+        ? item.extras
+            .map((extra) => `${extra.name} (x${extra.quantity})`)
+            .join(", ")
+        : "None",
+    paid: `₱${Number(item.paid).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+    })}`,
+    price: `₱${Number(item.price).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+    })}`,
+    half_price: `₱${Number(item.price / 2).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+    })}`,
+  }));
+
   return (
     <>
+      {toast && (
+        <Toaster
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
           Declined Booking
         </h1>
 
-        {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
+        {loading && <p className="text-blue-500 text-sm">Loading...</p>}
         {error && (
-          <p className="text-red-500 text-sm mb-4">
+          <p className="text-red-500 text-sm">
             {error.message || "Something went wrong."}
           </p>
         )}
 
-        <div className="w-full flex flex-row justify-between items-center mb-2">
+        <div className="w-full flex justify-between items-center mb-2">
           <span className="dark:text-gray-100 text-xs font-medium">
             Showing {filteredData.length} Booking
           </span>
 
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex items-center gap-2">
             <SearchInput
               placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              disabled={loading}
             />
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <GenericTable
-            columns={booking}
-            data={currentData}
+            columns={bookingDeclined}
+            data={formattedData}
             loading={loading}
             noDataComponent={<NoData />}
-            renderActions={(item) => {
-              return renderActionsBookingHistory({
-                item,
-                setShowForm,
-              });
-            }}
           />
         </div>
 
@@ -120,8 +148,6 @@ function AdminBookingDeclined() {
           />
         )}
       </div>
-
-      {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
     </>
   );
 }

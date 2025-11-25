@@ -14,71 +14,56 @@ if ($method === "GET") {
     $userId = $_GET['user_id'] ?? null;
     $status = $_GET['status'] ?? null;
 
-    if($status === "pending"){
-     $stmt = $conn->prepare("SELECT rb.*, u.firstname, u.lastname, u.email, r.room_name FROM room_booking AS rb JOIN users AS u  ON u.user_id = rb.user_id JOIN rooms AS r ON rb.facility_id = r.room_id WHERE rb.status = 'pending'");
-    $stmt->execute();
+    // Base SQL with joins and extras LEFT JOIN
+    $baseSql = "
+        SELECT 
+            rb.booking_id, rb.user_id, rb.facility_id, rb.fullname, rb.phone, rb.start_date, rb.end_date, rb.nights, rb.status, rb.price AS booking_price, rb.paid AS booking_paid,
+            u.firstname, u.lastname, u.email,
+            r.room_id, r.room_name, r.price AS room_price, r.capacity, r.duration,
+            be.name AS extra_name, be.quantity AS extra_quantity, be.price AS extra_price
+        FROM room_booking AS rb
+        JOIN users AS u ON u.user_id = rb.user_id
+        JOIN rooms AS r ON rb.facility_id = r.room_id
+        LEFT JOIN booking_extras AS be ON be.booking_id = rb.booking_id
+    ";
 
-    $result = $stmt->get_result();
-    $data = $result->fetch_all(MYSQLI_ASSOC);
-
-    echo json_encode([
-        "success" => true,
-        "data" => $data
-    ]);
-    exit;
-    }
-
-    if($status === "declined"){
-     $stmt = $conn->prepare("SELECT rb.*, u.firstname, u.lastname, u.email, r.room_name FROM room_booking AS rb JOIN users AS u  ON u.user_id = rb.user_id JOIN rooms AS r ON rb.facility_id = r.room_id WHERE rb.status = 'declined'");
-    $stmt->execute();
-
-    $result = $stmt->get_result();
-    $data = $result->fetch_all(MYSQLI_ASSOC);
-
-    echo json_encode([
-        "success" => true,
-        "data" => $data
-    ]);
-    exit;
-    }
-
-    if($status === "approved"){
-     $stmt = $conn->prepare("SELECT rb.*, u.firstname, u.lastname, u.email, r.room_name FROM room_booking AS rb JOIN users AS u  ON u.user_id = rb.user_id JOIN rooms AS r ON rb.facility_id = r.room_id WHERE rb.status = 'approved'");
-    $stmt->execute();
-
-    $result = $stmt->get_result();
-    $data = $result->fetch_all(MYSQLI_ASSOC);
-
-    echo json_encode([
-        "success" => true,
-        "data" => $data
-    ]);
-    exit;
+    $params = [];
+    $types = "";
+    $conditions = [];
+    
+    if ($status) {
+        $conditions[] = "rb.status = ?";
+        $params[] = $status;
+        $types .= "s";
     }
 
     if ($userId) {
-        // echo json_encode([
-        //     "success" => false,
-        //     "message" => "Missing userId"
-        // ]);
-        // exit;
-    
+        $conditions[] = "rb.user_id = ?";
+        $params[] = $userId;
+        $types .= "i";
+    }
 
-    // Fetch all bookings (with extras)
-    $stmt = $conn->prepare("SELECT rb.booking_id, rb.user_id, rb.facility_id, rb.start_date, rb.end_date, rb.nights, rb.status, rb.price AS booking_price, r.room_id, r.room_name, r.price AS room_price, r.capacity, r.duration, be.name AS extra_name, be.quantity AS extra_quantity, be.price AS extra_price FROM room_booking AS rb JOIN rooms AS r ON rb.facility_id = r.room_id LEFT JOIN booking_extras AS be ON be.booking_id = rb.booking_id WHERE rb.user_id = ? ORDER BY rb.booking_id DESC
-    ");
+    // Build WHERE clause if conditions exist
+    if (count($conditions) > 0) {
+        $baseSql .= " WHERE " . implode(" AND ", $conditions);
+    }
 
-    $stmt->bind_param("i", $userId);
+    $baseSql .= " ORDER BY rb.booking_id DESC";
+
+    $stmt = $conn->prepare($baseSql);
+
+    if ($params) {
+        $stmt->bind_param($types, ...$params);
+    }
+
     $stmt->execute();
     $result = $stmt->get_result();
 
     $bookings = [];
 
-    // Group all extras by booking
     while ($row = $result->fetch_assoc()) {
         $bookingId = $row['booking_id'];
 
-        // Initialize booking if not yet added
         if (!isset($bookings[$bookingId])) {
             $bookings[$bookingId] = [
                 'booking_id' => $row['booking_id'],
@@ -89,6 +74,12 @@ if ($method === "GET") {
                 'nights' => $row['nights'],
                 'status' => $row['status'],
                 'price' => $row['booking_price'],
+                'paid' => $row['booking_paid'],
+                'half_price' => $row['booking_price'] / 2,
+                // 'fullname' => $row['firstname'] . " " . $row['lastname'],
+                 'fullname' => $row['fullname'],
+                 'phone' => $row['phone'],
+                'email' => $row['email'],
                 'room' => [
                     'room_id' => $row['room_id'],
                     'room_name' => $row['room_name'],
@@ -100,12 +91,12 @@ if ($method === "GET") {
             ];
         }
 
-        // Add extras if they exist
+        // Add extras if exist
         if (!empty($row['extra_name'])) {
             $bookings[$bookingId]['extras'][] = [
                 'name' => $row['extra_name'],
                 'quantity' => $row['extra_quantity'],
-                'price' => $row['extra_price']
+                'price' => $row['extra_price'],
             ];
         }
     }
@@ -116,6 +107,4 @@ if ($method === "GET") {
     ]);
     exit;
 }
-}
-
 ?>

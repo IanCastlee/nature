@@ -64,11 +64,15 @@ export const menuItems = [
       },
       {
         name: "Approved Booking",
-        to: "/admin/booking-history",
+        to: "/admin/booking-approved",
       },
       {
         name: "Declined Booking",
         to: "/admin/declined-booking",
+      },
+      {
+        name: "Booking History",
+        to: "/admin/booking-history",
       },
     ],
   },
