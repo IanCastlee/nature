@@ -13,11 +13,11 @@ import Toaster from "../molecules/Toaster";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 
-function BookingPage() {
+function FunctionHallBooking() {
   const { user } = useAuthStore();
 
   const navigate = useNavigate();
-  const { roomId } = useParams();
+  const { facilityId } = useParams();
   const [addedExtras, setAddedExtras] = useState([]);
   const [extraQty, setExtraQty] = useState(1);
 
@@ -536,4 +536,4 @@ function BookingPage() {
   );
 }
 
-export default BookingPage;
+export default FunctionHallBooking;

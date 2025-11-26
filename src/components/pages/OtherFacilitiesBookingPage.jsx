@@ -4,37 +4,70 @@ import { useNavigate, useParams } from "react-router-dom";
 import useGetData from "../../hooks/useGetData";
 import useFormSubmit from "../../hooks/useFormSubmit";
 import { uploadUrl } from "../../utils/fileURL";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useAuthStore from "../../store/authStore";
 import Toaster from "../molecules/Toaster";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import Button from "../atoms/Button";
+import { useForm } from "../../store/useRoomStore";
+import Input from "../atoms/Input";
+import natureLogo from "../../assets/icons/naturelogo2.png";
+import html2canvas from "html2canvas";
 
 function OtherFacilitiesBookingPage() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const { facilityId } = useParams();
 
+  const setShowForm = useForm((state) => state.setShowForm);
+  const showForm = useForm((state) => state.showForm);
+
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [bookingSummary, setBookingSummary] = useState(null);
+
+  const summaryRef = useRef(null);
+
   const [toast, setToast] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [startTime, setStartTime] = useState("");
   const [disabledDates, setDisabledDates] = useState([]);
 
+  // Form state
+  const [form, setForm] = useState({
+    firstname: localStorage.getItem("firstname") || "",
+    lastname: localStorage.getItem("lastname") || "",
+    phone: localStorage.getItem("phone") || "",
+    remember: localStorage.getItem("remember_info") === "true" ? true : false,
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const {
     submit,
     loading: formLoading,
     error: formError,
-  } = useFormSubmit("/booking/fh-booking.php", () => {
+  } = useFormSubmit("/booking/fh-booking.php", (response) => {
     setToast({
       message: "Booking submitted successfully!",
       type: "success",
     });
 
+    setBookingSummary(response); // ✅ now response is defined
+    setShowSummaryModal(true);
+
     refetchNAD();
     setStartTime("");
     setSelectedDate(null);
   });
+
+  console.log("FORM ERROR : ", formError);
 
   const {
     data: notAvailableDatesTime,
@@ -108,6 +141,21 @@ function OtherFacilitiesBookingPage() {
       return;
     }
 
+    setShowForm(null);
+
+    //  REMEMBER ME — Save or Remove Local Storage
+    if (form.remember) {
+      localStorage.setItem("firstname", form.firstname);
+      localStorage.setItem("lastname", form.lastname);
+      localStorage.setItem("phone", form.phone);
+      localStorage.setItem("remember_info", "true");
+    } else {
+      localStorage.removeItem("firstname");
+      localStorage.removeItem("lastname");
+      localStorage.removeItem("phone");
+      localStorage.removeItem("remember_info");
+    }
+
     const slotHours = 8; // default/fixed duration for the booking
 
     const bookingDate = new Date(selectedDate);
@@ -131,15 +179,43 @@ function OtherFacilitiesBookingPage() {
     const formattedEndTime = endDateTime.toTimeString().split(" ")[0]; // HH:MM:SS
 
     submit({
+      fullname: `${form.firstname} ${form.lastname}`,
+      phone: form.phone,
       fhId: Number(facilityId),
       date: formattedDate,
       startTime: startTime,
       endTime: formattedEndTime,
-      facilityType: "function hall",
-      userId: user?.user_id,
     });
   };
 
+  console.log("ERRORR: ", fhError);
+
+  const bookingDate = new Date(selectedDate);
+  const formattedDate = bookingDate.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const handleScreenshot = () => {
+    const overlay = document.getElementById("overlay-message");
+
+    // Hide overlay before screenshot
+    if (overlay) overlay.style.display = "none";
+
+    if (summaryRef.current) {
+      html2canvas(summaryRef.current).then((canvas) => {
+        // Show overlay again
+        if (overlay) overlay.style.display = "flex";
+
+        const link = document.createElement("a");
+        link.download = `booking_summary_${bookingSummary.booking_id}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+  };
   return (
     <>
       {toast && (
@@ -253,7 +329,8 @@ function OtherFacilitiesBookingPage() {
 
               {/* Book Button */}
               <button
-                onClick={handleBooking}
+                // onClick={handleBooking}
+                onClick={() => setShowForm("add_user_details")}
                 disabled={formLoading || startTime === "" || !selectedDate}
                 className="mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded disabled:opacity-50"
               >
@@ -269,6 +346,222 @@ function OtherFacilitiesBookingPage() {
         className="text-2xl text-white cursor-pointer absolute top-8 left-8 z-20"
         onClick={() => navigate(-1)}
       />
+
+      {/* FORM MODAL WITH ADJUSTED WIDTH */}
+      {showForm === "add_user_details" && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
+          <div className="bg-white p-8 rounded-2xl shadow-xl w-[95%] max-w-5xl max-h-[98vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
+              Booking Details & Your Information
+            </h2>
+
+            <div className="flex flex-col md:flex-row md:gap-12">
+              <div className="md:w-3/5 mb-8 md:mb-0 pr-6 border-r border-gray-300">
+                <div className="grid grid-cols-3 gap-6 mb-6 text-gray-700">
+                  {/* Make "Choosen Date" span 2 columns */}
+                  <div className="flex flex-col items-center border-r border-gray-300 pr-4 col-span-2">
+                    <span className="text-sm uppercase font-semibold mb-1">
+                      Choosen Date
+                    </span>
+                    <span className="text-lg font-medium">{formattedDate}</span>
+                  </div>
+
+                  <div className="flex flex-col items-center pl-4">
+                    <span className="text-sm uppercase font-semibold mb-1">
+                      Start Time
+                    </span>
+                    <span className="text-lg font-medium">{startTime} AM</span>
+                  </div>
+                </div>
+
+                {/* Total Price */}
+                <div className="p-4 rounded-lg border border-gray-300 bg-gray-50 text-center font-bold text-xl text-gray-900">
+                  Total Price: ₱
+                  {price.toLocaleString("en-PH", {
+                    minimumFractionDigits: 2,
+                  })}
+                </div>
+              </div>
+
+              {/* Form - 40% width on md+ */}
+              <div className="md:w-2/5">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleBooking();
+                  }}
+                >
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <Input
+                      label="Firstname"
+                      name="firstname"
+                      value={form.firstname}
+                      onChange={handleChange}
+                      className="w-full"
+                      required
+                    />
+                    <Input
+                      label="Lastname"
+                      name="lastname"
+                      value={form.lastname}
+                      onChange={handleChange}
+                      className="w-full"
+                      required
+                    />
+                  </div>
+
+                  <Input
+                    label="Phone"
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    className="w-full mb-4"
+                    required
+                  />
+
+                  <div className="flex items-center mb-6">
+                    <input
+                      type="checkbox"
+                      id="remember"
+                      name="remember"
+                      className="h-5 w-5 rounded border-gray-300 focus:ring-blue-500"
+                      checked={form.remember}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          remember: e.target.checked,
+                        }))
+                      }
+                    />
+                    <label
+                      htmlFor="remember"
+                      className="ml-3 mt-2 block text-sm text-gray-700 select-none cursor-pointer"
+                    >
+                      Remember my info for next time
+                    </label>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    style="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300"
+                    label={formLoading ? "Submitting..." : "Done"}
+                    disabled={formLoading}
+                  />
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* BOOKING SUMMARY MODAL */}
+      {showSummaryModal && bookingSummary && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md">
+          <div
+            ref={summaryRef}
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-[600px] p-8 relative max-h-[90vh] overflow-y-auto font-sans"
+            style={{
+              backgroundImage: `url(${natureLogo})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
+            {/* Header */}
+            <h2 className="text-3xl font-extrabold mb-6 text-center text-gray-900 tracking-wide">
+              Booking Summary
+            </h2>
+
+            <div className="space-y-4 text-gray-800 text-sm leading-relaxed">
+              {/* Booking Info */}
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 border-b border-gray-200 pb-4">
+                <p>
+                  <span className="font-semibold text-gray-700">Room:</span>{" "}
+                  {name}
+                </p>
+                <p>
+                  <span className="font-semibold text-gray-700">
+                    Booking ID:
+                  </span>{" "}
+                  {bookingSummary.booking_id}
+                </p>
+
+                <p>
+                  <span className="font-semibold text-gray-700">Fullname:</span>{" "}
+                  {bookingSummary.fullname}
+                </p>
+                <p>
+                  <span className="font-semibold text-gray-700">Phone:</span>{" "}
+                  {bookingSummary.phone}
+                </p>
+
+                <p>
+                  <span className="font-semibold text-gray-700">
+                    Choosen Date :
+                  </span>{" "}
+                  {bookingSummary.date}
+                </p>
+                <p>
+                  <span className="font-semibold text-gray-700">
+                    Start Time :
+                  </span>{" "}
+                  {bookingSummary.start_time}
+                </p>
+              </div>
+
+              {/* Prices */}
+              <div className="border-b border-gray-200 pb-4 space-y-1">
+                <p>
+                  <span className="font-semibold text-gray-700">
+                    Base Price:
+                  </span>{" "}
+                  ₱{Number(bookingSummary.base_price).toLocaleString()}
+                </p>
+
+                <p className="font-extrabold text-lg text-blue-700">
+                  Total Price: ₱
+                  {Number(bookingSummary.total_price).toLocaleString()}
+                </p>
+              </div>
+
+              {/* Payment Reminder */}
+              <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded shadow-sm text-yellow-800 text-sm font-semibold">
+                Kindly settle the required <strong>50% advance payment</strong>{" "}
+                within the day to secure the reservation.
+              </div>
+            </div>
+
+            {/* Close Button */}
+            <button
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 transition text-3xl font-bold"
+              onClick={() => setShowSummaryModal(false)}
+            >
+              &times;
+            </button>
+          </div>
+
+          {/* SCREENSHOT OVERLAY (separate, covers whole screen) */}
+          <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-auto">
+            <div className="bg-black bg-opacity-60 flex items-center justify-center w-full h-full">
+              <div className="bg-white rounded-xl p-6 text-center shadow-lg max-w-md w-full space-y-4 border border-gray-300">
+                <p className="text-blue-800 text-sm font-medium">
+                  Please take a screenshot of this summary and send it to{" "}
+                  <strong>Nature Hot Spring</strong> to confirm your booking.
+                </p>
+                <p className="text-red-600 text-xs font-semibold">
+                  ⚠️ Do not delete this screenshot. You will need it for entry
+                  and confirmation.
+                </p>
+                <button
+                  onClick={handleScreenshot}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition shadow-md"
+                >
+                  📸Take Screenshot
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

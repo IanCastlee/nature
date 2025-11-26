@@ -12,7 +12,7 @@ function FunctionHallCard({ item, index }) {
   const navigate = useNavigate();
   const [toast, setToast] = useState(null);
 
-  // ✅ Check if user is logged in (same logic as RoomCard)
+  //  Check if user is logged in (same logic as RoomCard)
   const isLoggedIn = () => {
     const authStorage = sessionStorage.getItem("auth-storage");
     try {
@@ -23,21 +23,22 @@ function FunctionHallCard({ item, index }) {
     }
   };
 
-  // ✅ Handles protected reserve action
+  //  Handles protected reserve action
   const handleReserveClick = () => {
-    if (!isLoggedIn()) {
-      setToast({
-        message: "Please sign in first before continuing.",
-        type: "warning",
-      });
+    // if (!isLoggedIn()) {
+    //   setToast({
+    //     message: "Please sign in first before continuing.",
+    //     type: "warning",
+    //   });
 
-      return;
-    }
+    //   return;
+    // }
 
     navigate(`/other-facilities-booking/${item.fh_id}`);
+    // navigate(`/booking-fh/${item.fh_id}`);
   };
 
-  // ✅ Auto-hide toast after 3 seconds
+  //  Auto-hide toast after 3 seconds
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 3000);

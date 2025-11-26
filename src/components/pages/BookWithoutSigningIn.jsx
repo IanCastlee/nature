@@ -69,12 +69,6 @@ function BookWithoutSigningIn() {
     }));
   };
 
-  // const handleContinue = () => {
-  //   // User proceeds without signing in
-  //   setShowNote(false);
-  //   // Proceed to booking flow, but backend should know user is guest
-  // };
-
   const [toast, setToast] = useState(null);
 
   const [selectedRange, setSelectedRange] = useState({
@@ -206,7 +200,6 @@ function BookWithoutSigningIn() {
       localStorage.removeItem("firstname");
       localStorage.removeItem("lastname");
       localStorage.removeItem("phone");
-      localStorage.removeItem("address");
       localStorage.removeItem("remember_info");
     }
 
@@ -1019,15 +1012,6 @@ function BookWithoutSigningIn() {
                     className="w-full mb-4"
                     required
                   />
-
-                  {/* <Input
-                    label="Address"
-                    name="address"
-                    placeholder="Optional"
-                    value={form.address}
-                    onChange={handleChange}
-                    className="w-full mb-4"
-                  /> */}
 
                   <div className="flex items-center mb-6">
                     <input

@@ -10,7 +10,6 @@ if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !
     $_POST = $input;
 }
 
-
 $action = $_POST['action'] ?? 'create';
 $id = $_POST['id'] ?? null;
 
@@ -27,14 +26,12 @@ if ($action === "set_approve") {
     $stmt = $conn->prepare("UPDATE other_facilities_booking SET status = 'approved' WHERE id = ?");
     $stmt->bind_param("i", $id);
 
-    if ($stmt->execute()) {
-        echo json_encode(["success" => true, "message" => "Booking approved."]);
-    } else {
-        echo json_encode(["success" => false, "message" => "Database error: " . $stmt->error]);
-    }
+    echo json_encode([
+        "success" => $stmt->execute(),
+        "message" => $stmt->execute() ? "Booking approved." : "Failed to approve booking."
+    ]);
     exit;
 }
-
 
 /**---------------------------------------------------------
  * 2. DECLINE BOOKING + INSERT NOTIFICATION
@@ -42,71 +39,67 @@ if ($action === "set_approve") {
 if ($action === "set_decline" || $action === "set_declined") {
     if (!$id) {
         http_response_code(400);
-        echo json_encode(["error" => "Missing bookingcvfvgfg id"]);
+        echo json_encode(["error" => "Missing booking id"]);
         exit;
     }
 
-    // 1. Update booking status
+    // Update status
     $stmt = $conn->prepare("UPDATE other_facilities_booking SET status = 'declined' WHERE id = ?");
     $stmt->bind_param("i", $id);
-    if (!$stmt->execute()) {
-        echo json_encode(["success" => false, "message" => "Failed to decline booking."]);
-        exit;
-    }
+    $stmt->execute();
 
-    // 2. Fetch user_id to notify
+    // Get user_id
     $userStmt = $conn->prepare("SELECT user_id FROM other_facilities_booking WHERE id = ?");
     $userStmt->bind_param("i", $id);
     $userStmt->execute();
-    $userResult = $userStmt->get_result();
+    $userRes = $userStmt->get_result();
 
-    if ($userResult->num_rows === 0) {
-        echo json_encode(["success" => false, "message" => "Bookingdsds not found."]);
+    if ($userRes->num_rows === 0) {
+        echo json_encode(["success" => false, "message" => "Booking not found."]);
         exit;
     }
 
-    $row = $userResult->fetch_assoc();
-    $userId = $row['user_id'];
+    $userId = $userRes->fetch_assoc()['user_id'];
 
-    // 3. Insert notification
+    // Insert notification
     $reason = trim($_POST['reason'] ?? "Your booking has been declined.");
-    $from = 'admin';
-    $to = $userId;
-
     $notifStmt = $conn->prepare("
         INSERT INTO notifications (`from_`, `to_`, `message`, `is_read`, `created_at`)
-        VALUES (?, ?, ?, 0, NOW())
+        VALUES ('admin', ?, ?, 0, NOW())
     ");
-    $notifStmt->bind_param("sis", $from, $to, $reason);
+    $notifStmt->bind_param("is", $userId, $reason);
+    $notifStmt->execute();
 
-    if (!$notifStmt->execute()) {
-        echo json_encode(["success" => false, "message" => "Booking declined, but failed to notify user."]);
-        exit;
-    }
-
-    echo json_encode(["success" => true, "message" => "Booking declined and user notified."]);
-    exit;
-}
-
-// Required fields
-$userId     = $_POST['userId'] ?? null;
-$fhId       = $_POST['fhId'] ?? null; 
-$date       = $_POST['date'] ?? null;
-$startTime  = $_POST['startTime'] ?? null;
-$endTime    = $_POST['endTime'] ?? null;
-$createdAt  = date("Y-m-d H:i:s");
-
-// Validate required input
-if (!$userId || !$fhId || !$date || !$startTime || !$endTime) {
     echo json_encode([
-        "success" => false,
-        "message" => "Missing required fields.",
+        "success" => true,
+        "message" => "Booking declined and user notified."
     ]);
     exit;
 }
 
-// Check if Function Hall exists and get price and duration
-$stmt = $conn->prepare("SELECT name, price, duration FROM function_hall WHERE fh_id = ?");
+/**---------------------------------------------------------
+ * 3. CREATE BOOKING (MAIN PART)
+ *--------------------------------------------------------*/
+
+$fhId      = $_POST['fhId'] ?? null;
+$fullname  = $_POST['fullname'] ?? null;
+$phone     = $_POST['phone'] ?? null;
+$date      = $_POST['date'] ?? null;
+$startTime = $_POST['startTime'] ?? null;
+$endTime   = $_POST['endTime'] ?? null;
+$createdAt = date("Y-m-d H:i:s");
+
+// Validation
+if (!$fullname || !$phone || !$fhId || !$date || !$startTime || !$endTime) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Missing required fields."
+    ]);
+    exit;
+}
+
+// Check facility info
+$stmt = $conn->prepare("SELECT name, price FROM function_hall WHERE fh_id = ?");
 $stmt->bind_param("i", $fhId);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -114,63 +107,72 @@ $result = $stmt->get_result();
 if ($result->num_rows === 0) {
     echo json_encode([
         "success" => false,
-        "message" => "Function Hall not found.",
+        "message" => "Function Hall not found."
     ]);
     exit;
 }
 
 $facility = $result->fetch_assoc();
 $facilityType = $facility['name'];
-$price = $facility['price']; 
+$price        = $facility['price'];
 
-// Optional: Check for overlapping bookings
-$conflictStmt = $conn->prepare("
+// Check for time conflict
+$conflict = $conn->prepare("
     SELECT * FROM other_facilities_booking 
-    WHERE facility_type = ? AND date = ? 
+    WHERE facility_type = ? AND date = ?
     AND (
         (start_time < ? AND end_time > ?) OR
         (start_time >= ? AND start_time < ?)
     )
 ");
-$conflictStmt->bind_param("ssssss", $facilityType, $date, $endTime, $startTime, $startTime, $endTime);
-$conflictStmt->execute();
-$conflictResult = $conflictStmt->get_result();
+$conflict->bind_param("ssssss", $facilityType, $date, $endTime, $startTime, $startTime, $endTime);
+$conflict->execute();
+$conflictRes = $conflict->get_result();
 
-if ($conflictResult->num_rows > 0) {
+if ($conflictRes->num_rows > 0) {
     echo json_encode([
         "success" => false,
-        "message" => "This time slot is already booked.",
+        "message" => "This time slot is already booked."
     ]);
     exit;
 }
 
-// Insert booking with price from database
-$insertStmt = $conn->prepare("
-    INSERT INTO other_facilities_booking (user_id, facility_id, facility_type, date, start_time, end_time, price, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+// Insert booking
+$insert = $conn->prepare("
+    INSERT INTO other_facilities_booking (fullname, phone, facility_id, facility_type, date, start_time, end_time, price, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 ");
-
-$insertStmt->bind_param(
-    "iisssiss",
-    $userId,
-    $fhId,
-    $facilityType,
-    $date,
-    $startTime,
-    $endTime,
-    $price,    
-    $createdAt
+$insert->bind_param(
+    "ssisssiss",
+    $fullname, $phone, $fhId, $facilityType,
+    $date, $startTime, $endTime,
+    $price, $createdAt
 );
 
-if ($insertStmt->execute()) {
+if ($insert->execute()) {
+    $booking_id = $insert->insert_id; // <--- GET NEW ID
+
+    //  RETURN FULL SUMMARY for your React modal
     echo json_encode([
         "success" => true,
         "message" => "Booking successful!",
-        "price" => $price 
+        "booking_id" => $booking_id,
+        "fullname" => $fullname,
+        "phone" => $phone,
+        "fhId" => $fhId,
+        "facility_type" => $facilityType,
+        "date" => $date,
+        "start_time" => $startTime,
+        "end_time" => $endTime,
+        "base_price" => $price,
+        "total_price" => $price,
+        "extras_total" => 0,
+        "extras" => [],
+        "created_at" => $createdAt
     ]);
 } else {
     echo json_encode([
         "success" => false,
-        "message" => "Failed to insert booking.",
+        "message" => "Failed to insert booking."
     ]);
 }
