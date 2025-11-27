@@ -13,9 +13,11 @@ if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !
 $action = $_POST['action'] ?? 'create';
 $id = $_POST['id'] ?? null;
 
-/**---------------------------------------------------------
- * 1. APPROVE BOOKING
- *--------------------------------------------------------*/
+/**
+ * ========================================================
+ *  APPROVE BOOKING
+ * ========================================================
+ */
 if ($action === "set_approve") {
     if (!$id) {
         http_response_code(400);
@@ -23,15 +25,128 @@ if ($action === "set_approve") {
         exit;
     }
 
-    $stmt = $conn->prepare("UPDATE other_facilities_booking SET status = 'approved' WHERE id = ?");
+    $stmt = $conn->prepare("
+        UPDATE other_facilities_booking
+        SET status = 'approved',
+            paid = price / 2
+        WHERE id = ?
+    ");
     $stmt->bind_param("i", $id);
 
-    echo json_encode([
-        "success" => $stmt->execute(),
-        "message" => $stmt->execute() ? "Booking approved." : "Failed to approve booking."
-    ]);
+    echo $stmt->execute()
+        ? json_encode(["success" => true, "message" => "Booking approved."])
+        : json_encode(["success" => false, "message" => $stmt->error]);
+
     exit;
 }
+
+
+/**
+ * ========================================================
+ * 1. CLIENT ARRIVED BOOKING
+ * ========================================================
+ */
+if ($action === "set_arrived") {
+    if (!$id) {
+        http_response_code(400);
+        echo json_encode(["error" => "Missing booking id"]);
+        exit;
+    }
+
+    $stmt = $conn->prepare("
+        UPDATE other_facilities_booking 
+        SET status = 'arrived', 
+            paid = price 
+        WHERE id = ?
+    ");
+    $stmt->bind_param("i", $id);
+
+    echo $stmt->execute()
+        ? json_encode(["success" => true, "message" => "Client arrived, payment completed."])
+        : json_encode(["success" => false, "message" => $stmt->error]);
+
+    exit;
+}
+
+
+/**
+ * ========================================================
+ *  SET BACK TO PENDING + NOTIFY
+ * ========================================================
+ */
+if ($action === "set_pending") {
+    if (!$id) {
+        http_response_code(400);
+        echo json_encode(["error" => "Missing booking id"]);
+        exit;
+    }
+
+    $stmt = $conn->prepare("
+        UPDATE other_facilities_booking SET status = 'pending', paid = 0 WHERE id = ?
+    ");
+    $stmt->bind_param("i", $id);
+    if (!$stmt->execute()) {
+        echo json_encode(["success" => false, "message" => "Failed to update booking"]);
+        exit;
+    }
+
+    $userStmt = $conn->prepare("SELECT user_id FROM other_facilities_booking WHERE id = ?");
+    $userStmt->bind_param("i", $id);
+    $userStmt->execute();
+    $userResult = $userStmt->get_result();
+
+    if ($userResult->num_rows === 0) {
+        echo json_encode(["success" => false, "message" => "Booking not found"]);
+        exit;
+    }
+
+    $userId = $userResult->fetch_assoc()['user_id'];
+    $reason = trim($_POST['reason'] ?? "Your booking is pending again.");
+    $from = 'admin';
+
+    $notifStmt = $conn->prepare("
+        INSERT INTO notifications (`from_`, `to_`, `message`, `is_read`, `created_at`)
+        VALUES (?, ?, ?, 0, NOW())
+    ");
+    $notifStmt->bind_param("sis", $from, $userId, $reason);
+
+    echo $notifStmt->execute()
+        ? json_encode(["success" => true, "message" => "Status updated and user notified"])
+        : json_encode(["success" => false, "message" => "Notification failed"]);
+
+    exit;
+}
+
+
+/**
+ * ========================================================
+ *  SET BACK TO APPROVED (FROM ARRIVED)
+ * ========================================================
+ */
+if ($action === "set_backtoapproved") {
+    if (!$id) {
+        http_response_code(400);
+        echo json_encode(["error" => "Missing booking id"]);
+        exit;
+    }
+
+    // Set status back to approved and reset paid to half the price
+    $stmt = $conn->prepare("
+        UPDATE other_facilities_booking 
+        SET status = 'approved',
+            paid = price / 2
+        WHERE id = ?
+    ");
+    $stmt->bind_param("i", $id);
+
+    echo $stmt->execute()
+        ? json_encode(["success" => true, "message" => "Booking moved back to approved."])
+        : json_encode(["success" => false, "message" => $stmt->error]);
+
+    exit;
+}
+
+
 
 /**---------------------------------------------------------
  * 2. DECLINE BOOKING + INSERT NOTIFICATION
@@ -44,36 +159,51 @@ if ($action === "set_decline" || $action === "set_declined") {
     }
 
     // Update status
-    $stmt = $conn->prepare("UPDATE other_facilities_booking SET status = 'declined' WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
+    // $stmt = $conn->prepare("UPDATE other_facilities_booking SET status = 'declined' WHERE id = ?");
+    // $stmt->bind_param("i", $id);
+    // $stmt->execute();
 
-    // Get user_id
-    $userStmt = $conn->prepare("SELECT user_id FROM other_facilities_booking WHERE id = ?");
-    $userStmt->bind_param("i", $id);
-    $userStmt->execute();
-    $userRes = $userStmt->get_result();
+    // // Get user_id
+    // $userStmt = $conn->prepare("SELECT user_id FROM other_facilities_booking WHERE id = ?");
+    // $userStmt->bind_param("i", $id);
+    // $userStmt->execute();
+    // $userRes = $userStmt->get_result();
 
-    if ($userRes->num_rows === 0) {
-        echo json_encode(["success" => false, "message" => "Booking not found."]);
-        exit;
-    }
+    // if ($userRes->num_rows === 0) {
+    //     echo json_encode(["success" => false, "message" => "Booking not found."]);
+    //     exit;
+    // }
 
-    $userId = $userRes->fetch_assoc()['user_id'];
+    // $userId = $userRes->fetch_assoc()['user_id'];
 
-    // Insert notification
-    $reason = trim($_POST['reason'] ?? "Your booking has been declined.");
-    $notifStmt = $conn->prepare("
-        INSERT INTO notifications (`from_`, `to_`, `message`, `is_read`, `created_at`)
-        VALUES ('admin', ?, ?, 0, NOW())
+    // // Insert notification
+    // $reason = trim($_POST['reason'] ?? "Your booking has been declined.");
+    // $notifStmt = $conn->prepare("
+    //     INSERT INTO notifications (`from_`, `to_`, `message`, `is_read`, `created_at`)
+    //     VALUES ('admin', ?, ?, 0, NOW())
+    // ");
+    // $notifStmt->bind_param("is", $userId, $reason);
+    // $notifStmt->execute();
+
+    // echo json_encode([
+    //     "success" => true,
+    //     "message" => "Booking declined and user notified."
+    // ]);
+    // exit;
+
+
+
+     $stmt = $conn->prepare("
+        UPDATE other_facilities_booking 
+        SET status = 'declined'
+        WHERE id = ?
     ");
-    $notifStmt->bind_param("is", $userId, $reason);
-    $notifStmt->execute();
+    $stmt->bind_param("i", $id);
 
-    echo json_encode([
-        "success" => true,
-        "message" => "Booking declined and user notified."
-    ]);
+    echo $stmt->execute()
+        ? json_encode(["success" => true, "message" => "Booking declined."])
+        : json_encode(["success" => false, "message" => $stmt->error]);
+
     exit;
 }
 

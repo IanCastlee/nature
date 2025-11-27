@@ -13,6 +13,7 @@ import {
   booking,
   fhbooking,
   fhbookingApproved,
+  fhbookingDeclined,
 } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import { useLocation } from "react-router-dom";
@@ -83,7 +84,7 @@ function AdminBookingFhDeclined() {
     <>
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
-          Approved Function Hall Booking
+          Declined Function Hall Booking
         </h1>
 
         {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
@@ -110,17 +111,10 @@ function AdminBookingFhDeclined() {
 
         <div className="overflow-x-auto">
           <GenericTable
-            columns={fhbooking}
+            columns={fhbookingDeclined}
             data={currentData}
             loading={loading}
             noDataComponent={<NoData />}
-            renderActions={(item) => {
-              return renderActionsFhBooking({
-                isNotAvailablePage,
-                item,
-                setShowForm,
-              });
-            }}
           />
         </div>
 

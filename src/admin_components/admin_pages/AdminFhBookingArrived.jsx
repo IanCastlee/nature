@@ -5,15 +5,15 @@ import useGetData from "../../hooks/useGetData";
 import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
-import { renderActionsFhBookingApproved } from "../admin_molecules/RenderActions";
-import { fhbookingApproved } from "../../constant/tableColumns";
+import { renderActionsFhBookingArrived } from "../admin_molecules/RenderActions";
+import { fhbookingHistory } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import { useLocation } from "react-router-dom";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import Toaster from "../../components/molecules/Toaster";
 import useSetInactive from "../../hooks/useSetInactive";
 
-function AdminBookingFhApproved() {
+function AdminFhBookingArrived() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
@@ -37,7 +37,7 @@ function AdminBookingFhApproved() {
   //==============//
 
   const { data, loading, refetch, error } = useGetData(
-    `/booking/get-fhbooking.php?status=approved`
+    `/booking/get-fhbooking.php?status=arrived`
   );
 
   const handlePageChange = (pageNumber) => {
@@ -96,29 +96,19 @@ function AdminBookingFhApproved() {
     })}`,
   }));
 
-  //=========================//
-  // APPROVAL HANDLING //
-  //=========================//
-
-  const {
-    setInactive,
-    loading: approveLoading,
-    error: approveError,
-  } = useSetInactive("/booking/fh-booking.php", () => {
-    refetch();
-    setApproveItem(null);
-    setApproveAction("");
-    setToast({
-      message:
-        approveAction === "set_arrived"
-          ? "Booking marked as arrived"
-          : "Booking moved back to pending",
-      type: "success",
-    });
-  });
-
-  console.log("approveError : ", approveError);
-
+  // SET BACK TO APPROVED
+  const { setInactive, loading: approveLoading } = useSetInactive(
+    "/booking/fh-booking.php",
+    () => {
+      refetch();
+      setApproveItem(null);
+      setApproveAction("");
+      setToast({
+        message: "Booking moved back to approved",
+        type: "success",
+      });
+    }
+  );
   return (
     <>
       {toast && (
@@ -131,7 +121,7 @@ function AdminBookingFhApproved() {
 
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
-          Approved Function Hall Booking
+          Booking History
         </h1>
 
         {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
@@ -158,25 +148,19 @@ function AdminBookingFhApproved() {
 
         <div className="overflow-x-auto">
           <GenericTable
-            columns={fhbookingApproved}
+            columns={fhbookingHistory}
             data={formattedData}
             loading={loading}
             noDataComponent={<NoData />}
             renderActions={(item) =>
-              renderActionsFhBookingApproved({
+              renderActionsFhBookingArrived({
                 isNotAvailablePage,
                 item,
                 setShowForm,
 
-                // 🔥 ADD THESE ACTIONS
-                onSetPending: (item) => {
+                onSetBackToApproved: (item) => {
                   setApproveItem(item);
-                  setApproveAction("set_pending");
-                },
-
-                onSetArrived: (item) => {
-                  setApproveItem(item);
-                  setApproveAction("set_arrived");
+                  setApproveAction("set_backtoapproved");
                 },
               })
             }
@@ -202,23 +186,15 @@ function AdminBookingFhApproved() {
             setApproveItem(null);
             setApproveAction("");
           }}
-          label={
-            approveAction === "set_pending"
-              ? "Yes, Back to pending"
-              : "Yes, Mark as Arrived"
-          }
-          label2={approveAction === "set_pending" ? "pending" : "arrived"}
-          label3={
-            approveAction === "set_pending"
-              ? "Are you sure you want to back this booking to pending?"
-              : "Are you sure you want to mark this booking as arrived?"
-          }
-          onConfirm={() => {
+          label="Yes, Back to Approved"
+          label2="approved"
+          label3="Are you sure you want to move this booking back to approved?"
+          onConfirm={() =>
             setInactive({
               id: approveItem?.id,
               action: approveAction,
-            });
-          }}
+            })
+          }
         />
       )}
 
@@ -227,4 +203,4 @@ function AdminBookingFhApproved() {
   );
 }
 
-export default AdminBookingFhApproved;
+export default AdminFhBookingArrived;

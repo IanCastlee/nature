@@ -93,6 +93,10 @@ export const menuItems = [
         name: "Declined Booking",
         to: "/admin/fhbooking-declined",
       },
+      {
+        name: "Booking History",
+        to: "/admin/fhbooking-history",
+      },
     ],
   },
 

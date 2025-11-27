@@ -11,6 +11,7 @@ import DeleteModal from "../../components/molecules/DeleteModal";
 import { fhbooking } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import ModalDeclinedForm from "../admin_molecules/ModalDeclinedForm";
+import Toaster from "../../components/molecules/Toaster";
 
 function AdminFhBooking() {
   const showForm = useForm((state) => state.showForm);
@@ -18,7 +19,10 @@ function AdminFhBooking() {
 
   const [approveItem, setApproveItem] = useState(null);
   const [declinedItem, setDeclinedItem] = useState(null);
+
   const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
+
+  const [toast, setToast] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,6 +74,7 @@ function AdminFhBooking() {
   } = useSetInactive("/booking/fh-booking.php", () => {
     refetch();
     setApproveItem(null);
+    setToast({ message: "Booking set as approved", type: "success" });
   });
 
   const {
@@ -89,8 +94,27 @@ function AdminFhBooking() {
     setViewFHDetailsId(item);
   };
 
+  const formattedData = currentData.map((item) => ({
+    ...item,
+    price: `₱${Number(item.price).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    half_price: `₱${Number(item.half_price).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+  }));
+
   return (
     <>
+      {toast && (
+        <Toaster
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
           Function Hall Booking Record
@@ -121,7 +145,7 @@ function AdminFhBooking() {
         <div className="overflow-x-auto">
           <GenericTable
             columns={fhbooking}
-            data={currentData}
+            data={formattedData}
             loading={loading}
             noDataComponent={<NoData />}
             renderActions={(item) => {
@@ -165,21 +189,23 @@ function AdminFhBooking() {
 
       {/* DECLINE MODAL */}
       {declinedItem?.id && (
-        <ModalDeclinedForm
-          userId={declinedItem.user_id}
-          bookingId={declinedItem.id}
-          action="fh"
-          onConfirm={(reason) => {
+        <DeleteModal
+          item={declinedItem}
+          name={declinedItem?.firstname}
+          loading={declinedLoading}
+          onCancel={() => setDeclinedItem(null)}
+          label="Yes, Decline"
+          label2="decline this booking"
+          label3={`Are you sure you want to decline this booking?`}
+          onConfirm={() => {
             setDeclined({
-              id: declinedItem.id,
+              id: declinedItem?.id,
               action: "set_decline",
-              reason: reason,
             });
-          }}
-          onClose={() => setDeclinedItem(null)}
-          onSuccess={() => {
-            setDeclinedItem(null);
-            refetch();
+            setToast({
+              message: "Booking has been declined",
+              type: "success",
+            });
           }}
         />
       )}

@@ -15,7 +15,7 @@ if ($method === "GET") {
     $status = $_GET['status'] ?? null;
 
     if($status === "pending"){
-     $stmt = $conn->prepare("SELECT orb.*, u.firstname, u.lastname, u.email, fh.name FROM other_facilities_booking AS orb JOIN users AS u  ON u.user_id = orb.user_id JOIN function_hall AS fh ON orb.facility_id = fh.fh_id WHERE orb.status = 'pending'");
+     $stmt = $conn->prepare("SELECT orb.*, u.firstname, u.lastname, u.email, fh.name, orb.price / 2 AS half_price FROM other_facilities_booking AS orb JOIN users AS u  ON u.user_id = orb.user_id JOIN function_hall AS fh ON orb.facility_id = fh.fh_id WHERE orb.status = 'pending'");
     $stmt->execute();
 
     $result = $stmt->get_result();
@@ -43,7 +43,22 @@ if ($method === "GET") {
     }
 
     if($status === "approved"){
-     $stmt = $conn->prepare("SELECT orb.*, u.firstname, u.lastname, u.email, fh.name FROM other_facilities_booking AS orb JOIN users AS u  ON u.user_id = orb.user_id JOIN function_hall AS fh ON orb.facility_id = fh.fh_id WHERE orb.status = 'approved'");
+     $stmt = $conn->prepare("SELECT orb.*, u.firstname, u.lastname, u.email, fh.name, orb.price / 2, paid AS half_price FROM other_facilities_booking AS orb JOIN users AS u  ON u.user_id = orb.user_id JOIN function_hall AS fh ON orb.facility_id = fh.fh_id WHERE orb.status = 'approved'");
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $data = $result->fetch_all(MYSQLI_ASSOC);
+
+    echo json_encode([
+        "success" => true,
+        "data" => $data
+    ]);
+    exit;
+    }
+
+
+    if($status === "arrived"){
+    $stmt = $conn->prepare("SELECT orb.*, u.firstname, u.lastname, u.email, fh.name, paid FROM other_facilities_booking AS orb JOIN users AS u  ON u.user_id = orb.user_id JOIN function_hall AS fh ON orb.facility_id = fh.fh_id WHERE orb.status = 'arrived'");
     $stmt->execute();
 
     $result = $stmt->get_result();
@@ -89,6 +104,7 @@ if ($method === "GET") {
                 'nights' => $row['nights'],
                 'status' => $row['status'],
                 'price' => $row['booking_price'],
+
                 'room' => [
                     'room_id' => $row['room_id'],
                     'room_name' => $row['room_name'],

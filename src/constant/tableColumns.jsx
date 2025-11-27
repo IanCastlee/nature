@@ -281,12 +281,12 @@ export const users = [
 //function hall booking
 export const fhbooking = [
   {
-    title: "Name",
-    key: "firstname",
+    title: "Fullname",
+    key: "fullname",
   },
   {
-    title: "Email",
-    key: "email",
+    title: "Phone",
+    key: "phone",
   },
   {
     title: "Function Hall",
@@ -300,15 +300,14 @@ export const fhbooking = [
     title: "Start Time(mt)",
     key: "start_time",
   },
-  {
-    title: "End Time(mt)",
-    key: "end_time",
-  },
+  // {
+  //   title: "End Time(mt)",
+  //   key: "end_time",
+  // },
 
-  {
-    title: "Price",
-    key: "price",
-  },
+  { title: "Total Amount", key: "price" },
+  // { title: "Paid", key: "paid" },
+  { title: "Balance to Pay", key: "half_price" },
   {
     title: "Status",
     key: "status",
@@ -318,12 +317,12 @@ export const fhbooking = [
 //function hall approved booking
 export const fhbookingApproved = [
   {
-    title: "Name",
-    key: "firstname",
+    title: "Fullname",
+    key: "fullname",
   },
   {
-    title: "Email",
-    key: "email",
+    title: "Phone",
+    key: "phone",
   },
   {
     title: "Function Hall",
@@ -337,21 +336,79 @@ export const fhbookingApproved = [
     title: "Start Time(mt)",
     key: "start_time",
   },
-  {
-    title: "End Time(mt)",
-    key: "end_time",
-  },
 
-  {
-    title: "Price",
-    key: "price",
-  },
+  { title: "Total Amount", key: "price" },
+  { title: "Paid", key: "paid" },
+  { title: "Balance to Pay", key: "half_price" },
   {
     title: "Status",
     key: "status",
   },
 ];
 
+//function hall declined booking
+export const fhbookingDeclined = [
+  {
+    title: "Fullname",
+    key: "fullname",
+  },
+  {
+    title: "Phone",
+    key: "phone",
+  },
+  {
+    title: "Function Hall",
+    key: "name",
+  },
+  {
+    title: "Date",
+    key: "date",
+  },
+  {
+    title: "Start Time(mt)",
+    key: "start_time",
+  },
+
+  { title: "Total Amount", key: "price" },
+  { title: "Paid", key: "paid" },
+  {
+    title: "Status",
+    key: "status",
+  },
+];
+
+//function hall history booking
+
+//function hall declined booking
+export const fhbookingHistory = [
+  {
+    title: "Fullname",
+    key: "fullname",
+  },
+  {
+    title: "Phone",
+    key: "phone",
+  },
+  {
+    title: "Function Hall",
+    key: "name",
+  },
+  {
+    title: "Date",
+    key: "date",
+  },
+  {
+    title: "Start Time(mt)",
+    key: "start_time",
+  },
+
+  { title: "Total Amount", key: "price" },
+  { title: "Paid", key: "paid" },
+  {
+    title: "Status",
+    key: "status",
+  },
+];
 //gallery
 export const galleryColumn = [
   {

@@ -10,7 +10,6 @@ import useSetInactive from "../../hooks/useSetInactive";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import { bookingPending } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
-import ModalDeclinedForm from "../admin_molecules/ModalDeclinedForm";
 import Toaster from "../../components/molecules/Toaster";
 
 function AdminBookingPage() {
@@ -20,7 +19,6 @@ function AdminBookingPage() {
   const [approveItem, setApproveItem] = useState(null);
   const [declinedItem, setDeclinedItem] = useState(null);
 
-  const [deleteItem, setDeleteItem] = useState(null);
   const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
 
   const [toast, setToast] = useState(null);
@@ -213,7 +211,7 @@ function AdminBookingPage() {
           onCancel={() => setDeclinedItem(null)}
           label="Yes, Decline"
           label2="decline this booking"
-          label3={`Are you sure you want to decline ${declinedItem?.firstname}'s booking?`}
+          label3={`Are you sure you want to decline this booking?`}
           onConfirm={() => {
             setDeclined({
               id: declinedItem?.booking_id,

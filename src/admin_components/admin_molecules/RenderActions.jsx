@@ -1,6 +1,5 @@
 import Button from "../admin_atoms/Button";
 import { icons } from "../../constant/icon";
-import { div } from "framer-motion/client";
 
 // Outside AvailableRoomPage.jsx
 export const renderActions = ({
@@ -349,6 +348,80 @@ export const renderActionsFhBooking = ({
           </button>
         </div>
       )}
+
+      <button
+        onClick={() => onSetViewCottageDetails(item.cottage_id)}
+        className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="View Room Details"
+      >
+        <icons.AiOutlineInfoCircle />
+      </button>
+    </div>
+  );
+};
+
+//render action fh booking
+export const renderActionsFhBookingApproved = ({
+  item,
+  showForm,
+  onSetInactive,
+  onSetArrived,
+  onSetPending,
+  onSetViewCottageDetails,
+  onSetApprove,
+  onSetDeClined,
+  isNotAvailablePage,
+}) => {
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <button
+        onClick={() => onSetArrived(item)}
+        className="bg-blue-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center ml-4"
+        title="Set as arrived"
+      >
+        <icons.IoMdCheckmarkCircleOutline />
+      </button>
+      <button
+        onClick={() => onSetPending(item)}
+        className="bg-green-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="Back to Pending"
+      >
+        <icons.TbRefresh />
+      </button>
+
+      <button
+        onClick={() => onSetViewCottageDetails(item.cottage_id)}
+        className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="View Room Details"
+      >
+        <icons.AiOutlineInfoCircle />
+      </button>
+    </div>
+  );
+};
+
+//render action fh booking
+export const renderActionsFhBookingArrived = ({
+  item,
+  showForm,
+  onSetInactive,
+  setApproveAction,
+  onSetBackToApproved,
+  onSetPending,
+  onSetViewCottageDetails,
+  onSetApprove,
+  onSetDeClined,
+  isNotAvailablePage,
+}) => {
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <button
+        onClick={() => onSetBackToApproved(item)}
+        className="bg-green-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="Back to Pending"
+      >
+        <icons.TbRefresh />
+      </button>
 
       <button
         onClick={() => onSetViewCottageDetails(item.cottage_id)}
