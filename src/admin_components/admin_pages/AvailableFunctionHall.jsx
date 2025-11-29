@@ -11,7 +11,6 @@ import { renderActionsFuntionHall } from "../admin_molecules/RenderActions";
 import useFormSubmit from "../../hooks/useFormSubmit";
 import useSetInactive from "../../hooks/useSetInactive";
 import DeleteModal from "../../components/molecules/DeleteModal";
-import ViewRoomDetails from "../admin_molecules/ViewRoomDetails";
 import { availableFHColumns } from "../../constant/tableColumns";
 import ModalFormFunctionHall from "../admin_molecules/ModalFormFunctionHall";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";

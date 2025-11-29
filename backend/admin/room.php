@@ -1,6 +1,7 @@
 <?php
 include("../header.php");
 include("../dbConn.php");
+require_once("../auth/auth_middleware.php"); 
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -27,7 +28,7 @@ if ($method === "GET") {
     $categoryId = $_GET['categoryId'] ?? null;
     $status = $_GET['status'] ?? 'active';
 
-    // ✅ 1. Fetch single room by ID (with images, amenities, inclusions, extras)
+    //  1. Fetch single room by ID (with images, amenities, inclusions, extras)
     if ($roomId) {
         $stmt = $conn->prepare("SELECT r.*, 
                                        a.amenities, a.amenity_id, 
@@ -72,7 +73,7 @@ if ($method === "GET") {
         }
 
         if (!empty($roomData)) {
-            // ✅ Fetch room images
+            //  Fetch room images
             $imgStmt = $conn->prepare("SELECT image_path FROM room_images WHERE room_id=?");
             $imgStmt->bind_param("i", $roomData['room_id']);
             $imgStmt->execute();
@@ -95,7 +96,7 @@ if ($method === "GET") {
         exit;
     }
 
-    // ✅ 2. Fetch rooms by category
+    //  2. Fetch rooms by category
     elseif ($categoryId) {
         $stmt = $conn->prepare("SELECT r.*, rc.category_id, rc.category 
                                 FROM rooms AS r 
@@ -126,7 +127,7 @@ if ($method === "GET") {
         exit;
     }
 
-    // ✅ 3. Fetch all rooms by status
+    //  3. Fetch all rooms by status
     else {
         $stmt = $conn->prepare("SELECT * FROM rooms WHERE status=?");
         $stmt->bind_param("s", $status);
@@ -185,7 +186,7 @@ if ($method === "POST") {
         }
     }
 
-    // ✅ CREATE ROOM
+    //  CREATE ROOM
     if ($action === "create") {
         if (!$room_name || !$category || !$price || !$capacity || !$duration) {
             echo json_encode(["success" => false, "message" => "All fields are required."]);
@@ -213,14 +214,14 @@ if ($method === "POST") {
                 }
             }
 
-            echo json_encode(["success" => true, "message" => "✅ Room added successfully."]);
+            echo json_encode(["success" => true, "message" => " Room added successfully."]);
         } else {
             echo json_encode(["success" => false, "message" => "❌ Database error: " . $stmt->error]);
         }
         exit;
     }
 
-    // ✅ UPDATE ROOM
+    //  UPDATE ROOM
     if ($action === "update" && $id) {
         if ($filename_PS) {
             $stmt = $conn->prepare("UPDATE rooms SET category_id=?, room_name=?, price=?, capacity=?, duration=?, description=?, photo_sphere=? WHERE room_id=?");
@@ -245,19 +246,22 @@ if ($method === "POST") {
                 }
             }
 
-            echo json_encode(["success" => true, "message" => "✅ Room updated successfully."]);
+            echo json_encode(["success" => true, "message" => " Room updated successfully."]);
         } else {
             echo json_encode(["success" => false, "message" => "❌ Database error: " . $stmt->error]);
         }
         exit;
     }
 
-    // ✅ SET INACTIVE / ACTIVE
+
+
+    $user = require_auth($conn); 
+    //  SET INACTIVE / ACTIVE
     if ($action === "set_inactive" && $id) {
         $stmt = $conn->prepare("UPDATE rooms SET status='inactive' WHERE room_id=?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
-        echo json_encode(["success" => true, "message" => "✅ Room set to inactive."]);
+        echo json_encode(["success" => true, "message" => " Room set to inactive."]);
         exit;
     }
 
@@ -265,7 +269,7 @@ if ($method === "POST") {
         $stmt = $conn->prepare("UPDATE rooms SET status='active' WHERE room_id=?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
-        echo json_encode(["success" => true, "message" => "✅ Room set to active."]);
+        echo json_encode(["success" => true, "message" => " Room set to active."]);
         exit;
     }
 

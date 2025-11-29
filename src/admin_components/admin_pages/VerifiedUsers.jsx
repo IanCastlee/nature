@@ -6,7 +6,7 @@ import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
 import { renderActionsBookingHistory } from "../admin_molecules/RenderActions";
-import { booking, users } from "../../constant/tableColumns";
+import { users } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 
 function VerifiedUsers() {

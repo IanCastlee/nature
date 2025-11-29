@@ -10,7 +10,6 @@ import useSetInactive from "../../hooks/useSetInactive";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import { fhbooking } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
-import ModalDeclinedForm from "../admin_molecules/ModalDeclinedForm";
 import Toaster from "../../components/molecules/Toaster";
 
 function AdminFhBooking() {

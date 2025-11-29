@@ -136,10 +136,10 @@ function BookWithoutSigningIn() {
       }
 
       //  4. Always disable today
-      if (!disabledSet.has(today.getTime())) {
-        extendedDisabled.push(today);
-        disabledSet.add(today.getTime());
-      }
+      // if (!disabledSet.has(today.getTime())) {
+      //   extendedDisabled.push(today);
+      //   disabledSet.add(today.getTime());
+      // }
 
       // 5. Remove duplicates
       const finalDisabled = Array.from(

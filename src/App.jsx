@@ -59,6 +59,7 @@ import BookWithoutSigningIn from "./components/pages/BookWithoutSigningIn";
 import AdminBookingHistoryLog from "./admin_components/admin_pages/AdminBookingHistoryLog";
 import FunctionHallBooking from "./components/pages/FunctionHallBooking";
 import AdminFhBookingArrived from "./admin_components/admin_pages/AdminFhBookingArrived";
+import AdminSetting from "./admin_components/admin_pages/AdminSetting";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -213,6 +214,7 @@ const AdminLayout = () => {
           <Route path="/posted-post" element={<PostedPost />} />
 
           <Route path="/announcement" element={<AdminAnnouncementPage />} />
+          <Route path="/setting" element={<AdminSetting />} />
           <Route
             path="/announcement-history"
             element={<AdminAnnouncementHistory />}

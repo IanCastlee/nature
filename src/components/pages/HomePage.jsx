@@ -1,6 +1,5 @@
 import React, { useEffect, Suspense, lazy } from "react";
 import { images } from "../../constant/image";
-import { freebies } from "../../constant/mockData";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { icons } from "../../constant/icon";
@@ -15,6 +14,7 @@ import Title from "../molecules/Title";
 import ReadMoreButton from "../atoms/ReadMoreButton";
 import useGetData from "../../hooks/useGetData";
 import SearchBox from "../molecules/SearchBox";
+import { uploadUrl } from "../../utils/fileURL";
 
 const About = lazy(() => import("../organisms/About"));
 const ChatBot = lazy(() => import("../molecules/ChatBot"));
@@ -73,6 +73,15 @@ function HomePage() {
     });
   }, []);
 
+  // fetch fh data
+  const {
+    data: heroData,
+    loading: loadingHero,
+    refetch: refetchHero,
+    error: errorHero,
+  } = useGetData(`/admin/admin_setting.php`);
+  const heroImages = heroData?.hero_images || [];
+
   return (
     <>
       <main className="w-full min-h-screen bg-white dark:bg-black scroll-smooth pb-20">
@@ -83,28 +92,35 @@ function HomePage() {
             autoplay={{ delay: 4000, disableOnInteraction: false }}
             loop={true}
             speed={1000}
-            className="w-full h-full"
+            className="w-full h-screen" // important for full-height slider
           >
-            {imageKeys.map((key, idx) => (
-              <SwiperSlide key={idx}>
-                <div className="relative w-full h-full">
+            {loadingHero && (
+              <div className="flex items-center justify-center h-screen">
+                <p>Loading...</p>
+              </div>
+            )}
+            {errorHero && (
+              <div className="flex items-center justify-center h-screen">
+                <p className="text-red-500">{errorHero.message}</p>
+              </div>
+            )}
+
+            {!loadingHero &&
+              heroImages.map((img, idx) => (
+                <SwiperSlide key={img.id} className="w-full h-screen relative">
                   <LazyLoadImage
-                    src={images[key]}
+                    src={`${uploadUrl.uploadurl}/hero/${img.image}`}
                     alt={`Slide ${idx + 1}`}
                     effect="blur"
                     wrapperClassName="absolute top-0 left-0 w-full h-full"
                     className="w-full h-full object-cover object-center"
                   />
 
-                  {/* Overlay & caption */}
+                  {/* Overlay */}
                   <div className="absolute inset-0 bg-black bg-opacity-40" />
-                  <figcaption
-                    className="
-    relative flex flex-col justify-start items-start text-white
-    pl-4 lg:pl-20 pt-44 sm:pt-28
-    md:absolute md:inset-0 md:justify-center md:pt-0 z-20
-  "
-                  >
+
+                  {/* Caption */}
+                  <figcaption className="relative flex flex-col justify-start items-start text-white pl-4 lg:pl-20 pt-44 sm:pt-28 md:absolute md:inset-0 md:justify-center md:pt-0 z-20">
                     <h1 className="text-5xl font-playfair max-w-2xl mb-6 px-2 lg:px-0">
                       Experience the Serenity of{" "}
                       <span className="text-blue-400 relative inline-block">
@@ -125,10 +141,10 @@ function HomePage() {
                       seeking rest and rejuvenation.
                     </p>
                   </figcaption>
-                </div>
-              </SwiperSlide>
-            ))}
+                </SwiperSlide>
+              ))}
           </Swiper>
+
           {/* Search Box */}
           <SearchBox />
         </section>

@@ -99,7 +99,7 @@ function Header({ isHome }) {
                 <span
                   className={`text-sm transition-colors duration-300 group-hover:text-blue-400
                   before:content-[''] before:absolute before:bottom-0 before:left-1/2
-                  before:translate-x-[-50%] before:h-[2px] before:w-0
+                  before:translate-x-[-50%] before:h-[2px] before:w-0 flex flex-row items-center
                   before:bg-blue-400 before:transition-all before:duration-300
                   group-hover:before:w-full ${
                     !scrolled && isHome
@@ -107,7 +107,7 @@ function Header({ isHome }) {
                       : "text-black dark:text-white"
                   }`}
                 >
-                  Offer
+                  Offers <icons.MdOutlineKeyboardArrowDown />
                 </span>
 
                 {/* Offer dropdown menu */}
@@ -158,7 +158,7 @@ function Header({ isHome }) {
                 <Link
                   title="House Rules"
                   onClick={() => setShowForm("house_rules")}
-                  className={`text-sm transition-colors duration-300 group-hover:text-blue-400
+                  className={`text-sm transition-colors font-bold duration-300 group-hover:text-blue-400
 
                     before:bg-blue-400 before:transition-all before:duration-300
                     group-hover:before:w-full ${
@@ -187,26 +187,6 @@ function Header({ isHome }) {
                 </Link>
               </li>
 
-              {user && (
-                <li>
-                  <div
-                    className="relative"
-                    onClick={() => setShowForm("notification")}
-                  >
-                    <icons.IoMdNotifications
-                      className={`text-2xl ${
-                        scrolled
-                          ? "dark:text-gray-300 text-gray-400"
-                          : " text-gray-400"
-                      } cursor-pointer`}
-                    />
-                    <div className="h-4 w-4 rounded-full bg-red-600 flex flex-row justify-center items-center absolute -top-2 -right-1">
-                      <p className="text-xs text-white">9</p>
-                    </div>
-                  </div>
-                </li>
-              )}
-
               {/* Theme Toggle */}
               <button onClick={toggleDarkMode}>
                 {darkMode ? (
@@ -216,69 +196,6 @@ function Header({ isHome }) {
                 )}
               </button>
               {/* Sign In / User Dropdown */}
-              {user ? (
-                <div className="relative">
-                  <div
-                    className="flex flex-row items-center gap-2 bg-blue-400 py-1 px-2 rounded-full cursor-pointer hover:scale-105 transition-transform"
-                    onClick={() => setShowDropdown((prev) => !prev)}
-                  >
-                    <icons.FaUserCircle size={28} className="text-white" />
-                    <span className="text-xs text-white font-medium">
-                      {user.firstname.split(" ")[0]}
-                    </span>
-                    <icons.MdOutlineArrowDropDownCircle
-                      size={18}
-                      className={`${
-                        showDropdown ? "rotate-180" : "rotate-0"
-                      } transition-transform text-gray-200`}
-                    />
-                  </div>
-
-                  {showDropdown && (
-                    <div className="absolute flex flex-col gap-1 top-full right-0 mt-5 w-64 bg-white dark:bg-gray-800 shadow-lg rounded-md p-4 z-50">
-                      <Button
-                        onClick={() => navigate(`/my-booking/${user.user_id}`)}
-                        style="w-full flex flex-row items-center gap-2 text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                        label={
-                          <>
-                            <icons.GoChecklist /> Booking
-                          </>
-                        }
-                      />
-
-                      <Button
-                        style="w-full flex flex-row items-center gap-2 text-left px-4 py-2 text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                        label={
-                          <>
-                            <icons.IoSettingsOutline /> Setting
-                          </>
-                        }
-                      />
-
-                      <Button
-                        onClick={() => {
-                          useAuthStore.getState().logout();
-                          navigate("/signin");
-                        }}
-                        style="w-full flex flex-row justify-center items-center px-4 py-2 text-sm text-white hover:bg-gray-500 dark:hover:bg-gray-700 bg-red-600 rounded-full text-center gap-2"
-                        label={
-                          <>
-                            Logout{" "}
-                            <icons.IoIosLogOut className="text-lg text-white" />
-                          </>
-                        }
-                      />
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <button
-                  className="flex items-center gap-1 bg-blue-400 text-white font-semibold text-xs h-[30px] px-4 rounded-full transform transition duration-200 hover:scale-110"
-                  onClick={() => navigate("/signin")}
-                >
-                  Sign In <icons.PiSignIn className="text-lg" />
-                </button>
-              )}
             </ul>
           </nav>
 

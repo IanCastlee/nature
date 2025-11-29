@@ -27,8 +27,6 @@ function AvailableRoomPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  console.log("ROOMS: ", availableRoomColumns);
-
   //==============//
   //   FORMS      //
   //==============//
@@ -62,7 +60,6 @@ function AvailableRoomPage() {
   const { data, loading, refetch, error } = useGetData(
     `/admin/room.php?status=active`
   );
-  console.log("DATA : ", data);
 
   //fethc room categories
   const { data: roomCategoryData } = useGetData("/admin/room-category.php");
@@ -148,7 +145,7 @@ function AvailableRoomPage() {
     loading: formLoading,
     error: formError,
   } = useFormSubmit("/admin/room.php", () => {
-    window.location.reload(); // reload the page
+    window.location.reload();
 
     refetch();
     setShowForm(null);

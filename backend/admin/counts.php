@@ -1,8 +1,11 @@
 <?php
 include("../header.php");
 include("../dbConn.php");
+require_once("../auth/auth_middleware.php"); 
 
 header('Content-Type: application/json');
+$user = require_auth($conn); 
+
 
 $method = $_SERVER['REQUEST_METHOD'];
 

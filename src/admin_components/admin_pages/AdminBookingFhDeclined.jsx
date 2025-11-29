@@ -5,16 +5,8 @@ import useGetData from "../../hooks/useGetData";
 import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
-import {
-  renderActionsBookingHistory,
-  renderActionsFhBooking,
-} from "../admin_molecules/RenderActions";
-import {
-  booking,
-  fhbooking,
-  fhbookingApproved,
-  fhbookingDeclined,
-} from "../../constant/tableColumns";
+
+import { fhbookingDeclined } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import { useLocation } from "react-router-dom";
 

@@ -5,21 +5,10 @@ import useGetData from "../../hooks/useGetData";
 import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
-import {
-  renderActionsBookingHistory,
-  renderActionsBookingHistoryLog,
-} from "../admin_molecules/RenderActions";
-import {
-  bookingApproved,
-  bookingDeclined,
-  bookingHistory,
-} from "../../constant/tableColumns";
-import ViewFHDetails from "../admin_molecules/ViewFHDetails";
-import Button from "../admin_atoms/Button";
-import { icons } from "../../constant/icon";
-import useSetInactive from "../../hooks/useSetInactive";
+
+import { bookingDeclined } from "../../constant/tableColumns";
+
 import Toaster from "../../components/molecules/Toaster";
-import DeleteModal from "../../components/molecules/DeleteModal";
 
 function AdminBookingDeclined() {
   const showForm = useForm((state) => state.showForm);

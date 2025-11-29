@@ -11,6 +11,8 @@ import {
   Title,
 } from "chart.js";
 import useGetData from "../../hooks/useGetData";
+import Button from "../admin_atoms/Button";
+import CurrentOccupants from "./CurrentOccupants";
 
 ChartJS.register(
   LineElement,
@@ -24,6 +26,7 @@ ChartJS.register(
 
 const Dashboard = () => {
   const [selectedYear, setSelectedYear] = useState("2025");
+  const [showCurrentOccupants, setShowCurrentOccupants] = useState(false);
 
   // Fetch data count
   const { data, loading, refetch, error } = useGetData(`/admin/counts.php`);
@@ -147,86 +150,105 @@ const Dashboard = () => {
     },
   };
 
+  const handleClose = () => {
+    console.log("first");
+    setShowCurrentOccupants(false);
+    console.log("DFJDJNFJDFNN : ", showCurrentOccupants);
+  };
+
   return (
-    <div className="dark:bg-gray-800 bg-gray-100 min-h-screen">
-      <h1 className="text-lg font-bold mb-4 dark:text-white text-black">
-        Dashboard Overview
-      </h1>
+    <>
+      <div className="dark:bg-gray-800 bg-gray-100 min-h-screen">
+        <div className="w-full flex items-center justify-between mb-6">
+          <h1 className="text-lg font-bold mb-4 dark:text-white text-black">
+            Dashboard Overview
+          </h1>
 
-      {/* Top Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {stats.map((item, index) => (
-          <div
-            key={index}
-            className="bg-white dark:bg-gray-900 p-4 rounded-md shadow-md flex flex-col justify-between"
-          >
-            <h2 className="text-sm text-gray-600 dark:text-gray-200 font-medium">
-              {item.title}
-            </h2>
-            <p className={`text-2xl font-bold text-${item.color}-500`}>
-              {item.value}
-            </p>
-            <span className={`text-sm text-${item.color}-400`}>
-              {item.percent}
-            </span>
-          </div>
-        ))}
-      </div>
+          <Button
+            onClick={() => setShowCurrentOccupants(true)}
+            className="flex flex-row items-center h-[35px] bg-gray-700 hover:bg-gray-800
+             text-white text-xs font-medium px-3 rounded-md transition-colors"
+            label={<>Current Occupants</>}
+          />
+        </div>
 
-      {/* Facilities */}
-      <div>
-        <h2 className="text-lg font-semibold mb-3 dark:text-white text-black">
-          Facilities
-        </h2>
+        {/* Top Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {facilities.map((item, index) => (
+          {stats.map((item, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-gray-900 p-4 rounded-md shadow-md flex flex-col justify-between border-l-4"
-              style={{ borderLeftColor: item.color }}
+              className="bg-white dark:bg-gray-900 p-4 rounded-md shadow-md flex flex-col justify-between"
             >
-              <h2 className="text-sm text-gray-600 dark:text-gray-200 font-semibold">
+              <h2 className="text-sm text-gray-600 dark:text-gray-200 font-medium">
                 {item.title}
               </h2>
-              {item.details && (
-                <div className="mt-3 space-y-1">
-                  {item.details.map((detail, i) => (
-                    <div
-                      key={i}
-                      className="flex justify-between text-xs text-gray-600 dark:text-gray-300"
-                    >
-                      <span>{detail.label}</span>
-                      <span className="font-semibold">{detail.value}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <p className={`text-2xl font-bold text-${item.color}-500`}>
+                {item.value}
+              </p>
+              <span className={`text-sm text-${item.color}-400`}>
+                {item.percent}
+              </span>
             </div>
           ))}
         </div>
+
+        {/* Facilities */}
+        <div>
+          <h2 className="text-lg font-semibold mb-3 dark:text-white text-black">
+            Facilities
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {facilities.map((item, index) => (
+              <div
+                key={index}
+                className="bg-white dark:bg-gray-900 p-4 rounded-md shadow-md flex flex-col justify-between border-l-4"
+                style={{ borderLeftColor: item.color }}
+              >
+                <h2 className="text-sm text-gray-600 dark:text-gray-200 font-semibold">
+                  {item.title}
+                </h2>
+                {item.details && (
+                  <div className="mt-3 space-y-1">
+                    {item.details.map((detail, i) => (
+                      <div
+                        key={i}
+                        className="flex justify-between text-xs text-gray-600 dark:text-gray-300"
+                      >
+                        <span>{detail.label}</span>
+                        <span className="font-semibold">{detail.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Year Filter */}
+        <div className="mb-4 flex justify-end">
+          <label className="text-xs text-gray-700 dark:text-gray-200 font-medium mr-2 self-center">
+            Filter by Year:
+          </label>
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(e.target.value)}
+            className="border dark:bg-gray-900 dark:border-gray-500 dark:text-gray-200 rounded px-2 py-1 text-xs"
+          >
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+          </select>
+        </div>
+
+        {/* Graph */}
+        <div className="bg-white dark:bg-gray-900 p-6 rounded-md shadow-md">
+          <Line data={chartData} options={options} />
+        </div>
       </div>
 
-      {/* Year Filter */}
-      <div className="mb-4 flex justify-end">
-        <label className="text-xs text-gray-700 dark:text-gray-200 font-medium mr-2 self-center">
-          Filter by Year:
-        </label>
-        <select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(e.target.value)}
-          className="border dark:bg-gray-900 dark:border-gray-500 dark:text-gray-200 rounded px-2 py-1 text-xs"
-        >
-          <option value="2023">2023</option>
-          <option value="2024">2024</option>
-          <option value="2025">2025</option>
-        </select>
-      </div>
-
-      {/* Graph */}
-      <div className="bg-white dark:bg-gray-900 p-6 rounded-md shadow-md">
-        <Line data={chartData} options={options} />
-      </div>
-    </div>
+      {showCurrentOccupants && <CurrentOccupants close={handleClose} />}
+    </>
   );
 };
 

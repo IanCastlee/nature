@@ -7,6 +7,53 @@ export const menuItems = [
     to: "/admin",
     icon: icons.LuLayoutDashboard,
   },
+
+  {
+    name: "Room Booking",
+    icon: icons.GoChecklist,
+    children: [
+      {
+        name: "Pending Booking",
+        to: "/admin/booking",
+      },
+      {
+        name: "Approved Booking",
+        to: "/admin/booking-approved",
+      },
+      {
+        name: "Declined Booking",
+        to: "/admin/declined-booking",
+      },
+      {
+        name: "Booking History",
+        to: "/admin/booking-history",
+      },
+    ],
+  },
+
+  {
+    name: "Function Hall Booking",
+    icon: icons.GoChecklist,
+    children: [
+      {
+        name: "Pending Booking",
+        to: "/admin/fh-booking",
+      },
+      {
+        name: "Approved Booking",
+        to: "/admin/fhbooking-approved",
+      },
+      {
+        name: "Declined Booking",
+        to: "/admin/fhbooking-declined",
+      },
+      {
+        name: "Booking History",
+        to: "/admin/fhbooking-history",
+      },
+    ],
+  },
+
   {
     name: "Rooms",
     icon: icons.IoBedOutline,
@@ -51,51 +98,6 @@ export const menuItems = [
       {
         name: "Not Active Cottage",
         to: "/admin/not-available-cottage",
-      },
-    ],
-  },
-  {
-    name: "Room Booking",
-    icon: icons.GoChecklist,
-    children: [
-      {
-        name: "Pending Booking",
-        to: "/admin/booking",
-      },
-      {
-        name: "Approved Booking",
-        to: "/admin/booking-approved",
-      },
-      {
-        name: "Declined Booking",
-        to: "/admin/declined-booking",
-      },
-      {
-        name: "Booking History",
-        to: "/admin/booking-history",
-      },
-    ],
-  },
-
-  {
-    name: "Function Hall Booking",
-    icon: icons.GoChecklist,
-    children: [
-      {
-        name: "Pending Booking",
-        to: "/admin/fh-booking",
-      },
-      {
-        name: "Approved Booking",
-        to: "/admin/fhbooking-approved",
-      },
-      {
-        name: "Declined Booking",
-        to: "/admin/fhbooking-declined",
-      },
-      {
-        name: "Booking History",
-        to: "/admin/fhbooking-history",
       },
     ],
   },
@@ -149,7 +151,7 @@ export const menuItems = [
   },
   {
     name: "Settings",
-    to: "/admin/settings",
+    to: "/admin/setting",
     icon: icons.IoSettingsOutline,
     children: [
       {

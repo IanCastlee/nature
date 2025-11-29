@@ -5,14 +5,9 @@ import useGetData from "../../hooks/useGetData";
 import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
-import {
-  renderActionsBookingHistory,
-  renderActionsBookingHistoryLog,
-} from "../admin_molecules/RenderActions";
-import { bookingApproved, bookingHistory } from "../../constant/tableColumns";
+import { renderActionsBookingHistoryLog } from "../admin_molecules/RenderActions";
+import { bookingHistory } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
-import Button from "../admin_atoms/Button";
-import { icons } from "../../constant/icon";
 import useSetInactive from "../../hooks/useSetInactive";
 import Toaster from "../../components/molecules/Toaster";
 import DeleteModal from "../../components/molecules/DeleteModal";
@@ -137,15 +132,6 @@ function AdminBookingHistoryLog() {
               placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <Button
-              className="flex items-center h-[35px] bg-blue-600 text-white text-xs font-medium px-2 rounded-md"
-              label={
-                <>
-                  Add Booking
-                  <icons.IoAddOutline className="ml-1 text-lg" />
-                </>
-              }
             />
           </div>
         </div>

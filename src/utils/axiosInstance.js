@@ -24,10 +24,21 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      sessionStorage.removeItem("auth-storage");
-      window.location.href = "/";
+    if (error.response) {
+      if (error.response.status === 401) {
+        // Unauthorized → token invalid or expired
+        sessionStorage.removeItem("auth-storage");
+        window.location.href = "/signin";
+      }
+
+      //its not fckn working
+      if (error.response.status === 403) {
+        // Forbidden → user authenticated but not allowed
+        sessionStorage.removeItem("auth-storage");
+        window.location.href = "/";
+      }
     }
+
     return Promise.reject(error);
   }
 );

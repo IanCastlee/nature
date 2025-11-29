@@ -2,8 +2,17 @@ import React from "react";
 import { images } from "../../constant/image";
 import { icons } from "../../constant/icon";
 import { Link } from "react-router-dom";
+import useGetData from "../../hooks/useGetData";
 function Footer() {
   const currentYear = new Date().getFullYear();
+
+  // fetch fh data
+  const { data, loading, refetch, error } = useGetData(
+    `/admin/admin_setting.php`
+  );
+
+  console.log("DATA : ", data);
+
   return (
     <footer className="w-full bg-slate-50 dark:bg-gray-950 border-t-[1px] dark:border-gray-900">
       <div className="flex flex-row lg:flex-row justify-between  px-2 md:px-4 lg:px-[100px] py-6 flex-wrap">
@@ -22,15 +31,15 @@ function Footer() {
 
           <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
             <icons.IoIosMail className="text-blue-400 text-2xl border rounded-full border-blue-400 p-[2px]" />
-            rgspring882007@gmail.com
+            {data?.email}
           </Link>
           <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
             <icons.FaPhoneAlt className="text-blue-400 text-2xl border rounded-full border-blue-400 p-[2px]" />
-            Smart : +63 910 574 0612
+            Smart : {data?.smart_no}
           </Link>
           <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
             <icons.FaPhoneAlt className="text-blue-400 text-2xl border rounded-full border-blue-400 p-[2px]" />
-            Globe : +63 995 934 91002
+            Globe : {data?.globe_no}
           </Link>
         </div>
 

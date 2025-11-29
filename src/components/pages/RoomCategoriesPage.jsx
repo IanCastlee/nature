@@ -4,7 +4,6 @@ import { images } from "../../constant/image";
 import RoomCard from "../molecules/RoomCard";
 import useGetData from "../../hooks/useGetData";
 import { motion } from "framer-motion";
-import SearchBox from "../molecules/SearchBox";
 
 function SkeletonRoomCard() {
   return (
