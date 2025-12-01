@@ -348,6 +348,8 @@ if (!empty($sanitizedExtras)) {
 echo json_encode([
     "success" => true,
     "booking_id" => $bookingId,
+    'fullname' => $fullname,
+    'phone' => $phone,
     "start_date" => $checkIn,
     "end_date" => $checkOut,
     "nights" => $nights,

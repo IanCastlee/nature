@@ -168,7 +168,7 @@ function NotAvailableRoomPage() {
           onCancel={() => setDeleteItem(null)}
           label={isNotAvailablePage ? "Yes, Set as available" : ""}
           label2="active"
-          label3="This will set the data to available."
+          label3="This will set  this room to available."
           onConfirm={() => {
             setInactive({
               id: deleteItem?.room_id,

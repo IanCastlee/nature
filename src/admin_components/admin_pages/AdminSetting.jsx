@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import useGetData from "../../hooks/useGetData";
 import useFormSubmit from "../../hooks/useFormSubmit";
 import { uploadUrl } from "../../utils/fileURL";
+import axiosInstance from "../../utils/axiosInstance";
 
 function AdminSetting() {
   const { data, loading, refetch, error } = useGetData(

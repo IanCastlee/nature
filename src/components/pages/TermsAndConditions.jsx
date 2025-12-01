@@ -1,62 +1,63 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import useGetData from "../../hooks/useGetData";
 
 function TermsAndConditions() {
+  const { data, loading, error } = useGetData(`/admin/terms_conditions.php`);
+  const [terms, setTerms] = useState([]);
+
+  useEffect(() => {
+    if (Array.isArray(data)) {
+      setTerms(data);
+    }
+  }, [data]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-gray-100 dark:bg-gray-900">
+        <p className="text-gray-600 dark:text-gray-300 text-sm">
+          Loading Terms & Conditions...
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-gray-100 dark:bg-gray-900">
+        <p className="text-red-500 text-sm">
+          {error.message || "Failed to load Terms & Conditions."}
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsam dicta
-      facere soluta voluptatibus repellendus, neque maxime deleniti nulla
-      veritatis perferendis delectus minus provident, autem, est illo. Neque,
-      placeat harum cumque maxime, doloremque, fuga minus deleniti beatae magnam
-      earum quaerat! Nemo placeat, quisquam obcaecati voluptates repellat,
-      consequatur libero dolore illum laudantium porro corporis, cum cumque
-      culpa. Laborum rem amet tempora placeat deserunt voluptate quae? Iste
-      doloremque velit tempore officia itaque non mollitia soluta fugit, in
-      perspiciatis dolorum facilis voluptatibus obcaecati consequatur maiores
-      magnam! Dolorem alias soluta cum beatae quaerat asperiores nobis,
-      voluptate hic culpa quidem, quia ab libero nesciunt. Perspiciatis hic
-      consequatur neque ullam et aut eos aperiam eum odio itaque. In ab beatae
-      aut, maiores eum vero quisquam ad repudiandae. At dolorum cumque iste
-      voluptatum totam praesentium, vero nesciunt doloremque iusto animi ab qui
-      ratione consectetur, minima molestias, omnis sapiente facilis iure. Fugit
-      dignissimos rem commodi, quas, enim dolore dolor, officiis error expedita
-      maiores maxime sapiente cumque omnis corporis aut! Animi sunt aperiam
-      labore consequuntur exercitationem minima nulla, cumque repellat, optio
-      debitis consequatur ipsa distinctio facilis veniam quasi praesentium
-      culpa. Repudiandae ex consequuntur, impedit delectus possimus quae
-      consectetur, culpa placeat molestias officia ipsum quam. Laudantium
-      doloremque et unde quasi quis ipsa eos eaque vero, quibusdam ducimus
-      repellat ab reiciendis reprehenderit voluptatem ipsam quo, sapiente
-      maiores nemo, nihil dolorum perferendis! Nisi quibusdam aliquam obcaecati
-      a dolorum natus corrupti! Iusto perferendis culpa, numquam et nesciunt
-      suscipit porro cumque harum sed alias commodi autem dolore eum ratione
-      consectetur dignissimos! Quidem, quod! Alias dolore laudantium impedit sed
-      expedita, qui saepe. Incidunt hic neque alias eveniet laborum aperiam nam
-      error doloribus reprehenderit quaerat in exercitationem fuga, iste natus,
-      ex saepe unde vitae similique qui rem voluptatibus ipsam sequi accusantium
-      officiis? Tenetur est eveniet iure libero? Aut iste facilis eveniet, optio
-      dolorum ut ipsum ratione, iure ullam, corrupti quidem. Minima laborum
-      adipisci, aliquid exercitationem ut iure deleniti reiciendis repudiandae,
-      mollitia officia iusto sed numquam maxime quis necessitatibus neque
-      reprehenderit aut ducimus nihil labore! Est sequi minima in dolorum cumque
-      cupiditate, sunt, nisi architecto culpa reiciendis, laborum incidunt?
-      Enim, maxime, alias nobis vitae error voluptatem nostrum soluta
-      voluptatibus commodi quisquam reprehenderit velit sit fuga, earum minus ea
-      iusto. Porro accusantium ducimus necessitatibus suscipit nam iure
-      laboriosam exercitationem, corrupti est soluta cumque voluptatem ratione
-      ut, veniam voluptate praesentium sint nemo enim laudantium cupiditate?
-      Animi, ipsum maxime! Culpa omnis recusandae blanditiis quisquam nisi
-      asperiores perferendis, eligendi quibusdam quas quidem impedit explicabo.
-      Earum quae laborum nihil tempore aut voluptatum reprehenderit, ducimus
-      deserunt laudantium ab ut cum, enim perspiciatis doloremque similique!
-      Earum magnam nulla mollitia iste veritatis, nisi quos quaerat, architecto
-      molestias pariatur excepturi ratione unde illum necessitatibus. Sit maxime
-      aut, earum sunt soluta quas reprehenderit odit quis! Velit, tempora vero,
-      quo, dignissimos reprehenderit aliquid esse tenetur libero labore dolores
-      ipsum voluptatibus maxime accusantium quis eius porro autem commodi
-      facilis deserunt. Molestias, quas? Iure, vitae sunt voluptate non
-      reiciendis ex. Nulla alias velit quos est, quae laborum reprehenderit
-      cumque qui? Tempora veritatis velit aperiam voluptatum, quam aut autem?
-      Deleniti, vero ad.
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-20 mt-[70px]">
+      <div className="w-full mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 lg:p-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-gray-900 dark:text-white text-center">
+          Terms and Conditions
+        </h1>
+
+        {terms.length > 0 ? (
+          terms.map((item) => (
+            <div key={item.id} className="mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold mb-1 text-gray-900 dark:text-white">
+                {item.title}
+              </h2>
+              <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed whitespace-pre-line">
+                {item.content}
+              </p>
+              <p className="text-gray-500 dark:text-gray-400 text-xs mt-1 text-right">
+                Last updated: {new Date(item.last_update).toLocaleDateString()}
+              </p>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-700 dark:text-gray-300 text-sm">
+            No terms and conditions available at the moment.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -8,17 +8,14 @@ import CustomDropDownn from "../atoms/CustomDropDownn";
 import Input from "../atoms/Input";
 import React, { useEffect, useRef, useState } from "react";
 import useFormSubmit from "../../hooks/useFormSubmit";
-import useAuthStore from "../../store/authStore";
 import Toaster from "../molecules/Toaster";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import Note from "../molecules/Note";
 import { useForm } from "../../store/useRoomStore";
 import html2canvas from "html2canvas";
 import natureLogo from "../../assets/icons/naturelogo2.png";
 
 function BookWithoutSigningIn() {
-  const { user } = useAuthStore();
   const setShowForm = useForm((state) => state.setShowForm);
   const showForm = useForm((state) => state.showForm);
 
@@ -40,7 +37,10 @@ function BookWithoutSigningIn() {
     lastname: localStorage.getItem("lastname") || "",
     phone: localStorage.getItem("phone") || "",
     remember: localStorage.getItem("remember_info") === "true" ? true : false,
+    terms: false,
   });
+
+  console.log("bookingSummary : ", bookingSummary);
 
   const handleScreenshot = () => {
     const overlay = document.getElementById("overlay-message");
@@ -183,6 +183,13 @@ function BookWithoutSigningIn() {
   });
 
   const handleSubmitBooking = () => {
+    if (!form.terms) {
+      setToast({
+        message: "You must agree to the Terms & Conditions before proceeding.",
+        type: "message",
+      });
+      return;
+    }
     const nights = getNumberOfNights();
 
     const extrasTotal = addedExtras.reduce(
@@ -230,6 +237,10 @@ function BookWithoutSigningIn() {
 
     submit(payload);
   };
+
+  console.log("Name : ", form.firstname);
+  console.log("Name : ", form.lastname);
+  console.log("Phone : ", form.phone);
 
   // Function to handle adding selected extra to the list
   const handleAddExtra = () => {
@@ -350,8 +361,6 @@ function BookWithoutSigningIn() {
 
   const isSubmitDisabled =
     formLoading || !selectedRange.from || !selectedRange.to || nights === 0;
-
-  console.log("EXTRAS: ", extrasData);
 
   return (
     <>
@@ -687,13 +696,13 @@ function BookWithoutSigningIn() {
                     handleSubmitBooking();
                   }}
                 >
-                  <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="grid grid-cols-2 gap-4 mb-3">
                     <Input
                       label="Firstname"
                       name="firstname"
                       value={form.firstname}
                       onChange={handleChange}
-                      className="w-full"
+                      className="w-full text-sm"
                       required
                     />
                     <Input
@@ -701,7 +710,7 @@ function BookWithoutSigningIn() {
                       name="lastname"
                       value={form.lastname}
                       onChange={handleChange}
-                      className="w-full"
+                      className="w-full text-sm"
                       required
                     />
                   </div>
@@ -711,21 +720,21 @@ function BookWithoutSigningIn() {
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
-                    className="w-full mb-4"
+                    className="w-full mb-3 text-sm"
                     required
                   />
 
-                  <Input
+                  {/* <Input
                     label="Address"
                     name="address"
                     placeholder="Optional"
                     value={form.address}
                     onChange={handleChange}
-                    className="w-full mb-4"
-                  />
+                    className="w-full mb-3 text-sm"
+                  /> */}
 
                   {/* REMEMBER ME */}
-                  <div className="flex items-center mb-6">
+                  <div className="flex items-center mb-3 text-sm">
                     <input
                       type="checkbox"
                       id="remember"
@@ -739,19 +748,49 @@ function BookWithoutSigningIn() {
                         }))
                       }
                     />
-
                     <label
                       htmlFor="remember"
-                      className="ml-3 mt-2 block text-sm text-gray-700 select-none cursor-pointer"
+                      className="ml-2 select-none cursor-pointer text-gray-700 dark:text-gray-300"
                     >
                       Remember my info for next time
+                    </label>
+                  </div>
+
+                  {/* TERMS & CONDITIONS */}
+                  <div className="flex items-start mb-4 text-sm">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      name="terms"
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-1"
+                      checked={form.terms}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          terms: e.target.checked,
+                        }))
+                      }
+                      required
+                    />
+                    <label
+                      htmlFor="terms"
+                      className="ml-2 select-none cursor-pointer text-gray-700 dark:text-gray-300"
+                    >
+                      I have read and agree to the{" "}
+                      <a
+                        href="/terms"
+                        target="_blank"
+                        className="text-blue-600 underline hover:text-blue-800"
+                      >
+                        Terms & Conditions
+                      </a>
                     </label>
                   </div>
 
                   {/* SUBMIT BUTTON */}
                   <Button
                     type="submit"
-                    style="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300"
+                    style="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300 text-sm"
                     label={formLoading ? "Submitting..." : "Submit"}
                     disabled={formLoading}
                     onClick={handleSubmitBooking}
@@ -898,150 +937,6 @@ function BookWithoutSigningIn() {
                 >
                   📸Take Screenshot
                 </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* FORM MODAL WITH ADJUSTED WIDTH */}
-      {showForm === "add_user_details" && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
-          <div className="bg-white p-8 rounded-2xl shadow-xl w-[95%] max-w-5xl max-h-[98vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
-              Booking Details & Your Information
-            </h2>
-
-            <div className="flex flex-col md:flex-row md:gap-12">
-              {/* Summary - 60% width on md+ */}
-              <div className="md:w-3/5 mb-8 md:mb-0 pr-6 border-r border-gray-300">
-                {/* You can reuse your summary JSX here or a condensed version */}
-                {/* Example Dates Summary */}
-                <div className="grid grid-cols-3 gap-6 mb-6 text-gray-700">
-                  {/* Dates with border right on first two */}
-                  <div className="flex flex-col items-center border-r border-gray-300 pr-4">
-                    <span className="text-sm uppercase font-semibold mb-1">
-                      Check-In
-                    </span>
-                    <span className="text-lg font-medium">
-                      {selectedRange.from
-                        ? selectedRange.from.toLocaleDateString()
-                        : "—"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-center border-r border-gray-300 px-4">
-                    <span className="text-sm uppercase font-semibold mb-1">
-                      Check-Out
-                    </span>
-                    <span className="text-lg font-medium">
-                      {selectedRange.to
-                        ? selectedRange.to.toLocaleDateString()
-                        : "—"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-center pl-4">
-                    <span className="text-sm uppercase font-semibold mb-1">
-                      Nights
-                    </span>
-                    <span className="text-lg font-medium">{nights}</span>
-                  </div>
-                </div>
-
-                {/* Extras summary */}
-                {addedExtras.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b border-gray-300 pb-2">
-                      Amenities / Extras
-                    </h3>
-                    <ul className="list-disc list-inside space-y-1 text-gray-700 max-h-40 overflow-y-auto">
-                      {addedExtras.map((item) => (
-                        <li key={item.id} className="flex justify-between">
-                          <span>
-                            {item.name} (x{item.quantity})
-                          </span>
-                          <span className="font-semibold text-blue-600">
-                            ₱{(item.price * item.quantity).toLocaleString()}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Total Price */}
-                <div className="p-4 rounded-lg border border-gray-300 bg-gray-50 text-center font-bold text-xl text-gray-900">
-                  Total Price: ₱
-                  {grandTotal.toLocaleString("en-PH", {
-                    minimumFractionDigits: 2,
-                  })}
-                </div>
-              </div>
-
-              {/* Form - 40% width on md+ */}
-              <div className="md:w-2/5">
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSubmitBooking();
-                  }}
-                >
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <Input
-                      label="Firstname"
-                      name="firstname"
-                      value={form.firstname}
-                      onChange={handleChange}
-                      className="w-full"
-                      required
-                    />
-                    <Input
-                      label="Lastname"
-                      name="lastname"
-                      value={form.lastname}
-                      onChange={handleChange}
-                      className="w-full"
-                      required
-                    />
-                  </div>
-
-                  <Input
-                    label="Phone"
-                    name="phone"
-                    value={form.phone}
-                    onChange={handleChange}
-                    className="w-full mb-4"
-                    required
-                  />
-
-                  <div className="flex items-center mb-6">
-                    <input
-                      type="checkbox"
-                      id="remember"
-                      name="remember"
-                      className="h-5 w-5 rounded border-gray-300 focus:ring-blue-500"
-                      checked={form.remember}
-                      onChange={(e) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          remember: e.target.checked,
-                        }))
-                      }
-                    />
-                    <label
-                      htmlFor="remember"
-                      className="ml-3 mt-2 block text-sm text-gray-700 select-none cursor-pointer"
-                    >
-                      Remember my info for next time
-                    </label>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    style="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300"
-                    label={formLoading ? "Submitting..." : "Done"}
-                    disabled={formLoading}
-                  />
-                </form>
               </div>
             </div>
           </div>

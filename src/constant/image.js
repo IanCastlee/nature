@@ -37,6 +37,10 @@ import fourth from "../assets/icons/meeting.png";
 import fith from "../assets/icons/deal.png";
 import sixth from "../assets/icons/eco-friendly.png";
 
+//about
+import mission from "../assets/images/mission.jpg";
+import promise from "../assets/images/promise.jpg";
+
 export const images = {
   first,
   second,
@@ -52,6 +56,8 @@ export const images = {
   // hero2_m,
   // hero3_m,
 
+  mission,
+  promise,
   aboutbg,
   messageIcons,
   announcement,

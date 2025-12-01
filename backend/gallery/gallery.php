@@ -4,63 +4,27 @@ include("../dbConn.php");
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Allow JSON body (Axios sends JSON by default)
-if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
+// Allow JSON body
+if ($method === "POST" && isset($_SERVER["CONTENT_TYPE"]) && strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
     $input = json_decode(file_get_contents("php://input"), true);
     if (is_array($input)) {
         $_POST = array_merge($_POST, $input);
     }
 }
 
-// -------------------------
-// HANDLE POST UPLOAD
-// -------------------------
+//
+//  UPLOAD IMAGES WITH CAPTION
+//
 if ($method === "POST" && isset($_FILES) && !empty($_FILES)) {
-    $userId = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
-
-    if ($userId <= 0) {
-        echo json_encode(["success" => false, "message" => "Invalid user ID."]);
-        exit;
-    }
-
-    // Check existing uploaded images for this user
-    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM gallery WHERE user_id = ?");
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-    $existingCount = intval($row['count']);
-    $stmt->close();
-
-    $maxLimit = 5;
-    $fileCount = count($_FILES);
-
-    if ($existingCount >= $maxLimit) {
-        echo json_encode([
-            "success" => false,
-            "message" => "You have reached the maximum upload limit of {$maxLimit} images."
-        ]);
-        exit;
-    }
-
-    if ($existingCount + $fileCount > $maxLimit) {
-        echo json_encode([
-            "success" => false,
-            "message" => "You can upload only " . ($maxLimit - $existingCount) . " more images."
-        ]);
-        exit;
-    }
-
-    if ($fileCount < 1) {
-        echo json_encode(["success" => false, "message" => "Please upload at least 1 image."]);
-        exit;
-    }
-
     $uploadDir = "../uploads/gallery/";
+    if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
     $uploadedFiles = [];
+    $index = 0;
 
     foreach ($_FILES as $file) {
         if ($file['error'] === UPLOAD_ERR_OK) {
+
             $tmpName = $file['tmp_name'];
             $filename = basename($file['name']);
             $uniqueFilename = time() . "_" . uniqid() . "_" . $filename;
@@ -69,16 +33,25 @@ if ($method === "POST" && isset($_FILES) && !empty($_FILES)) {
             if (move_uploaded_file($tmpName, $targetPath)) {
                 $datePosted = date("Y-m-d H:i:s");
 
-                $stmt = $conn->prepare("INSERT INTO gallery (user_id, image, date_posted, status) VALUES (?, ?, ?, 'pending')");
-                $stmt->bind_param("iss", $userId, $uniqueFilename, $datePosted);
+                // caption0, caption1...
+                $captionKey = "caption" . $index;
+                $caption = isset($_POST[$captionKey]) ? $_POST[$captionKey] : null;
+
+                $stmt = $conn->prepare("INSERT INTO gallery (image, caption, date_posted, status) VALUES (?, ?, ?, 'posted')");
+                $stmt->bind_param("sss", $uniqueFilename, $caption, $datePosted);
                 $stmt->execute();
                 $stmt->close();
 
-                $uploadedFiles[] = $uniqueFilename;
+                $uploadedFiles[] = [
+                    "image" => $uniqueFilename,
+                    "caption" => $caption,
+                    "date_posted" => $datePosted,
+                    "status" => "pending"
+                ];
             } else {
                 echo json_encode([
                     "success" => false,
-                    "message" => "Failed to move uploaded file: " . $filename
+                    "message" => "Failed to upload " . $filename
                 ]);
                 exit;
             }
@@ -89,6 +62,7 @@ if ($method === "POST" && isset($_FILES) && !empty($_FILES)) {
             ]);
             exit;
         }
+        $index++;
     }
 
     echo json_encode([
@@ -99,93 +73,68 @@ if ($method === "POST" && isset($_FILES) && !empty($_FILES)) {
     exit;
 }
 
-// -------------------------
-// HANDLE ACTION REQUESTS (approve / reject / set inactive)
-// -------------------------
-if ($method === "POST" && isset($_POST['action'])) {
-    $action = $_POST['action'];
-    $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+//
+//  DELETE IMAGE
+//
+if ($method === "POST" && isset($_POST['action']) && $_POST['action'] === "set_delete") {
+    $id = intval($_POST['id']);
 
-    if ($id <= 0) {
-        echo json_encode(["success" => false, "message" => "Invalid ID."]);
-        exit;
-    }
+    // Fetch image name
+    $stmt = $conn->prepare("SELECT image FROM gallery WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $imageData = $result->fetch_assoc();
+    $stmt->close();
 
-    if ($action === "set_approve") {
-        $stmt = $conn->prepare("UPDATE gallery SET status = 'posted' WHERE id = ?");
+    if ($imageData) {
+        $imagePath = "../uploads/gallery/" . $imageData['image'];
+
+        if (file_exists($imagePath)) {
+            unlink($imagePath);
+        }
+
+        $stmt = $conn->prepare("DELETE FROM gallery WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
-        if ($stmt->affected_rows > 0) {
-            echo json_encode(["success" => true, "message" => "Post approved successfully."]);
-        } else {
-            echo json_encode(["success" => false, "message" => "No changes made or post not found."]);
-        }
-        $stmt->close();
+
+        echo json_encode(["success" => true, "message" => "Image deleted successfully."]);
         exit;
     }
 
-    if ($action === "set_reject") {
-        $stmt = $conn->prepare("UPDATE gallery SET status = 'rejected' WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        if ($stmt->affected_rows > 0) {
-            echo json_encode(["success" => true, "message" => "Post rejected successfully."]);
-        } else {
-            echo json_encode(["success" => false, "message" => "No changes made or post not found."]);
-        }
-        $stmt->close();
-        exit;
-    }
-
-    if ($action === "set_inactive") {
-        $stmt = $conn->prepare("UPDATE gallery SET status = 'inactive' WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        if ($stmt->affected_rows > 0) {
-            echo json_encode(["success" => true, "message" => "Post set to inactive."]);
-        } else {
-            echo json_encode(["success" => false, "message" => "No changes made or post not found."]);
-        }
-        $stmt->close();
-        exit;
-    }
-
-    echo json_encode(["success" => false, "message" => "Unknown action."]);
+    echo json_encode(["success" => false, "message" => "Image not found."]);
     exit;
 }
 
-// -------------------------
-// HANDLE GET IMAGES (posted / pending)
-// -------------------------
+//
+//  GET IMAGES
+//
 if ($method === "GET") {
-    $status = isset($_GET['status']) ? $_GET['status'] : '';
+    $status = isset($_GET['status']) ? $_GET['status'] : "";
 
-    if (in_array($status, ['posted', 'pending'])) {
-        $stmt = $conn->prepare("
-            SELECT g.*, u.firstname, u.lastname 
-            FROM gallery AS g 
-            JOIN users AS u ON g.user_id = u.user_id 
-            WHERE g.status = ? 
-            ORDER BY g.date_posted DESC
-        ");
+    if ($status) {
+        $stmt = $conn->prepare("SELECT * FROM gallery WHERE status = ? ORDER BY date_posted DESC");
         $stmt->bind_param("s", $status);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        $images = [];
-        while ($row = $result->fetch_assoc()) {
-            $row['image_url'] = "../uploads/gallery/" . $row['image'];
-            $images[] = $row;
-        }
-
-        echo json_encode([
-            "success" => true,
-            "data" => $images
-        ]);
-        exit;
+    } else {
+        $stmt = $conn->prepare("SELECT * FROM gallery ORDER BY date_posted DESC");
     }
 
-    echo json_encode(["success" => false, "message" => "Invalid GET request"]);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $list = [];
+    while ($row = $result->fetch_assoc()) {
+        $row["image_url"] = "../uploads/gallery/" . $row["image"];
+        $list[] = $row;
+    }
+
+    echo json_encode([
+        "success" => true,
+        "data" => $list
+    ]);
     exit;
 }
+
+echo json_encode(["success" => false, "message" => "Invalid request"]);
+exit;
 ?>

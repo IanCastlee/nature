@@ -196,7 +196,6 @@ function AdminBookingFhApproved() {
       {approveItem?.id && (
         <DeleteModal
           item={approveItem}
-          name={approveItem?.firstname}
           loading={approveLoading}
           onCancel={() => {
             setApproveItem(null);

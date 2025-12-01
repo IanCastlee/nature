@@ -102,34 +102,27 @@ export const menuItems = [
     ],
   },
 
-  {
-    name: "Users",
-    icon: icons.LuUsers,
-    children: [
-      {
-        name: "Verified Users",
-        to: "/admin/verified-users",
-      },
-      {
-        name: "Not-Verified Users",
-        to: "/admin/notverified-users",
-      },
-    ],
-  },
+  // {
+  //   name: "Users",
+  //   icon: icons.LuUsers,
+  //   children: [
+  //     {
+  //       name: "Verified Users",
+  //       to: "/admin/verified-users",
+  //     },
+  //     {
+  //       name: "Not-Verified Users",
+  //       to: "/admin/notverified-users",
+  //     },
+  //   ],
+  // },
+
   {
     name: "Gallery",
+    to: "/admin/pending-post",
     icon: icons.GoImage,
-    children: [
-      {
-        name: "Pending",
-        to: "/admin/pending-post",
-      },
-      {
-        name: "Posted",
-        to: "/admin/posted-post",
-      },
-    ],
   },
+
   {
     name: "Announcement",
     icon: icons.VscMegaphone,
@@ -144,26 +137,28 @@ export const menuItems = [
       },
     ],
   },
+
   {
-    name: "Analytics",
-    to: "/admin/analytics",
-    icon: icons.GrAnalytics,
+    name: "Terms and Conditions",
+    icon: icons.VscMegaphone,
+    children: [
+      {
+        name: "Active Terms",
+        to: "/admin/terms",
+      },
+      {
+        name: "History",
+        to: "/admin/announcement-history",
+      },
+    ],
   },
+
   {
     name: "Settings",
     to: "/admin/setting",
     icon: icons.IoSettingsOutline,
-    children: [
-      {
-        name: "Active Rooms",
-        to: "/admin/room3",
-      },
-      {
-        name: "Inactive Rooms",
-        to: "/admin/rooms33",
-      },
-    ],
   },
+
   {
     name: "Logout",
     action: "logout",

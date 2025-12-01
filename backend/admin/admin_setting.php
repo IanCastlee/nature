@@ -9,9 +9,12 @@ header('Content-Type: application/json');
 try {
     if ($method === 'POST') {
 
+        // ------------------- Read JSON input -------------------
+        $input = json_decode(file_get_contents('php://input'), true);
+
         // ------------------- Delete Hero Image -------------------
-        if (isset($_POST['delete_hero_id'])) {
-            $delete_id = intval($_POST['delete_hero_id']);
+        if (!empty($input['delete_hero_id'])) {
+            $delete_id = intval($input['delete_hero_id']);
 
             // Get the file name from DB
             $stmt = $conn->prepare("SELECT image FROM hero_images WHERE id=?");
@@ -24,7 +27,9 @@ try {
                 $file = "../uploads/hero/" . $row['image'];
 
                 // Delete file from filesystem
-                if (file_exists($file)) unlink($file);
+                if (file_exists($file)) {
+                    unlink($file);
+                }
 
                 // Delete from database
                 $stmt = $conn->prepare("DELETE FROM hero_images WHERE id=?");
@@ -46,11 +51,11 @@ try {
         }
 
         // ------------------- Normal Update -------------------
-        $hero_heading = $_POST['hero_heading'] ?? '';
-        $hero_subheading = $_POST['hero_subheading'] ?? '';
-        $email = $_POST['email'] ?? '';
-        $globe_no = $_POST['globe_no'] ?? '';
-        $smart_no = $_POST['smart_no'] ?? '';
+        $hero_heading   = $input['hero_heading'] ?? '';
+        $hero_subheading = $input['hero_subheading'] ?? '';
+        $email          = $input['email'] ?? '';
+        $globe_no       = $input['globe_no'] ?? '';
+        $smart_no       = $input['smart_no'] ?? '';
 
         // ------------------- Logo Upload -------------------
         $logoPath = null;

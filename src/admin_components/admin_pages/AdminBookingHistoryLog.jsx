@@ -174,8 +174,8 @@ function AdminBookingHistoryLog() {
             setApproveItem(null);
             setApproveAction("");
           }}
-          label="Yes, Back to Approved"
-          label2="approved"
+          label="Yes, Move Back to Approved"
+          label2="back_approved"
           label3="Are you sure you want to move this booking back to approved?"
           onConfirm={() =>
             setInactive({

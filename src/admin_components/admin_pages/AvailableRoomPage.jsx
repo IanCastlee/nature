@@ -424,7 +424,7 @@ function AvailableRoomPage() {
       capacity: "",
       duration: "",
       description: "",
-      images: [], // ✅ clear multiple images
+      images: [],
       photo_sphere: null,
     });
   };
@@ -536,10 +536,9 @@ function AvailableRoomPage() {
           name={deleteItem.room_name}
           loading={inactiveLoading}
           onCancel={() => setDeleteItem(null)}
-          label="Yes, Set as unavailable"
+          label="Yes, Set as Unavailable"
           label2="unavailable"
-          label3=" This will make this room unavailable, but not delete it
-            permanently."
+          label3="This will mark this room as unavailable, but it will not be deleted permanently."
           onConfirm={() => {
             setInactive({
               id: deleteItem?.room_id,

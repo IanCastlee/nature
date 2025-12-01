@@ -39,6 +39,7 @@ function OtherFacilitiesBookingPage() {
     lastname: localStorage.getItem("lastname") || "",
     phone: localStorage.getItem("phone") || "",
     remember: localStorage.getItem("remember_info") === "true" ? true : false,
+    terms: false,
   });
 
   const handleChange = (e) => {
@@ -66,8 +67,6 @@ function OtherFacilitiesBookingPage() {
     setStartTime("");
     setSelectedDate(null);
   });
-
-  console.log("FORM ERROR : ", formError);
 
   const {
     data: notAvailableDatesTime,
@@ -133,6 +132,14 @@ function OtherFacilitiesBookingPage() {
   const { image, name, price, capacity, duration } = fhDetails;
 
   const handleBooking = () => {
+    if (!form.terms) {
+      setToast({
+        message: "You must agree to the Terms & Conditions before proceeding.",
+        type: "message",
+      });
+      return;
+    }
+
     if (!selectedDate || !startTime) {
       setToast({
         message: "Please complete all booking fields.",
@@ -438,6 +445,37 @@ function OtherFacilitiesBookingPage() {
                       className="ml-3 mt-2 block text-sm text-gray-700 select-none cursor-pointer"
                     >
                       Remember my info for next time
+                    </label>
+                  </div>
+
+                  {/* TERMS & CONDITIONS */}
+                  <div className="flex items-start mb-4 text-sm">
+                    <input
+                      type="checkbox"
+                      id="terms"
+                      name="terms"
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-1"
+                      checked={form.terms}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          terms: e.target.checked,
+                        }))
+                      }
+                      required
+                    />
+                    <label
+                      htmlFor="terms"
+                      className="ml-2 select-none cursor-pointer text-gray-700 dark:text-gray-300"
+                    >
+                      I have read and agree to the{" "}
+                      <a
+                        href="/terms"
+                        target="_blank"
+                        className="text-blue-600 underline hover:text-blue-800"
+                      >
+                        Terms & Conditions
+                      </a>
                     </label>
                   </div>
 

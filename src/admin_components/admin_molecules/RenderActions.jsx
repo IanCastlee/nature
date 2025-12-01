@@ -264,10 +264,10 @@ export const renderActionsBookingHistory = ({
     <div className="flex flex-row gap-2 items-center justify-end">
       <button
         onClick={() => onSetArrived(item)}
-        className="bg-blue-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center ml-4"
+        className="bg-blue-500 text-white w-auto h-[27px] rounded-sm flex justify-center items-center mr-4 ml-2 px-2 text-sm"
         title="Set as arrived"
       >
-        <icons.IoMdCheckmarkCircleOutline />
+        Arrived <icons.IoMdCheckmarkCircleOutline />
       </button>
       <button
         onClick={() => onSetPending(item)}
@@ -316,8 +316,7 @@ export const renderActionsBookingHistoryLog = ({
 //render action fh booking
 export const renderActionsFhBooking = ({
   item,
-  showForm,
-  onSetInactive,
+
   onSetViewCottageDetails,
   onSetApprove,
   onSetDeClined,
@@ -329,7 +328,7 @@ export const renderActionsFhBooking = ({
         <div className="flex flex-row items-center gap-2">
           <button
             onClick={() => onSetApprove(item)}
-            className="bg-yellow-600 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center items-center"
+            className="bg-yellow-600 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center  items-center"
             title="Approve"
           >
             Approve
@@ -363,23 +362,18 @@ export const renderActionsFhBooking = ({
 //render action fh booking
 export const renderActionsFhBookingApproved = ({
   item,
-  showForm,
-  onSetInactive,
   onSetArrived,
   onSetPending,
   onSetViewCottageDetails,
-  onSetApprove,
-  onSetDeClined,
-  isNotAvailablePage,
 }) => {
   return (
     <div className="flex items-center justify-end gap-2">
       <button
         onClick={() => onSetArrived(item)}
-        className="bg-blue-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center ml-4"
+        className="bg-blue-500 text-white w-auto h-[27px] rounded-sm flex justify-center items-center mr-4 ml-2 px-2 text-xs"
         title="Set as arrived"
       >
-        <icons.IoMdCheckmarkCircleOutline />
+        Mark as Arrived <icons.IoMdCheckmarkCircleOutline className="ml-1" />
       </button>
       <button
         onClick={() => onSetPending(item)}
@@ -438,7 +432,7 @@ export const renderActionsFhBookingArrived = ({
 export const renderActionsGallery = ({
   item,
   onSetReject,
-  onSetApprove,
+  onSetDelete,
   isNotAvailablePage,
 }) => {
   return (
@@ -446,25 +440,13 @@ export const renderActionsGallery = ({
       <div className="flex flex-row items-center gap-2">
         {!isNotAvailablePage && (
           <button
-            onClick={() => onSetApprove(item)}
-            className="bg-yellow-600 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center items-center"
+            onClick={() => onSetDelete(item)}
+            className="bg-red-600 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center items-center"
             title="Approve"
           >
-            Approve
+            Delete
           </button>
         )}
-
-        <button
-          onClick={() => onSetReject(item)}
-          className="bg-red-500 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center items-center "
-          title={
-            isNotAvailablePage?.isNotAvailablePage
-              ? "Set as available"
-              : "Set as not in-active"
-          }
-        >
-          Reject
-        </button>
       </div>
     </div>
   );

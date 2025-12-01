@@ -20,9 +20,7 @@ function ImageCard({ item }) {
         />
 
         <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 hover:opacity-100 transition duration-300 flex flex-col justify-end p-2">
-          <h2 className="text-white text-sm sm:text-base">
-            {`${item.firstname} ${item.lastname}`}
-          </h2>
+          <h2 className="text-white text-xs sm:text-base">{item.caption}</h2>
           <p className="text-white text-xs sm:text-sm">{item.date_posted}</p>
         </div>
       </div>

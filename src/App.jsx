@@ -60,6 +60,7 @@ import AdminBookingHistoryLog from "./admin_components/admin_pages/AdminBookingH
 import FunctionHallBooking from "./components/pages/FunctionHallBooking";
 import AdminFhBookingArrived from "./admin_components/admin_pages/AdminFhBookingArrived";
 import AdminSetting from "./admin_components/admin_pages/AdminSetting";
+import AdminTermsAndConditions from "./admin_components/admin_pages/AdminTermsAndConditions";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -219,6 +220,8 @@ const AdminLayout = () => {
             path="/announcement-history"
             element={<AdminAnnouncementHistory />}
           />
+
+          <Route path="/terms" element={<AdminTermsAndConditions />} />
         </Routes>
       </main>
     </div>

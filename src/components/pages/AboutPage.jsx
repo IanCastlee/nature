@@ -1,7 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import { images } from "../../constant/image";
-import { motion, useInView } from "framer-motion";
-import Animation from "../molecules/Animation";
 import Blur from "../molecules/Blur";
 import SubtTitle from "../molecules/SubtTitle";
 function AboutPage() {
@@ -69,7 +67,7 @@ function AboutPage() {
 
         <article className="flex flex-col md:flex-row-reverse lg:flex-row-reverse gap-4">
           <img
-            src={images.aboutbg}
+            src={images.mission}
             alt="Hot spring pools"
             className="h-[250px] object-cover w-[100%] rounded-lg"
           />
@@ -93,7 +91,7 @@ function AboutPage() {
 
         <article className="flex flex-col md:flex-row lg:flex-row gap-4">
           <img
-            src={images.aboutbg}
+            src={images.promise}
             alt="Resort entrance"
             className="h-[250px] object-cover w-[100%] rounded-lg"
           />

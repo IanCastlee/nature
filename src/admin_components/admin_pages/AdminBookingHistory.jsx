@@ -194,20 +194,20 @@ function AdminBookingHistory() {
             setApproveAction("");
           }}
           label={
-            approveAction === "set_pending"
-              ? "Yes, Back to pending"
-              : "Yes, Mark as Arrived"
+            approveAction === "set_arrived"
+              ? "Yes, Mark as Arrived"
+              : "Yes, Move to Pending"
           }
-          label2={approveAction === "set_pending" ? "pending" : "arrived"}
+          label2={approveAction === "set_arrived" ? "arrived" : "pending"}
           label3={
-            approveAction === "set_pending"
-              ? "Are you sure you want to back this booking to pending?"
-              : "Are you sure you want to mark this booking as arrived?"
+            approveAction === "set_arrived"
+              ? "Are you sure you want to mark this booking as arrived?"
+              : "Are you sure you want to move this booking back to pending?"
           }
           onConfirm={() => {
             setInactive({
               id: approveItem?.booking_id,
-              action: approveAction, // DYNAMIC ACTION
+              action: approveAction,
             });
           }}
         />

@@ -11,8 +11,6 @@ function Footer() {
     `/admin/admin_setting.php`
   );
 
-  console.log("DATA : ", data);
-
   return (
     <footer className="w-full bg-slate-50 dark:bg-gray-950 border-t-[1px] dark:border-gray-900">
       <div className="flex flex-row lg:flex-row justify-between  px-2 md:px-4 lg:px-[100px] py-6 flex-wrap">
@@ -48,14 +46,30 @@ function Footer() {
             QUICK LINKS
           </h3>
 
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
+          <Link
+            to="/"
+            className="dark:text-white text-sm flex flex-row items-center gap-3"
+          >
             Home
           </Link>
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
+          <Link
+            to="/about"
+            className="dark:text-white text-sm flex flex-row items-center gap-3"
+          >
             About
           </Link>
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
+          <Link
+            to="/contact"
+            className="dark:text-white text-sm flex flex-row items-center gap-3"
+          >
             Contact
+          </Link>
+          {/* Add Terms and Conditions link */}
+          <Link
+            to="/terms"
+            className="dark:text-white text-sm flex flex-row items-center gap-3"
+          >
+            Terms & Conditions
           </Link>
         </div>
 

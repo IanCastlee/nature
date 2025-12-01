@@ -13,17 +13,33 @@ function DeleteModal({
   onConfirm,
 }) {
   // Determine message text
-  const message =
-    label2 === "approve post"
-      ? "Approve this post?"
-      : `${
-          label && label !== "Yes, Approve"
-            ? "You are about to set"
-            : "Are you sure you want to set"
-        } 
-        ${name ? ` ${name}` : ""}${
-          label && label !== "Yes, Approve" ? " as" : "'s"
-        } ${label2}`;
+  const message = (() => {
+    switch (label2) {
+      case "approve this booking":
+        return "Are you sure you want to approve this booking?";
+
+      case "decline this booking":
+        return "Are you sure you want to decline this booking?";
+
+      case "arrived":
+        return name
+          ? `You are about to mark ${name}'s booking as arrived.`
+          : "You are about to mark this booking as arrived.";
+
+      case "pending":
+        return name
+          ? `You are about to move ${name}'s booking back to pending.`
+          : "You are about to move this booking back to pending.";
+
+      case "back_approved":
+        return name
+          ? `You are about to move ${name}'s booking back to approved.`
+          : "You are about to move this booking back to approved.";
+
+      default:
+        return "Are you sure you want to continue?";
+    }
+  })();
 
   return (
     <div className="w-full h-screen bg-black/10 flex justify-center items-start pt-10 fixed inset-0 z-50">
@@ -55,7 +71,10 @@ function DeleteModal({
             disabled={loading}
             onClick={onConfirm}
             className={`h-[28px] px-2 ${
-              label === "Yes, Approve" || label2 === "approve post"
+              label === "Yes, Approve" ||
+              label2 === "approve post" ||
+              label2 === "arrived" ||
+              label2 === "active"
                 ? "bg-green-600"
                 : "bg-red-500"
             } text-xs text-white font-medium rounded-md w-auto hover:bg-gray-600`}

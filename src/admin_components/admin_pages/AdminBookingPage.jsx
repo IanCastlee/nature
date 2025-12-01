@@ -191,7 +191,7 @@ function AdminBookingPage() {
           loading={approveLoading}
           onCancel={() => setApproveItem(null)}
           label="Yes, Approve"
-          label2="booking as approve"
+          label2="approve this booking"
           label3="Are you sure you want to approve this booking?"
           onConfirm={() => {
             setInactive({
@@ -211,14 +211,14 @@ function AdminBookingPage() {
           onCancel={() => setDeclinedItem(null)}
           label="Yes, Decline"
           label2="decline this booking"
-          label3={`Are you sure you want to decline this booking?`}
+          label3="Are you sure you want to decline this booking?"
           onConfirm={() => {
             setDeclined({
               id: declinedItem?.booking_id,
               action: "set_decline",
             });
             setToast({
-              message: "Booking has been declined",
+              message: "The booking has been declined.",
               type: "success",
             });
           }}

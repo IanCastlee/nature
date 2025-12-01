@@ -297,7 +297,7 @@ export const fhbooking = [
     key: "date",
   },
   {
-    title: "Start Time(mt)",
+    title: "Start Time(AM)",
     key: "start_time",
   },
   // {
@@ -333,7 +333,7 @@ export const fhbookingApproved = [
     key: "date",
   },
   {
-    title: "Start Time(mt)",
+    title: "Start Time(AM)",
     key: "start_time",
   },
 
@@ -365,7 +365,7 @@ export const fhbookingDeclined = [
     key: "date",
   },
   {
-    title: "Start Time(mt)",
+    title: "Start Time(AM)",
     key: "start_time",
   },
 
@@ -376,8 +376,6 @@ export const fhbookingDeclined = [
     key: "status",
   },
 ];
-
-//function hall history booking
 
 //function hall declined booking
 export const fhbookingHistory = [
@@ -398,7 +396,7 @@ export const fhbookingHistory = [
     key: "date",
   },
   {
-    title: "Start Time(mt)",
+    title: "Start Time(AM)",
     key: "start_time",
   },
 
@@ -411,11 +409,6 @@ export const fhbookingHistory = [
 ];
 //gallery
 export const galleryColumn = [
-  {
-    title: "Posted By",
-    key: "fullname",
-    render: (item) => `${item.firstname} ${item.lastname}`,
-  },
   {
     title: "Post",
     key: "image",
@@ -437,6 +430,10 @@ export const galleryColumn = [
         </div>
       </div>
     ),
+  },
+  {
+    title: "Caption",
+    key: "caption",
   },
   {
     title: "Date Posted",
@@ -464,6 +461,27 @@ export const announcementColumn = [
   {
     title: "Date Posted",
     key: "createdAt",
+    width: "150px",
+    className: "text-center",
+  },
+];
+
+//terms and conditions column
+export const termsAndConditionsColumn = [
+  {
+    title: "Title",
+    key: "title",
+    width: "180px",
+    className: "truncate",
+  },
+  {
+    title: "Content",
+    key: "content",
+    className: "whitespace-pre-line break-words",
+  },
+  {
+    title: "Last Update",
+    key: "last_update",
     width: "150px",
     className: "text-center",
   },
