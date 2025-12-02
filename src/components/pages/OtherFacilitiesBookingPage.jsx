@@ -242,85 +242,105 @@ function OtherFacilitiesBookingPage() {
       )}
 
       <div className="w-full dark:bg-black">
-        <div className="w-full flex flex-row">
-          {/* Left - Image */}
+        <div className="w-full flex flex-col md:flex-col lg:flex-row">
+          {/* LEFT IMAGE SECTION */}
           <LazyLoadImage
             src={`${uploadUrl.uploadurl}/function_hall/${image}`}
             alt="Facility image"
             effect="blur"
-            wrapperClassName="w-1/2 h-screen"
-            className="w-full h-full object-cover"
+            wrapperClassName="
+        w-full 
+        lg:w-1/2 
+        h-[280px] 
+        md:h-[350px] 
+        lg:h-screen
+      "
+            className="w-full h-full object-cover rounded-b-lg lg:rounded-none"
           />
 
-          {/* Right - Booking Form */}
-          <div className="w-1/2 p-6 overflow-y-auto h-screen">
-            <div className="w-full flex flex-row justify-between items-center mb-5 pb-1 border-b dark:border-gray-600 border-gray-300">
-              <h2 className="font-semibold text-sm dark:text-gray-200 text-gray-800">
+          {/* RIGHT PANEL */}
+          <div
+            className="
+      w-full 
+      lg:w-1/2 
+      p-5 
+      md:p-8 
+      lg:p-10 
+      overflow-y-auto 
+      lg:h-screen 
+      bg-white 
+      dark:bg-gray-900
+    "
+          >
+            {/* HEADER */}
+            <div className="w-full flex flex-row justify-between items-center mb-6 pb-2 border-b dark:border-gray-700 border-gray-300">
+              <h2 className="font-semibold text-base md:text-lg dark:text-gray-200 text-gray-800">
                 Facility Details
               </h2>
-              <div className="flex flex-row items-center gap-10">
+
+              <div className="flex items-center gap-3 md:gap-6 lg:gap-8">
                 <Button
                   onClick={handlePreviousRoom}
                   label={
                     <>
                       <icons.BsArrowRight className="transform -scale-x-100" />
-                      Previous Room
+                      Previous
                     </>
                   }
-                  style="flex flex-row items-center gap-1 text-sm text-blue-500 font-medium rounded-sm px-2 transition-all duration-300 transform hover:scale-105 mb-4"
+                  style="flex items-center gap-1 text-sm text-blue-500 font-medium rounded px-2 py-1 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
                 />
                 <Button
                   onClick={handleNextRoom}
                   label={
                     <>
-                      Next Room
-                      <icons.BsArrowRight />
+                      Next <icons.BsArrowRight />
                     </>
                   }
-                  style="flex flex-row items-center gap-1 text-sm text-blue-500 font-medium rounded-sm px-2 transition-all duration-300 transform hover:scale-105 mb-4"
+                  style="flex items-center gap-1 text-sm text-blue-500 font-medium rounded px-2 py-1 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
                 />
               </div>
             </div>
 
-            <h1 className="text-3xl dark:text-white text-gray-800 font-semibold">
+            {/* TITLE AND BASIC INFO */}
+            <h1 className="text-2xl md:text-3xl dark:text-white text-gray-800 font-bold">
               {name}
             </h1>
-            <p className="text-lg dark:text-white text-gray-800 font-normal">
+
+            <p className="text-base md:text-lg dark:text-gray-300 text-gray-800 mt-1">
               Price: ₱{price} / per {duration} hours
             </p>
-            <p className="text-lg dark:text-white text-gray-800 font-normal">
+            <p className="text-base md:text-lg dark:text-gray-300 text-gray-800">
               Capacity: {capacity} persons
             </p>
 
-            <div className="mt-6">
-              <h3 className="text-xl font-semibold text-gray-700 dark:text-white mb-2">
+            {/* BOOKING SECTION */}
+            <div className="mt-8">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-700 dark:text-white mb-3">
                 Book This Facility
               </h3>
 
-              <div className="flex flex-row gap-6">
-                {/* Date Picker */}
-                <div>
+              {/* DATE + TIME ROW */}
+              <div className="w-full flex flex-col sm:flex-row gap-6">
+                {/* DATE PICKER */}
+                <div className="flex-1">
                   <label className="block mb-1 text-sm text-gray-600 dark:text-gray-300">
                     Select Date:
                   </label>
 
-                  <div className="scale-90 md:scale-100 w-fit border p-2 rounded-lg">
+                  <div className="border rounded-lg p-2 bg-white dark:bg-gray-800 shadow-sm">
                     <DayPicker
                       mode="single"
                       selected={selectedDate}
                       onSelect={setSelectedDate}
                       required
-                      disabled={[
-                        { before: new Date() }, // Disable past
-                        ...disabledDates, // Disable booked
-                      ]}
+                      disabled={[{ before: new Date() }, ...disabledDates]}
                     />
                   </div>
                 </div>
 
-                {/* Time Input */}
-                <div>
-                  <label className="block mt-4 mb-1 text-sm text-gray-600 dark:text-gray-300">
+                {/* TIME INPUT */}
+                <div className="sm:w-[40%] w-full">
+                  <label className="block mb-1 text-sm text-gray-600 dark:text-gray-300">
                     Start Time:
                   </label>
                   <input
@@ -329,17 +349,31 @@ function OtherFacilitiesBookingPage() {
                     min="05:00"
                     max="21:59"
                     onChange={(e) => setStartTime(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded dark:bg-gray-800 dark:text-white"
+                    className="
+                w-full p-3 
+                border dark:border-gray-700 
+                rounded-md 
+                dark:bg-gray-800 
+                dark:text-white 
+                shadow-sm
+              "
                   />
                 </div>
               </div>
 
-              {/* Book Button */}
+              {/* BOOK NOW BUTTON */}
               <button
-                // onClick={handleBooking}
                 onClick={() => setShowForm("add_user_details")}
                 disabled={formLoading || startTime === "" || !selectedDate}
-                className="mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded disabled:opacity-50"
+                className="
+            mt-6 
+            bg-blue-600 hover:bg-blue-700 
+            text-white font-semibold 
+            w-full sm:w-auto 
+            px-6 py-3 rounded-lg 
+            shadow-md disabled:opacity-50 
+            transition-all
+          "
               >
                 {formLoading ? "Booking..." : "Book Now"}
               </button>

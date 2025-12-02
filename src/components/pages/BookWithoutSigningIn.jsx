@@ -346,9 +346,9 @@ function BookWithoutSigningIn() {
     withExtras,
   } = roomDetails;
 
-  const parsedAmenities = amenities?.split(",") || [];
-  const parsedInclusions = inclusion?.split(",") || [];
-  const parsedExtras = extrasData?.data || [];
+  // const parsedAmenities = amenities?.split(",") || [];
+  // const parsedInclusions = inclusion?.split(",") || [];
+  // const parsedExtras = extrasData?.data || [];
 
   const nights = getNumberOfNights();
   const roomTotal = nights * Number(price);
@@ -361,6 +361,10 @@ function BookWithoutSigningIn() {
 
   const isSubmitDisabled =
     formLoading || !selectedRange.from || !selectedRange.to || nights === 0;
+
+  const removeExtra = (index) => {
+    setAddedExtras((prev) => prev.filter((_, i) => i !== index));
+  };
 
   return (
     <>
@@ -547,16 +551,26 @@ function BookWithoutSigningIn() {
 
                       <ul className="text-xs text-gray-800 dark:text-gray-200 space-y-1 list-disc ml-4">
                         {addedExtras.map((extra, idx) => (
-                          <li key={idx}>
-                            {extra.name} x {extra.quantity} x {nights} night
-                            {nights > 1 ? "s" : ""} = ₱
-                            {(
-                              extra.price *
-                              extra.quantity *
-                              nights
-                            ).toLocaleString("en-PH", {
-                              minimumFractionDigits: 2,
-                            })}
+                          <li key={idx} className="flex items-center gap-2">
+                            <span>
+                              {extra.name} x {extra.quantity} x {nights} night
+                              {nights > 1 ? "s" : ""} = ₱
+                              {(
+                                extra.price *
+                                extra.quantity *
+                                nights
+                              ).toLocaleString("en-PH", {
+                                minimumFractionDigits: 2,
+                              })}
+                            </span>
+
+                            {/* Remove Button */}
+                            <button
+                              onClick={() => removeExtra(idx)}
+                              className="text-red-500 hover:text-red-700 text-xs font-medium ml-4 flex items-center gap-1"
+                            >
+                              <icons.MdOutlineClose /> Remove
+                            </button>
                           </li>
                         ))}
                       </ul>

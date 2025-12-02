@@ -140,7 +140,7 @@ export const menuItems = [
 
   {
     name: "Terms and Conditions",
-    icon: icons.VscMegaphone,
+    icon: icons.RiShakeHandsLine,
     children: [
       {
         name: "Active Terms",

@@ -57,12 +57,14 @@ import { IoSearch } from "react-icons/io5";
 import { BiSolidMegaphone } from "react-icons/bi";
 import { VscMegaphone } from "react-icons/vsc";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { RiShakeHandsLine } from "react-icons/ri";
 
 import { IoMdNotifications } from "react-icons/io";
 import { IoIosInformationCircleOutline } from "react-icons/io";
 
 export const icons = {
   FaPhoneAlt,
+  RiShakeHandsLine,
   IoIosInformationCircleOutline,
   IoMdNotifications,
   IoMdCheckmarkCircleOutline,
