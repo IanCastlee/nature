@@ -1,7 +1,7 @@
 <?php
 include("../header.php");
 include("../dbConn.php");
-require_once("../auth/auth_middleware.php"); 
+//require_once("../auth/auth_middleware.php"); 
 //$user = require_auth($conn); 
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -25,7 +25,7 @@ if ($facilityId <= 0) {
     exit;
 }
 
-$sql = "SELECT start_date, end_date FROM room_booking WHERE facility_id = ? AND status = 'pending'";
+$sql = "SELECT start_date, end_date FROM room_booking WHERE facility_id = ? AND status != 'declined'";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $facilityId);
 $stmt->execute();

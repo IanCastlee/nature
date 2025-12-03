@@ -56,11 +56,11 @@ function OtherFacilitiesBookingPage() {
     error: formError,
   } = useFormSubmit("/booking/fh-booking.php", (response) => {
     setToast({
-      message: "Booking submitted successfully!",
+      message: "Reservation submitted successfully!",
       type: "success",
     });
 
-    setBookingSummary(response); // ✅ now response is defined
+    setBookingSummary(response);
     setShowSummaryModal(true);
 
     refetchNAD();
@@ -375,7 +375,7 @@ function OtherFacilitiesBookingPage() {
             transition-all
           "
               >
-                {formLoading ? "Booking..." : "Book Now"}
+                {formLoading ? "Booking..." : "Reserve Now"}
               </button>
             </div>
           </div>

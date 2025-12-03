@@ -40,8 +40,6 @@ function BookWithoutSigningIn() {
     terms: false,
   });
 
-  console.log("bookingSummary : ", bookingSummary);
-
   const handleScreenshot = () => {
     const overlay = document.getElementById("overlay-message");
 
@@ -90,6 +88,8 @@ function BookWithoutSigningIn() {
     refetch: refetchNAD,
     error: errorFh,
   } = useGetData(`/booking/get-notavailable-date.php?facility_id=${roomId}`);
+
+  console.log("Not Available Dates: ", notAvailableDates);
 
   useEffect(() => {
     if (notAvailableDates && notAvailableDates.booked_dates) {
@@ -159,7 +159,7 @@ function BookWithoutSigningIn() {
   } = useFormSubmit("/booking/booking.php", (response) => {
     if (response.success) {
       setToast({
-        message: `Booking #${response.booking_id} submitted successfully!`,
+        message: `Reservation submitted successfully!`,
         type: "success",
       });
       setShowForm(null);
@@ -598,7 +598,7 @@ function BookWithoutSigningIn() {
                         })}
                       </div>
                       <Button
-                        label={formLoading ? "Submitting..." : "Submit Booking"}
+                        label={formLoading ? "Submitting..." : "Reserve Now"}
                         style={`${
                           isSubmitDisabled
                             ? "bg-gray-400 cursor-not-allowed"

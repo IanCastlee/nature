@@ -337,7 +337,17 @@ function Header({ isHome }) {
                     <li
                       className="cursor-pointer py-1 hover:underline rounded"
                       onClick={() => {
-                        navigate("/function-hall");
+                        navigate("/function-halls");
+                        setMobileMenuOpen(false);
+                        setMobileOfferOpen(false);
+                      }}
+                    >
+                      Function Hall
+                    </li>
+                    <li
+                      className="cursor-pointer py-1 hover:underline rounded"
+                      onClick={() => {
+                        navigate("/function-halls");
                         setMobileMenuOpen(false);
                         setMobileOfferOpen(false);
                       }}
@@ -347,6 +357,24 @@ function Header({ isHome }) {
                   </ul>
                 )}
               </li>
+
+              {[
+                { label: "Announcement", form: "announcement" },
+                { label: "House Rules", form: "house_rules" },
+              ].map((item) => (
+                <li key={item.label}>
+                  <div
+                    onClick={() => {
+                      setShowForm(item.form);
+                      setMobileMenuOpen(false);
+                      setMobileOfferOpen(false);
+                    }}
+                    className="block w-full py-2 pl-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer"
+                  >
+                    {item.label}
+                  </div>
+                </li>
+              ))}
 
               {/* Theme Toggle */}
               <li>
@@ -364,7 +392,7 @@ function Header({ isHome }) {
               </li>
 
               {/* Sign In / User */}
-              <li>
+              {/* <li>
                 {user ? (
                   <Button
                     onClick={() => {
@@ -390,7 +418,7 @@ function Header({ isHome }) {
                     Sign In
                   </button>
                 )}
-              </li>
+              </li> */}
             </ul>
           </div>
         )}
