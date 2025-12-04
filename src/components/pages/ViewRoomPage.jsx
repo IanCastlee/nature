@@ -7,7 +7,6 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { uploadUrl } from "../../utils/fileURL";
 import useGetData from "../../hooks/useGetData";
-import Button from "../atoms/Button";
 import Toaster from "../molecules/Toaster";
 function ViewRoomPage() {
   const { roomId } = useParams();
@@ -198,15 +197,6 @@ function ViewRoomPage() {
                 <icons.GrNotes className="text-sm" />
                 View House Rules
               </button>
-              {status !== "under_maintenance" && (
-                <Button
-                  onClick={() =>
-                    handleProtectedNavigation(`/booking/${room_id}`)
-                  }
-                  style="h-[30px] bg-green-600 text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover: hover:scale-105"
-                  label="Reserve Now"
-                />
-              )}
             </div>
           </div>
 
@@ -222,8 +212,8 @@ function ViewRoomPage() {
             </span>
           </div>
         </section>
-        <section className="w-full flex flex-row justify-between px-2 md:px-2 lg:px-[130px] mt-4">
-          <div className="w-full flex flex-row gap-x-8 mt-6">
+        <section className="w-full px-2 md:px-2 lg:px-[130px] mt-4">
+          <div className="w-full flex flex-col lg:flex-row gap-8 mt-6">
             {parsedAmenities.filter((a) => a && a.trim() !== "").length > 0 && (
               <ul className="flex-1">
                 <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">

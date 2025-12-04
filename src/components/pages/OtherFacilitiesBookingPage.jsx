@@ -195,8 +195,6 @@ function OtherFacilitiesBookingPage() {
     });
   };
 
-  console.log("ERRORR: ", fhError);
-
   const bookingDate = new Date(selectedDate);
   const formattedDate = bookingDate.toLocaleDateString("en-US", {
     weekday: "long",
@@ -538,9 +536,15 @@ function OtherFacilitiesBookingPage() {
               backgroundPosition: "center",
             }}
           >
+            <div className="w-full flex flex-col items-center justify-center mb-2">
+              <p className="text-xs font-bold">
+                2JKLA NATURE HOT SPRING AND INN RESORT COPR.
+              </p>
+              <p className="text-xs font-normal">Monbon, Irosin, Sorsgon</p>
+            </div>
             {/* Header */}
-            <h2 className="text-3xl font-extrabold mb-6 text-center text-gray-900 tracking-wide">
-              Booking Summary
+            <h2 className="text-2xl font-extrabold mb-6 text-center text-gray-900 tracking-wide">
+              Reservation Details
             </h2>
 
             <div className="space-y-4 text-gray-800 text-sm leading-relaxed">
@@ -598,7 +602,15 @@ function OtherFacilitiesBookingPage() {
               {/* Payment Reminder */}
               <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded shadow-sm text-yellow-800 text-sm font-semibold">
                 Kindly settle the required <strong>50% advance payment</strong>{" "}
-                within the day to secure the reservation.
+                within the day to secure the reservation. <br />
+                <span className="block mt-1">
+                  ⚠️ If the advance payment is not received within the day, the
+                  reservation will automatically be removed.
+                </span>
+                <span className="block mt-1">
+                  ❌ This booking is <strong>non-refundable</strong> and{" "}
+                  <strong>cannot be cancelled</strong>.
+                </span>
               </div>
             </div>
 

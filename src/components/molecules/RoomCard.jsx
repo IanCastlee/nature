@@ -13,6 +13,8 @@ import useAuthStore from "../../store/authStore";
 function RoomCard({ rooms }) {
   const { user } = useAuthStore();
 
+  console.log("ROOMS AND EXRASS: ", rooms);
+
   const navigate = useNavigate();
   const [toast, setToast] = useState(null);
 
@@ -124,9 +126,6 @@ function RoomCard({ rooms }) {
                     <p className="dark:text-white text-sm font-medium">
                       ₱ {item.price} / Night
                     </p>
-                    {/* <p className="text-xs text-gray-600 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 h-5 flex justify-center items-center px-1 rounded-full text-center mt-1">
-                      156 booking
-                    </p> */}
                   </div>
 
                   <div className="flex flex-col items-end justify-end">
@@ -165,7 +164,7 @@ function RoomCard({ rooms }) {
                 <div className="border-t dark:border-gray-800 mt-4 flex flex-wrap justify-start pt-4 gap-5">
                   <span className="inline-flex items-center text-sm dark:text-gray-100 text-gray-700 font-medium">
                     <icons.LuUsers className="mr-1 text-blue-600 dark:text-blue-400" />{" "}
-                    {item.capacity} per person
+                    Good for {item.capacity} person(s)
                   </span>
 
                   <span className="inline-flex items-center text-sm dark:text-gray-100 text-gray-700 font-medium">
@@ -176,37 +175,36 @@ function RoomCard({ rooms }) {
 
                 {/* Extras */}
                 <div className="w-full border-t dark:border-gray-800 mt-4 pt-4">
-                  {item.extras && (
-                    <h3 className="dark:text-gray-100 text-gray-700 text-sm font-medium mb-2">
-                      Extras
-                    </h3>
+                  {item.extras && item.extras.length > 0 && (
+                    <>
+                      <h3 className="dark:text-gray-100 text-gray-700 text-sm font-medium mb-2">
+                        Extras
+                      </h3>
+
+                      <div className="w-full flex flex-row flex-wrap gap-5">
+                        {item.extras.map((ex, index) => (
+                          <motion.span
+                            key={ex.extra_id}
+                            whileHover={{ scale: 1.05 }}
+                            transition={{ duration: 0.2 }}
+                            className="text-xs dark:text-gray-100 flex flex-row items-center"
+                          >
+                            {/* Display name + price */}
+                            {ex.extras} – ₱
+                            {parseFloat(ex.price).toLocaleString()}
+                            <icons.PiLineVerticalThin className="text-gray-600 dark:text-gray-500 text-lg ml-3" />
+                          </motion.span>
+                        ))}
+                      </div>
+                    </>
                   )}
-                  <div className="w-full flex flex-row flex-wrap gap-5">
-                    {item.extras &&
-                      item.extras.split(",").map((e, index) => (
-                        <motion.span
-                          key={index}
-                          whileHover={{ scale: 1.05 }}
-                          transition={{ duration: 0.2 }}
-                          className="text-xs dark:text-gray-100 flex flex-row items-center"
-                        >
-                          {e.trim()}
-                          <icons.PiLineVerticalThin className="text-gray-600 dark:text-gray-500 text-lg ml-3" />
-                        </motion.span>
-                      ))}
-                  </div>
                 </div>
 
                 {/* Buttons */}
                 <div className="flex flex-row justify-between mt-8">
                   <motion.div whileTap={{ scale: 0.95 }}>
                     <Button
-                      // onClick={() =>
-                      //   handleProtectedNavigation(`/booking/${item.room_id}`)
-                      // }
-                      onClick={() =>
-                        navigate(`/reserve-without-signin/${item.room_id}`)
-                      }
+                      onClick={() => navigate(`/reserve/${item.room_id}`)}
                       disabled={isUnderMaintenance}
                       style={`${
                         isUnderMaintenance
@@ -222,27 +220,6 @@ function RoomCard({ rooms }) {
                       }
                     />
                   </motion.div>
-
-                  {/* {!user && (
-                    <motion.button
-                      whileHover={{ x: 5 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() =>
-                        navigate(`/reserve-without-signin/${item.room_id}`)
-                      }
-                      className="group relative flex flex-row items-center text-blue-500 text-sm font-medium rounded-sm h-[30px] self-end ml-auto transition-colors duration-300 hover:text-blue-400"
-                    >
-                      <span
-                        className="relative before:content-[''] before:absolute before:bottom-0 before:left-1/2 
-                        before:translate-x-[-50%] before:h-[2px] before:w-0 
-                        before:bg-blue-400 before:transition-all before:duration-300 
-                        group-hover:before:w-full text-xs"
-                      >
-                        Reserve without Signing In
-                      </span>
-                      <icons.FiArrowUpRight className="ml-1 text-blue-600 text-lg font-bold" />
-                    </motion.button>
-                  )} */}
                 </div>
               </div>
             </motion.article>

@@ -6,8 +6,6 @@ function Toaster({ message, type = "info", onClose }) {
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  console.log("first", type);
-
   return (
     <div
       className={`fixed top-4 right-4 px-4 py-2 rounded shadow-lg text-white text-sm z-[9999] transition-all duration-300 ${

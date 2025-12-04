@@ -9,7 +9,6 @@ import useGetData from "../../hooks/useGetData";
 import Notification from "../organisms/Notification";
 import { useForm } from "../../store/useRoomStore";
 import Announcement from "../pages/Announcement";
-import HouseRules from "../organisms/HouseRules";
 
 function Header({ isHome }) {
   const { user } = useAuthStore();
@@ -154,22 +153,40 @@ function Header({ isHome }) {
                   </li>
                 </ul>
               </li>
-              <li className="relative group">
-                <Link
-                  title="House Rules"
-                  onClick={() => setShowForm("house_rules")}
-                  className={`text-sm transition-colors font-bold duration-300 group-hover:text-blue-400
 
+              {[
+                {
+                  label: "How to Reserve",
+                  action: () => setShowForm("how_to_reserve"),
+                  isLink: false, // this one uses onClick
+                },
+                {
+                  label: "Contacts",
+                  path: "/contacts",
+                  isLink: true,
+                },
+              ].map((item) => (
+                <li key={item.label} className="relative group">
+                  <Link
+                    title={item.label}
+                    {...(item.isLink
+                      ? { to: item.path } // use `to` for Link navigation
+                      : { onClick: item.action })} // use onClick for actions
+                    className={`text-sm transition-colors duration-300 group-hover:text-blue-400
+                    before:content-[''] before:absolute before:bottom-0 before:left-1/2
+                    before:translate-x-[-50%] before:h-[2px] before:w-0
                     before:bg-blue-400 before:transition-all before:duration-300
                     group-hover:before:w-full ${
                       !scrolled && isHome
                         ? "text-white"
-                        : "text-gray-500 dark:text-white"
+                        : "text-black dark:text-white"
                     }`}
-                >
-                  House Rules
-                </Link>
-              </li>
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+
               <li className="relative group">
                 <Link
                   title="Announcement"
@@ -360,12 +377,17 @@ function Header({ isHome }) {
 
               {[
                 { label: "Announcement", form: "announcement" },
-                { label: "House Rules", form: "house_rules" },
+                // { label: "House Rules", form: "house_rules" },
+                { label: "Contacts", form: "/contacts", navigate: true },
               ].map((item) => (
                 <li key={item.label}>
                   <div
                     onClick={() => {
-                      setShowForm(item.form);
+                      if (item.navigate) {
+                        navigate(item.form);
+                      } else {
+                        setShowForm(item.form);
+                      }
                       setMobileMenuOpen(false);
                       setMobileOfferOpen(false);
                     }}
@@ -432,9 +454,9 @@ function Header({ isHome }) {
         <Announcement close={() => setShowForm(null)} />
       )}
 
-      {showForm === "house_rules" && (
+      {/* {showForm === "house_rules" && (
         <HouseRules close={() => setShowForm(null)} />
-      )}
+      )} */}
     </>
   );
 }

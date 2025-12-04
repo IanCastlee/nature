@@ -4,6 +4,24 @@ import useFormSubmit from "../../hooks/useFormSubmit";
 import { uploadUrl } from "../../utils/fileURL";
 import axiosInstance from "../../utils/axiosInstance";
 
+// Simple Toaster component
+function Toaster({ message, type = "success", onClose, duration = 3000 }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, duration);
+    return () => clearTimeout(timer);
+  }, [onClose, duration]);
+
+  const bgColor = type === "success" ? "bg-green-500" : "bg-red-500";
+
+  return (
+    <div
+      className={`fixed top-5 right-5 px-4 py-2 text-white rounded shadow ${bgColor}`}
+    >
+      {message}
+    </div>
+  );
+}
+
 function AdminSetting() {
   const { data, loading, refetch, error } = useGetData(
     `/admin/admin_setting.php`
@@ -16,10 +34,13 @@ function AdminSetting() {
     email: "",
     globe_no: "",
     smart_no: "",
+    fb: "",
+    ig: "",
   });
 
   const [heroImages, setHeroImages] = useState([]);
   const [existingHeroImages, setExistingHeroImages] = useState([]);
+  const [toast, setToast] = useState(null); // Toast state
 
   useEffect(() => {
     if (data) {
@@ -30,6 +51,8 @@ function AdminSetting() {
         email: data.email || "",
         globe_no: data.globe_no || "",
         smart_no: data.smart_no || "",
+        fb: data.fb || "",
+        ig: data.ig || "",
       });
       setExistingHeroImages(data.hero_images || []);
     }
@@ -39,16 +62,16 @@ function AdminSetting() {
     submit: submitForm,
     loading: formLoading,
     error: formError,
-  } = useFormSubmit("/admin/admin_setting.php", () => refetch());
+  } = useFormSubmit("/admin/admin_setting.php", () => {
+    refetch();
+    setToast({ message: "Settings updated successfully!", type: "success" });
+  });
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
       if (name === "logo") setFormData((prev) => ({ ...prev, logo: files[0] }));
-      if (name === "heroImages") {
-        const selectedFiles = Array.from(files).slice(0, 5);
-        setHeroImages(selectedFiles);
-      }
+      if (name === "heroImages") setHeroImages(Array.from(files).slice(0, 5));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -82,34 +105,6 @@ function AdminSetting() {
         onSubmit={handleSubmit}
         className="space-y-6 bg-white p-6 rounded-lg shadow-md"
       >
-        {/* Hero Heading */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">
-            Hero Heading
-          </label>
-          <input
-            type="text"
-            name="hero_heading"
-            value={formData.hero_heading}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-
-        {/* Hero Subheading */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">
-            Hero Subheading
-          </label>
-          <input
-            type="text"
-            name="hero_subheading"
-            value={formData.hero_subheading}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-
         {/* Email */}
         <div>
           <label className="block text-gray-700 font-medium mb-2">Email</label>
@@ -150,23 +145,49 @@ function AdminSetting() {
           />
         </div>
 
-        {/* Logo */}
+        {/* Social Links */}
         <div>
+          <label className="block text-gray-700 font-medium mb-2">
+            Facebook
+          </label>
+          <input
+            type="text"
+            name="fb"
+            value={formData.fb}
+            onChange={handleChange}
+            placeholder="Facebook URL (optional)"
+            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <label className="block text-gray-700 font-medium mb-2 mt-2">
+            Instagram
+          </label>
+          <input
+            type="text"
+            name="ig"
+            value={formData.ig}
+            onChange={handleChange}
+            placeholder="Instagram URL (optional)"
+            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+
+        {/* Logo */}
+        {/* <div>
           <label className="block text-gray-700 font-medium mb-2">Logo</label>
           <input
             type="file"
             name="logo"
             onChange={handleChange}
-            className="block"
+            className="block mb-2"
           />
           {data.logo && (
             <img
               src={`${uploadUrl.uploadurl}/logo/${data.logo}`}
               alt="logo"
-              className="mt-2 w-32 h-auto rounded border"
+              className="w-32 h-auto rounded border"
             />
           )}
-        </div>
+        </div> */}
 
         {/* Hero Images */}
         <div>
@@ -188,28 +209,39 @@ function AdminSetting() {
                   alt="hero"
                   className="w-full h-full object-cover rounded border"
                 />
-                {/* Delete Button */}
                 <button
                   type="button"
                   onClick={async () => {
                     if (window.confirm("Delete this image?")) {
                       try {
+                        const form = new FormData();
+                        form.append("delete_hero_id", img.id);
+
                         const res = await axiosInstance.post(
                           "/admin/admin_setting.php",
-                          {
-                            delete_hero_id: img.id,
-                          }
+                          form
                         );
+
                         if (res.data.success) {
                           setExistingHeroImages((prev) =>
                             prev.filter((i) => i.id !== img.id)
                           );
+                          setToast({
+                            message: "Hero image deleted!",
+                            type: "success",
+                          });
                         } else {
-                          alert(res.data.message || "Failed to delete image.");
+                          setToast({
+                            message:
+                              res.data.message || "Failed to delete image",
+                            type: "error",
+                          });
                         }
-                      } catch (err) {
-                        console.error(err);
-                        alert("Something went wrong while deleting.");
+                      } catch {
+                        setToast({
+                          message: "Something went wrong while deleting.",
+                          type: "error",
+                        });
                       }
                     }
                   }}
@@ -231,7 +263,7 @@ function AdminSetting() {
           </div>
         </div>
 
-        {/* Submit Button */}
+        {/* Submit */}
         <button
           type="submit"
           disabled={formLoading}
@@ -244,6 +276,15 @@ function AdminSetting() {
 
         {formError && <p className="text-red-500 mt-2">{formError.message}</p>}
       </form>
+
+      {/* Toast */}
+      {toast && (
+        <Toaster
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

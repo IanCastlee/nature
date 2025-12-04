@@ -28,7 +28,7 @@ if ($method === "GET") {
     $categoryId = $_GET['categoryId'] ?? null;
     $status = $_GET['status'] ?? 'active';
 
-    //  1. Fetch single room by ID (with images, amenities, inclusions, extras)
+    // 1. Fetch single room by ID (with images, amenities, inclusions, extras)
     if ($roomId) {
         $stmt = $conn->prepare("SELECT r.*, 
                                        a.amenities, a.amenity_id, 
@@ -73,7 +73,7 @@ if ($method === "GET") {
         }
 
         if (!empty($roomData)) {
-            //  Fetch room images
+            // Fetch room images
             $imgStmt = $conn->prepare("SELECT image_path FROM room_images WHERE room_id=?");
             $imgStmt->bind_param("i", $roomData['room_id']);
             $imgStmt->execute();
@@ -96,7 +96,7 @@ if ($method === "GET") {
         exit;
     }
 
-    //  2. Fetch rooms by category
+    // 2. Fetch rooms by category (NOW INCLUDES EXTRAS)
     elseif ($categoryId) {
         $stmt = $conn->prepare("SELECT r.*, rc.category_id, rc.category 
                                 FROM rooms AS r 
@@ -107,8 +107,10 @@ if ($method === "GET") {
         $result = $stmt->get_result();
 
         $rooms = [];
+
         while ($row = $result->fetch_assoc()) {
-            // fetch images
+
+            // Fetch room images
             $imgStmt = $conn->prepare("SELECT image_path FROM room_images WHERE room_id=?");
             $imgStmt->bind_param("i", $row['room_id']);
             $imgStmt->execute();
@@ -119,7 +121,25 @@ if ($method === "GET") {
                 $images[] = $img['image_path'];
             }
 
+            // Fetch EXTRAS
+            $extraStmt = $conn->prepare("SELECT extra_id, extras, price FROM extras WHERE room_id=?");
+            $extraStmt->bind_param("i", $row['room_id']);
+            $extraStmt->execute();
+            $extraRes = $extraStmt->get_result();
+
+            $extras = [];
+            while ($ex = $extraRes->fetch_assoc()) {
+                $extras[] = [
+                    "extra_id" => $ex['extra_id'],
+                    "extras" => $ex['extras'],
+                    "price" => $ex['price']
+                ];
+            }
+
+            // Add images + extras to room data
             $row['images'] = $images;
+            $row['extras'] = $extras;
+
             $rooms[] = $row;
         }
 
@@ -127,7 +147,7 @@ if ($method === "GET") {
         exit;
     }
 
-    //  3. Fetch all rooms by status
+    // 3. Fetch all rooms by status
     else {
         $stmt = $conn->prepare("SELECT * FROM rooms WHERE status=?");
         $stmt->bind_param("s", $status);
@@ -135,8 +155,9 @@ if ($method === "GET") {
         $result = $stmt->get_result();
 
         $rooms = [];
+
         while ($row = $result->fetch_assoc()) {
-            // fetch images
+            // Fetch room images
             $imgStmt = $conn->prepare("SELECT image_path FROM room_images WHERE room_id=?");
             $imgStmt->bind_param("i", $row['room_id']);
             $imgStmt->execute();
@@ -147,7 +168,9 @@ if ($method === "GET") {
                 $images[] = $img['image_path'];
             }
 
+            // Add images
             $row['images'] = $images;
+
             $rooms[] = $row;
         }
 
@@ -155,6 +178,7 @@ if ($method === "GET") {
         exit;
     }
 }
+
 
 /* ======================================================
    🔹 POST REQUESTS

@@ -9,8 +9,8 @@ import { renderActionsBooking } from "../admin_molecules/RenderActions";
 import useSetInactive from "../../hooks/useSetInactive";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import { bookingPending } from "../../constant/tableColumns";
-import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import Toaster from "../../components/molecules/Toaster";
+import ViewDetails from "../admin_molecules/ViewDetails";
 
 function AdminBookingPage() {
   const showForm = useForm((state) => state.showForm);
@@ -19,7 +19,7 @@ function AdminBookingPage() {
   const [approveItem, setApproveItem] = useState(null);
   const [declinedItem, setDeclinedItem] = useState(null);
 
-  const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
+  const [viewDetailsId, setViewDetailsId] = useState(null);
 
   const [toast, setToast] = useState(null);
 
@@ -93,11 +93,11 @@ function AdminBookingPage() {
   });
 
   //=====================//
-  //  view room details  //
+  //  view  details  //
   //=====================//
-  const viewFHDetails = (item) => {
-    setShowForm("view fh-hall");
-    setViewFHDetailsId(item);
+  const viewDetails = (item) => {
+    setShowForm("view_details");
+    setViewDetailsId(item);
   };
 
   const formattedData = currentData.map((item) => ({
@@ -169,6 +169,7 @@ function AdminBookingPage() {
                 setShowForm,
                 onSetApprove: (item) => setApproveItem(item),
                 onSetDeClined: (item) => setDeclinedItem(item),
+                onSetViewDetails: (item) => viewDetails(item),
               })
             }
           />
@@ -225,7 +226,7 @@ function AdminBookingPage() {
         />
       )}
 
-      {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
+      {showForm === "view_details" && <ViewDetails id={viewDetailsId} />}
     </>
   );
 }

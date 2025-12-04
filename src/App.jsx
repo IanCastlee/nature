@@ -61,6 +61,8 @@ import FunctionHallBooking from "./components/pages/FunctionHallBooking";
 import AdminFhBookingArrived from "./admin_components/admin_pages/AdminFhBookingArrived";
 import AdminSetting from "./admin_components/admin_pages/AdminSetting";
 import AdminTermsAndConditions from "./admin_components/admin_pages/AdminTermsAndConditions";
+import AdminWhyChooseUs from "./admin_components/admin_pages/AdminWhyChooseUs";
+import Contacts from "./components/pages/Contacts";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -76,7 +78,7 @@ const UserLayout = () => {
     "/resend-verification",
     "/forgot",
     "/reset",
-    "/reserve-without-signin",
+    "/reserve",
   ];
   const shouldHideLayout = hideLayoutPaths.some((path) =>
     location.pathname.startsWith(path)
@@ -118,6 +120,7 @@ const UserLayout = () => {
         <Route path="/cottages" element={<CottagesPage />} />
         <Route path="/function-halls" element={<FunctionHallsPage />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contacts" element={<Contacts />} />
         <Route path="/test" element={<Test />} />
         <Route path="/room-view/:photo" element={<RoomViewTest />} />
 
@@ -134,10 +137,7 @@ const UserLayout = () => {
         <Route path="/resend-verification" element={<ResendVerification />} />
 
         <Route path="/tester" element={<Tester />} />
-        <Route
-          path="/reserve-without-signin/:roomId"
-          element={<BookWithoutSigningIn />}
-        />
+        <Route path="/reserve/:roomId" element={<BookWithoutSigningIn />} />
       </Routes>
       {!shouldHideLayout && <Footer />}
     </>
@@ -222,6 +222,7 @@ const AdminLayout = () => {
           />
 
           <Route path="/terms" element={<AdminTermsAndConditions />} />
+          <Route path="/why-choose-us" element={<AdminWhyChooseUs />} />
         </Routes>
       </main>
     </div>

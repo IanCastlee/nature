@@ -3,7 +3,6 @@ include("../header.php");
 include("../dbConn.php");
 require_once("../auth/auth_middleware.php"); 
 
-
 $user = require_auth($conn); 
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -15,8 +14,11 @@ if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !
 }
 
 if ($method === "GET") {
-    $userId = $_GET['user_id'] ?? null;
-    $status = $_GET['status'] ?? null;
+
+    // NEW: support ?id=BOOKING_ID
+    $bookingId = $_GET['id'] ?? null;
+    $userId    = $_GET['user_id'] ?? null;
+    $status    = $_GET['status'] ?? null;
 
     // Base SQL with joins and extras LEFT JOIN
     $baseSql = "
@@ -34,11 +36,12 @@ if ($method === "GET") {
     $params = [];
     $types = "";
     $conditions = [];
-    
-    if ($status) {
-        $conditions[] = "rb.status = ?";
-        $params[] = $status;
-        $types .= "s";
+
+    // NEW: filter by booking_id
+    if ($bookingId) {
+        $conditions[] = "rb.booking_id = ?";
+        $params[] = $bookingId;
+        $types .= "i";
     }
 
     if ($userId) {
@@ -47,8 +50,14 @@ if ($method === "GET") {
         $types .= "i";
     }
 
+    if ($status) {
+        $conditions[] = "rb.status = ?";
+        $params[] = $status;
+        $types .= "s";
+    }
+
     // Build WHERE clause if conditions exist
-    if (count($conditions) > 0) {
+    if (!empty($conditions)) {
         $baseSql .= " WHERE " . implode(" AND ", $conditions);
     }
 
@@ -56,7 +65,7 @@ if ($method === "GET") {
 
     $stmt = $conn->prepare($baseSql);
 
-    if ($params) {
+    if (!empty($params)) {
         $stmt->bind_param($types, ...$params);
     }
 
@@ -66,10 +75,10 @@ if ($method === "GET") {
     $bookings = [];
 
     while ($row = $result->fetch_assoc()) {
-        $bookingId = $row['booking_id'];
+        $id = $row['booking_id'];
 
-        if (!isset($bookings[$bookingId])) {
-            $bookings[$bookingId] = [
+        if (!isset($bookings[$id])) {
+            $bookings[$id] = [
                 'booking_id' => $row['booking_id'],
                 'user_id' => $row['user_id'],
                 'facility_id' => $row['facility_id'],
@@ -80,9 +89,8 @@ if ($method === "GET") {
                 'price' => $row['booking_price'],
                 'paid' => $row['booking_paid'],
                 'half_price' => $row['booking_price'] / 2,
-                // 'fullname' => $row['firstname'] . " " . $row['lastname'],
-                 'fullname' => $row['fullname'],
-                 'phone' => $row['phone'],
+                'fullname' => $row['fullname'],
+                'phone' => $row['phone'],
                 'email' => $row['email'],
                 'room' => [
                     'room_id' => $row['room_id'],
@@ -97,7 +105,7 @@ if ($method === "GET") {
 
         // Add extras if exist
         if (!empty($row['extra_name'])) {
-            $bookings[$bookingId]['extras'][] = [
+            $bookings[$id]['extras'][] = [
                 'name' => $row['extra_name'],
                 'quantity' => $row['extra_quantity'],
                 'price' => $row['extra_price'],

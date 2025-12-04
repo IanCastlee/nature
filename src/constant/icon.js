@@ -61,10 +61,16 @@ import { RiShakeHandsLine } from "react-icons/ri";
 
 import { IoMdNotifications } from "react-icons/io";
 import { IoIosInformationCircleOutline } from "react-icons/io";
+import { FaFacebookMessenger } from "react-icons/fa6";
+import { IoMailSharp } from "react-icons/io5";
+import { MdLocalPhone } from "react-icons/md";
 
 export const icons = {
   FaPhoneAlt,
   RiShakeHandsLine,
+  IoMailSharp,
+  MdLocalPhone,
+  FaFacebookMessenger,
   IoIosInformationCircleOutline,
   IoMdNotifications,
   IoMdCheckmarkCircleOutline,

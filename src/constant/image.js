@@ -40,6 +40,8 @@ import sixth from "../assets/icons/eco-friendly.png";
 //about
 import mission from "../assets/images/mission.jpg";
 import promise from "../assets/images/promise.jpg";
+import contact from "../assets/images/contact.webp";
+import topcover from "../assets/images/W3.webp";
 
 export const images = {
   first,
@@ -48,6 +50,7 @@ export const images = {
   fourth,
   fith,
   sixth,
+  topcover,
 
   hero1,
   hero2,
@@ -59,6 +62,7 @@ export const images = {
   mission,
   promise,
   aboutbg,
+  contact,
   messageIcons,
   announcement,
   ebike,

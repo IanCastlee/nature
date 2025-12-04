@@ -11,12 +11,13 @@ import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import useSetInactive from "../../hooks/useSetInactive";
 import Toaster from "../../components/molecules/Toaster";
 import DeleteModal from "../../components/molecules/DeleteModal";
+import ViewDetails from "../admin_molecules/ViewDetails";
 
 function AdminBookingHistory() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
-  const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
+  const [viewDetailsId, setViewDetailsId] = useState(null);
   const [toast, setToast] = useState(null);
   const [approveItem, setApproveItem] = useState(null);
   const [approveAction, setApproveAction] = useState(""); // <-- ADDED
@@ -113,6 +114,14 @@ function AdminBookingHistory() {
     });
   });
 
+  //=====================//
+  //  view  details  //
+  //=====================//
+  const viewDetails = (item) => {
+    setShowForm("view_details");
+    setViewDetailsId(item);
+  };
+
   return (
     <>
       {toast && (
@@ -165,6 +174,7 @@ function AdminBookingHistory() {
                   setApproveItem(item);
                   setApproveAction("set_pending");
                 },
+                onSetViewDetails: (item) => viewDetails(item),
 
                 onSetArrived: (item) => {
                   setApproveItem(item);
@@ -213,7 +223,7 @@ function AdminBookingHistory() {
         />
       )}
 
-      {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
+      {showForm === "view_details" && <ViewDetails id={viewDetailsId} />}
     </>
   );
 }

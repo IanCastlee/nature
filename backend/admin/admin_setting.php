@@ -3,18 +3,14 @@ include("../header.php");
 include("../dbConn.php");
 
 $method = $_SERVER['REQUEST_METHOD'];
-
 header('Content-Type: application/json');
 
 try {
     if ($method === 'POST') {
 
-        // ------------------- Read JSON input -------------------
-        $input = json_decode(file_get_contents('php://input'), true);
-
         // ------------------- Delete Hero Image -------------------
-        if (!empty($input['delete_hero_id'])) {
-            $delete_id = intval($input['delete_hero_id']);
+        if (!empty($_POST['delete_hero_id'])) {
+            $delete_id = intval($_POST['delete_hero_id']);
 
             // Get the file name from DB
             $stmt = $conn->prepare("SELECT image FROM hero_images WHERE id=?");
@@ -26,12 +22,8 @@ try {
                 $row = $res->fetch_assoc();
                 $file = "../uploads/hero/" . $row['image'];
 
-                // Delete file from filesystem
-                if (file_exists($file)) {
-                    unlink($file);
-                }
+                if (file_exists($file)) unlink($file);
 
-                // Delete from database
                 $stmt = $conn->prepare("DELETE FROM hero_images WHERE id=?");
                 $stmt->bind_param("i", $delete_id);
                 $stmt->execute();
@@ -40,22 +32,23 @@ try {
                     "success" => true,
                     "message" => "Hero image deleted successfully."
                 ]);
-                exit;
             } else {
                 echo json_encode([
                     "success" => false,
                     "message" => "Hero image not found."
                 ]);
-                exit;
             }
+            exit;
         }
 
         // ------------------- Normal Update -------------------
-        $hero_heading   = $input['hero_heading'] ?? '';
-        $hero_subheading = $input['hero_subheading'] ?? '';
-        $email          = $input['email'] ?? '';
-        $globe_no       = $input['globe_no'] ?? '';
-        $smart_no       = $input['smart_no'] ?? '';
+        $hero_heading   = $_POST['hero_heading'] ?? '';
+        $hero_subheading = $_POST['hero_subheading'] ?? '';
+        $email          = $_POST['email'] ?? '';
+        $globe_no       = $_POST['globe_no'] ?? '';
+        $smart_no       = $_POST['smart_no'] ?? '';
+        $fb             = $_POST['fb'] ?? '';
+        $ig             = $_POST['ig'] ?? '';
 
         // ------------------- Logo Upload -------------------
         $logoPath = null;
@@ -73,15 +66,15 @@ try {
         }
 
         // ------------------- Update Settings -------------------
-        $sql = "UPDATE `setting` SET hero_heading=?, hero_subheading=?, email=?, globe_no=?, smart_no=?";
-        if (!empty($logoPath)) $sql .= ", logo=?";
+        $sql = "UPDATE `setting` SET hero_heading=?, hero_subheading=?, email=?, globe_no=?, smart_no=?, fb=?, ig=?";
+        if ($logoPath) $sql .= ", logo=?";
         $sql .= " WHERE id=1";
 
         $stmt = $conn->prepare($sql);
-        if (!empty($logoPath)) {
-            $stmt->bind_param("ssssss", $hero_heading, $hero_subheading, $email, $globe_no, $smart_no, $logoPath);
+        if ($logoPath) {
+            $stmt->bind_param("ssssssss", $hero_heading, $hero_subheading, $email, $globe_no, $smart_no, $fb, $ig, $logoPath);
         } else {
-            $stmt->bind_param("sssss", $hero_heading, $hero_subheading, $email, $globe_no, $smart_no);
+            $stmt->bind_param("sssssss", $hero_heading, $hero_subheading, $email, $globe_no, $smart_no, $fb, $ig);
         }
         $stmt->execute();
 
@@ -135,3 +128,4 @@ try {
         "message" => $e->getMessage()
     ]);
 }
+$conn->close();

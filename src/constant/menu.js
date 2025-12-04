@@ -20,13 +20,14 @@ export const menuItems = [
         name: "Approved Booking",
         to: "/admin/booking-approved",
       },
-      {
-        name: "Declined Booking",
-        to: "/admin/declined-booking",
-      },
+
       {
         name: "Booking History",
         to: "/admin/booking-history",
+      },
+      {
+        name: "Declined Booking",
+        to: "/admin/declined-booking",
       },
     ],
   },
@@ -43,13 +44,14 @@ export const menuItems = [
         name: "Approved Booking",
         to: "/admin/fhbooking-approved",
       },
-      {
-        name: "Declined Booking",
-        to: "/admin/fhbooking-declined",
-      },
+
       {
         name: "Booking History",
         to: "/admin/fhbooking-history",
+      },
+      {
+        name: "Declined Booking",
+        to: "/admin/fhbooking-declined",
       },
     ],
   },
@@ -74,7 +76,7 @@ export const menuItems = [
     ],
   },
   {
-    name: "Function Hall",
+    name: "Function Halls",
     icon: icons.HiOutlineUserGroup,
     children: [
       {
@@ -88,7 +90,7 @@ export const menuItems = [
     ],
   },
   {
-    name: "Cottage",
+    name: "Cottages",
     icon: icons.MdOutlineCottage,
     children: [
       {
@@ -124,7 +126,7 @@ export const menuItems = [
   },
 
   {
-    name: "Announcement",
+    name: "Announcements",
     icon: icons.VscMegaphone,
     children: [
       {
@@ -152,7 +154,11 @@ export const menuItems = [
       },
     ],
   },
-
+  // {
+  //   name: "Why Choose Us",
+  //   to: "/admin/why-choose-us",
+  //   icon: icons.GoImage,
+  // },
   {
     name: "Settings",
     to: "/admin/setting",
