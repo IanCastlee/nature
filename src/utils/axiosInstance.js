@@ -2,7 +2,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost/NATURE-HS-R/backend/",
+  //baseURL: "http://localhost/NATURE-HS-R/backend/",
+  baseURL: "https://naturehotspring.liveblog365.com/backend/",
 });
 
 axiosInstance.interceptors.request.use(

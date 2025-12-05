@@ -11,7 +11,6 @@ import Toaster from "../molecules/Toaster";
 function ViewRoomPage() {
   const { roomId } = useParams();
 
-  const [showHouseRules, setShowHouseRules] = useState(false);
   const [toast, setToast] = useState(null);
 
   const navigate = useNavigate();
@@ -106,6 +105,10 @@ function ViewRoomPage() {
           .filter((e) => e)
       : [];
 
+  const formattedPrice = Number(price).toLocaleString("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  });
   return (
     <>
       {toast && (
@@ -117,7 +120,7 @@ function ViewRoomPage() {
       )}
       <main className="min-h-screen w-full dark:bg-black pb-20">
         <section className="w-full flex flex-row gap-1 lg:h-screen md:h-[400px] h-[400px] m-0 p-0 relative overflow-hidden">
-          <div className="relative w-full h-full overflow-hidden rounded-lg">
+          <div className="relative w-full h-full overflow-hidden rounded-none">
             {/* 🔹 Blurred Background — visible only on lg */}
             <div
               className="absolute inset-0 bg-center bg-cover blur-2xl scale-110 hidden lg:block"
@@ -174,8 +177,8 @@ function ViewRoomPage() {
                   {room_name}
                 </h3>
                 <p className="dark:text-white text-lg md:text-lg lg:text-2xl font-medium flex flex-row items-center">
-                  <icons.IoPricetagsOutline className="mr-1 text-lg" /> P{price}{" "}
-                  / Night
+                  <icons.IoPricetagsOutline className="mr-1 text-lg" />{" "}
+                  {formattedPrice} / Night
                 </p>
               </div>
 
@@ -184,19 +187,6 @@ function ViewRoomPage() {
                 title="View Room"
                 className="text-[40px] text-blue-400 cursor-pointer transform transition-transform duration-300 hover:scale-125 hidden lg:block"
               />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={() => setShowHouseRules(true)}
-                className="dark:bg-blue-400 bg-gray-900 dark:border-blue-400 border border-gray-700 
-  text-white dark:text-white py-1 px-2 rounded-lg text-sm 
-  flex flex-row items-center gap-2 transition-all duration-300 
-  hover:bg-blue-500 hover:text-white dark:hover:bg-blue-400 dark:hover:text-gray-900"
-              >
-                <icons.GrNotes className="text-sm" />
-                View House Rules
-              </button>
             </div>
           </div>
 
@@ -280,8 +270,6 @@ function ViewRoomPage() {
           </div>
         </section>
       </main>
-
-      {showHouseRules && <HouseRules close={() => setShowHouseRules(false)} />}
 
       <icons.FiArrowLeftCircle
         className="text-2xl text-white cursor-pointer absolute top-8 left-8 z-20"

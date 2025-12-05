@@ -9,7 +9,6 @@ import useGetData from "../../hooks/useGetData";
 
 function ViewFunctionHallPage() {
   const { fhId } = useParams();
-  const [showHouseRules, setShowHouseRules] = useState(false);
   const navigate = useNavigate();
 
   const {
@@ -63,17 +62,6 @@ function ViewFunctionHallPage() {
                 className="text-[35px] sm:text-[40px] text-blue-400 cursor-pointer transform transition-transform duration-300 hover:scale-125"
               />
             </div>
-
-            {/* House Rules Button */}
-            <button
-              onClick={() => setShowHouseRules(true)}
-              className="self-start lg:self-auto dark:bg-blue-400 bg-gray-900 dark:border-blue-400 border border-gray-700 
-                text-white py-2 px-4 rounded-lg text-sm flex items-center gap-2
-                transition-all duration-300 hover:bg-blue-500 dark:hover:bg-blue-600"
-            >
-              <icons.GrNotes className="text-sm" />
-              View House Rules
-            </button>
           </div>
 
           {/* CAPACITY & DURATION */}
@@ -102,8 +90,6 @@ function ViewFunctionHallPage() {
           </div>
         </section>
       </main>
-
-      {showHouseRules && <HouseRules close={() => setShowHouseRules(false)} />}
     </>
   );
 }

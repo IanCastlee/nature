@@ -12,7 +12,7 @@ if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !
 
 if ($method === "GET") {
     // Fetch all terms and conditions
-    $stmt = $conn->prepare("SELECT * FROM term_conditions ORDER BY last_update DESC");
+    $stmt = $conn->prepare("SELECT * FROM term_conditions ORDER BY id ASC");
     $stmt->execute();
     $result = $stmt->get_result();
     $data = $result->fetch_all(MYSQLI_ASSOC);
@@ -27,6 +27,7 @@ if ($method === "POST") {
     $title = $_POST['title'] ?? '';
     $content = $_POST['content'] ?? '';
 
+    // CREATE
     if ($action === "create") {
         $stmt = $conn->prepare("INSERT INTO term_conditions (title, content, last_update) VALUES (?, ?, NOW())");
         $stmt->bind_param("ss", $title, $content);
@@ -38,11 +39,24 @@ if ($method === "POST") {
         exit;
     }
 
+    // UPDATE
     if ($action === "update" && $id) {
         $stmt = $conn->prepare("UPDATE term_conditions SET title = ?, content = ?, last_update = NOW() WHERE id = ?");
         $stmt->bind_param("ssi", $title, $content, $id);
         if ($stmt->execute()) {
             echo json_encode(["success" => true, "message" => "✅ Terms & Conditions updated successfully."]);
+        } else {
+            echo json_encode(["success" => false, "message" => "❌ Database error: " . $stmt->error]);
+        }
+        exit;
+    }
+
+    // DELETE
+    if ($action === "set_inactive" && $id) {
+        $stmt = $conn->prepare("DELETE FROM term_conditions WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            echo json_encode(["success" => true, "message" => "✅ Terms & Conditions deleted successfully."]);
         } else {
             echo json_encode(["success" => false, "message" => "❌ Database error: " . $stmt->error]);
         }

@@ -121,7 +121,7 @@ function HomePage() {
 
                   {/* Caption */}
                   <figcaption className="relative flex flex-col justify-start items-start text-white pl-4 lg:pl-20 pt-44 sm:pt-28 md:absolute md:inset-0 md:justify-center md:pt-0 z-20">
-                    <h1 className="text-5xl font-playfair max-w-2xl mb-6 px-2 lg:px-0">
+                    <h1 className="lg:text-5xl md:text-[30px] text-xl font-playfair max-w-2xl mb-6 px-2 lg:px-0">
                       Experience the Serenity of{" "}
                       <span className="text-blue-400 relative inline-block">
                         Nature Hot Spring{" "}
@@ -292,37 +292,21 @@ function HomePage() {
               </Suspense>
             ))}
           </div>
-          <div className="px-2 lg:px-[130px] mt-4">
-            <ReadMoreButton
-              label={
-                <>
-                  Show More{" "}
-                  <icons.HiArrowSmallRight className="text-white inline" />
-                </>
-              }
-              onClick={() => navigate("/cottages")}
-            />
-          </div>
+          {dataCottage?.length > 3 && (
+            <div className="px-2 lg:px-[130px] mt-4">
+              <ReadMoreButton
+                label={
+                  <>
+                    Show More{" "}
+                    <icons.HiArrowSmallRight className="text-white inline" />
+                  </>
+                }
+                onClick={() => navigate("/cottages")}
+              />
+            </div>
+          )}
         </section>
       </main>
-
-      {/* <img
-        onClick={() => setShowChatBox(true)}
-        src={images.messageIcons}
-        alt="Chat Icon"
-        className="fixed bottom-4 right-10 z-30 cursor-pointer h-12 w-12"
-      />
-      {showChatBox && (
-        <Suspense
-          fallback={
-            <div className="fixed bottom-4 right-10 text-white">
-              Loading Chat...
-            </div>
-          }
-        >
-          <ChatBot close={() => setShowChatBox(false)} />
-        </Suspense>
-      )} */}
 
       <img
         onClick={() => navigate("/test")}
@@ -331,12 +315,6 @@ function HomePage() {
         alt="Street View Icon"
         className="h-[60px] w-[60px] fixed bottom-4 right-10 z-30"
       />
-
-      {/* <img
-        src={images.announcement}
-        className=" top-[80px] right-14 z-50 absolute h-auto w-[40px] "
-        alt="announcement"
-      /> */}
     </>
   );
 }

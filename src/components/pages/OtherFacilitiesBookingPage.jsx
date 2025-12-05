@@ -32,6 +32,7 @@ function OtherFacilitiesBookingPage() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [startTime, setStartTime] = useState("");
   const [disabledDates, setDisabledDates] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form state
   const [form, setForm] = useState({
@@ -131,68 +132,79 @@ function OtherFacilitiesBookingPage() {
 
   const { image, name, price, capacity, duration } = fhDetails;
 
-  const handleBooking = () => {
-    if (!form.terms) {
-      setToast({
-        message: "You must agree to the Terms & Conditions before proceeding.",
-        type: "message",
+  const handleBooking = async () => {
+    if (isSubmitting) return; // prevent double click
+    setIsSubmitting(true); // disable further clicks
+
+    try {
+      if (!form.terms) {
+        setToast({
+          message:
+            "You must agree to the Terms & Conditions before proceeding.",
+          type: "message",
+        });
+        return;
+      }
+
+      if (!selectedDate || !startTime) {
+        setToast({
+          message: "Please complete all booking fields.",
+          type: "error",
+        });
+        return;
+      }
+
+      setShowForm(null);
+
+      // REMEMBER ME — Save or Remove Local Storage
+      if (form.remember) {
+        localStorage.setItem("firstname", form.firstname);
+        localStorage.setItem("lastname", form.lastname);
+        localStorage.setItem("phone", form.phone);
+        localStorage.setItem("remember_info", "true");
+      } else {
+        localStorage.removeItem("firstname");
+        localStorage.removeItem("lastname");
+        localStorage.removeItem("phone");
+        localStorage.removeItem("remember_info");
+      }
+
+      const slotHours = 8;
+
+      const bookingDate = new Date(selectedDate);
+      const formattedDate = bookingDate.toLocaleDateString("en-CA");
+
+      const startDateTime = new Date(`${formattedDate}T${startTime}`);
+      const endDateTime = new Date(startDateTime);
+      endDateTime.setHours(endDateTime.getHours() + slotHours);
+
+      const startHour = startDateTime.getHours();
+      const endHour = endDateTime.getHours();
+
+      if (startHour < 4 || endHour > 22 || endHour <= startHour) {
+        setToast({
+          message: `Booking must start at least between 4:00 AM and end by 10:00 PM.`,
+          type: "error",
+        });
+        return;
+      }
+
+      const formattedEndTime = endDateTime.toTimeString().split(" ")[0]; // HH:MM:SS
+
+      // Await the submit function if it's async
+      await submit({
+        fullname: `${form.firstname} ${form.lastname}`,
+        phone: form.phone,
+        fhId: Number(facilityId),
+        date: formattedDate,
+        startTime: startTime,
+        endTime: formattedEndTime,
       });
-      return;
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    if (!selectedDate || !startTime) {
-      setToast({
-        message: "Please complete all booking fields.",
-        type: "error",
-      });
-      return;
-    }
-
-    setShowForm(null);
-
-    //  REMEMBER ME — Save or Remove Local Storage
-    if (form.remember) {
-      localStorage.setItem("firstname", form.firstname);
-      localStorage.setItem("lastname", form.lastname);
-      localStorage.setItem("phone", form.phone);
-      localStorage.setItem("remember_info", "true");
-    } else {
-      localStorage.removeItem("firstname");
-      localStorage.removeItem("lastname");
-      localStorage.removeItem("phone");
-      localStorage.removeItem("remember_info");
-    }
-
-    const slotHours = 8; // default/fixed duration for the booking
-
-    const bookingDate = new Date(selectedDate);
-    const formattedDate = bookingDate.toLocaleDateString("en-CA");
-
-    const startDateTime = new Date(`${formattedDate}T${startTime}`);
-    const endDateTime = new Date(startDateTime);
-    endDateTime.setHours(endDateTime.getHours() + slotHours);
-
-    const startHour = startDateTime.getHours();
-    const endHour = endDateTime.getHours();
-
-    if (startHour < 4 || endHour > 22 || endHour <= startHour) {
-      setToast({
-        message: `Booking must start atleast between 4:00 AM and end by 10:00 PM.`,
-        type: "error",
-      });
-      return;
-    }
-
-    const formattedEndTime = endDateTime.toTimeString().split(" ")[0]; // HH:MM:SS
-
-    submit({
-      fullname: `${form.firstname} ${form.lastname}`,
-      phone: form.phone,
-      fhId: Number(facilityId),
-      date: formattedDate,
-      startTime: startTime,
-      endTime: formattedEndTime,
-    });
   };
 
   const bookingDate = new Date(selectedDate);
@@ -221,6 +233,19 @@ function OtherFacilitiesBookingPage() {
       });
     }
   };
+
+  const formattedPrice = Number(price).toLocaleString("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  });
+  const currentDate = new Date().toLocaleDateString();
+
+  const handleCloseFormModal = () => {
+    setSelectedDate(null);
+    setStartTime("");
+    setShowForm(null);
+  };
+
   return (
     <>
       {toast && (
@@ -272,12 +297,12 @@ function OtherFacilitiesBookingPage() {
           >
             {/* HEADER */}
             <div className="w-full flex flex-row justify-between items-center mb-6 pb-2 border-b dark:border-gray-700 border-gray-300">
-              <h2 className="font-semibold text-base md:text-lg dark:text-gray-200 text-gray-800">
-                Facility Details
-              </h2>
+              <h1 className="text-2xl md:text-3xl dark:text-white text-gray-800 font-bold">
+                {name}
+              </h1>
 
               <div className="flex items-center gap-3 md:gap-6 lg:gap-8">
-                <Button
+                {/* <Button
                   onClick={handlePreviousRoom}
                   label={
                     <>
@@ -286,7 +311,7 @@ function OtherFacilitiesBookingPage() {
                     </>
                   }
                   style="flex items-center gap-1 text-sm text-blue-500 font-medium rounded px-2 py-1 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
-                />
+                /> */}
                 <Button
                   onClick={handleNextRoom}
                   label={
@@ -300,20 +325,17 @@ function OtherFacilitiesBookingPage() {
             </div>
 
             {/* TITLE AND BASIC INFO */}
-            <h1 className="text-2xl md:text-3xl dark:text-white text-gray-800 font-bold">
-              {name}
-            </h1>
 
-            <p className="text-base md:text-lg dark:text-gray-300 text-gray-800 mt-1">
-              Price: ₱{price} / per {duration} hours
+            <p className="text-base md:text-lg dark:text-white text-gray-800 font-medium tracking-wide">
+              Price: {formattedPrice} / per {duration} hours
             </p>
-            <p className="text-base md:text-lg dark:text-gray-300 text-gray-800">
+            <p className="text-base md:text-lg dark:text-white text-gray-800 font-medium tracking-wide">
               Capacity: {capacity} persons
             </p>
 
             {/* BOOKING SECTION */}
             <div className="mt-8">
-              <h3 className="text-lg md:text-xl font-semibold text-gray-700 dark:text-white mb-3">
+              <h3 className="text-lg md:text-xl font-normal text-gray-700 dark:text-white mb-3">
                 Book This Facility
               </h3>
 
@@ -389,27 +411,34 @@ function OtherFacilitiesBookingPage() {
       {/* FORM MODAL WITH ADJUSTED WIDTH */}
       {showForm === "add_user_details" && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
-          <div className="bg-white p-8 rounded-2xl shadow-xl w-[95%] max-w-5xl max-h-[98vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
-              Booking Details & Your Information
+          <div className="bg-white p-8 rounded-2xl shadow-xl w-[95%] max-w-5xl max-h-[98vh] overflow-y-auto relative">
+            <h2 className="text-lg md:text-2xl font-bold text-center text-gray-900 mb-8">
+              Reservation Details & Your Information
             </h2>
-
+            <icons.MdOutlineClose
+              onClick={handleCloseFormModal}
+              className="absolute top-2 right-2 text-2xl cursor-pointer"
+            />
             <div className="flex flex-col md:flex-row md:gap-12">
               <div className="md:w-3/5 mb-8 md:mb-0 pr-6 border-r border-gray-300">
                 <div className="grid grid-cols-3 gap-6 mb-6 text-gray-700">
                   {/* Make "Choosen Date" span 2 columns */}
                   <div className="flex flex-col items-center border-r border-gray-300 pr-4 col-span-2">
-                    <span className="text-sm uppercase font-semibold mb-1">
+                    <span className="text-xs md:text-sm uppercase font-semibold mb-1">
                       Choosen Date
                     </span>
-                    <span className="text-lg font-medium">{formattedDate}</span>
+                    <span className="text-xs md:text-sm font-medium">
+                      {formattedDate}
+                    </span>
                   </div>
 
                   <div className="flex flex-col items-center pl-4">
-                    <span className="text-sm uppercase font-semibold mb-1">
+                    <span className="text-xs md:text-sm uppercase font-semibold mb-1">
                       Start Time
                     </span>
-                    <span className="text-lg font-medium">{startTime} AM</span>
+                    <span className="text-xs md:text-sm font-medium">
+                      {startTime} AM
+                    </span>
                   </div>
                 </div>
 
@@ -458,12 +487,13 @@ function OtherFacilitiesBookingPage() {
                     required
                   />
 
-                  <div className="flex items-center mb-6">
+                  {/* REMEMBER ME */}
+                  <div className="flex items-center mt-2 mb-3 text-xs md:text-sm">
                     <input
                       type="checkbox"
                       id="remember"
                       name="remember"
-                      className="h-5 w-5 rounded border-gray-300 focus:ring-blue-500"
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       checked={form.remember}
                       onChange={(e) =>
                         setForm((prev) => ({
@@ -474,14 +504,14 @@ function OtherFacilitiesBookingPage() {
                     />
                     <label
                       htmlFor="remember"
-                      className="ml-3 mt-2 block text-sm text-gray-700 select-none cursor-pointer"
+                      className="ml-2 select-none cursor-pointer text-gray-700 dark:text-gray-300"
                     >
                       Remember my info for next time
                     </label>
                   </div>
 
                   {/* TERMS & CONDITIONS */}
-                  <div className="flex items-start mb-4 text-sm">
+                  <div className="flex items-start mb-4 text-xs md:text-sm">
                     <input
                       type="checkbox"
                       id="terms"
@@ -511,12 +541,17 @@ function OtherFacilitiesBookingPage() {
                     </label>
                   </div>
 
-                  <Button
+                  <button
                     type="submit"
-                    style="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300"
-                    label={formLoading ? "Submitting..." : "Done"}
-                    disabled={formLoading}
-                  />
+                    disabled={isSubmitting}
+                    className={`w-full h-12 bg-blue-600 text-white font-semibold rounded-lg ${
+                      isSubmitting
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:bg-blue-700"
+                    }`}
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit Reservation"}
+                  </button>
                 </form>
               </div>
             </div>
@@ -537,6 +572,8 @@ function OtherFacilitiesBookingPage() {
             }}
           >
             <div className="w-full flex flex-col items-center justify-center mb-2">
+              <p className="text-xs">{currentDate}</p>
+
               <p className="text-xs font-bold">
                 2JKLA NATURE HOT SPRING AND INN RESORT COPR.
               </p>
@@ -600,7 +637,7 @@ function OtherFacilitiesBookingPage() {
               </div>
 
               {/* Payment Reminder */}
-              <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded shadow-sm text-yellow-800 text-sm font-semibold">
+              <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded shadow-sm text-yellow-800 text-xs md:text-sm font-semibold">
                 Kindly settle the required <strong>50% advance payment</strong>{" "}
                 within the day to secure the reservation. <br />
                 <span className="block mt-1">

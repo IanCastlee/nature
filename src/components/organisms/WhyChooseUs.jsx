@@ -4,7 +4,7 @@ import Title from "../molecules/Title";
 
 function WhyChooseUs() {
   return (
-    <section className="flex flex-col items-center justify-center gap-12 px-4 lg:px-[130px] py-16 dark:bg-black relative">
+    <section className="flex flex-col items-center justify-center mt-2  px-4 lg:px-[130px] py-16 dark:bg-black relative">
       {/* Section Header */}
       <div className="w-full flex flex-col justify-center items-center text-center">
         <SubtTitle title="WHY CHOOSE US" />

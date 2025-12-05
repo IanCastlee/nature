@@ -115,6 +115,8 @@ function AdminTermsAndConditions() {
     });
   };
 
+  console.log("FDBHF: ", deleteItem?.id);
+
   return (
     <>
       <div className="scroll-smooth">
@@ -203,9 +205,9 @@ function AdminTermsAndConditions() {
           name={deleteItem?.title}
           loading={inactiveLoading}
           onCancel={() => setDeleteItem(null)}
-          label="Yes, Set as not active"
+          label="Yes, Delete"
           label2="not-active"
-          label3="This will hide this record but not delete it permanently."
+          label3="This will permanently delete this record."
           onConfirm={() =>
             setInactive({ id: deleteItem?.id, action: "set_inactive" })
           }

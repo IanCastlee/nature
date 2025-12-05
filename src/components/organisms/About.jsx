@@ -16,12 +16,12 @@ function About() {
   const isInView = useInView(ref, { once: true, amount: 0.3 });
 
   return (
-    <section className="flex flex-col md:flex-row items-start justify-between gap-8 px-2 lg:px-[130px] md:px-2 py-16 dark:bg-black relative">
+    <section className="flex flex-col md:flex-row items-start justify-between gap-8 px-2 lg:px-[130px] md:px-2 lg:py-16 dark:bg-black relative">
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full h-[200px] lg:h-[270px] md:h-[250px] md:w-1/2 "
+        className="hidden md:block w-full h-[200px] lg:h-[270px] md:h-[250px] md:w-1/2"
       >
         <LazyLoadImage
           src={images.aboutbg}
@@ -38,16 +38,16 @@ function About() {
         transition={{ duration: 0.5 }}
         className="w-full md:w-1/2"
       >
-        <div className="flex flex-col justify-start items-start ">
+        <div className="flex flex-col lg:justify-start md:justify-start justify-center items-center ">
           <SubtTitle title="ABOUT US" hidden="hidden" />
-          <Title title="2JKLA Nature Hot Spring" />
         </div>
-
-        <p className="text-sm text-gray-700 mb-4 leading-relaxed dark:text-white">
+        <p className="dark:text-white text-black leading-relaxed">
           Welcome to{" "}
-          <span className="text-blue-400"> 2JKLA Nature Hot Spring</span> Inn
-          and Resort Corp., your premier destination for relaxation, adventure,
-          and unforgettable stays in the heart of Irosin, Sorsogon. Nestled in
+          <span className="text-blue-400">
+            2JKLA Nature Hot Spring Inn and Resort Corp
+          </span>
+          , your premier destination for relaxation, adventure, and
+          unforgettable stays in the heart of Irosin, Sorsogon. Nestled in
           nature’s embrace, our resort offers a harmonious blend of comfort,
           luxury, and authentic experiences powered by natural hot springs.
         </p>

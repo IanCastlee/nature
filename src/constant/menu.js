@@ -142,18 +142,10 @@ export const menuItems = [
 
   {
     name: "Terms and Conditions",
+    to: "/admin/terms",
     icon: icons.RiShakeHandsLine,
-    children: [
-      {
-        name: "Active Terms",
-        to: "/admin/terms",
-      },
-      {
-        name: "History",
-        to: "/admin/announcement-history",
-      },
-    ],
   },
+
   // {
   //   name: "Why Choose Us",
   //   to: "/admin/why-choose-us",

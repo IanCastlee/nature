@@ -23,6 +23,7 @@ function BookWithoutSigningIn() {
   const { roomId } = useParams();
   const [addedExtras, setAddedExtras] = useState([]);
   const [extraQty, setExtraQty] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // const [showNote, setShowNote] = useState(true);
 
@@ -180,57 +181,63 @@ function BookWithoutSigningIn() {
     }
   });
 
-  const handleSubmitBooking = () => {
-    const nights = getNumberOfNights();
+  const handleSubmitBooking = async () => {
+    if (isSubmitting) return; // prevent multiple clicks
+    setIsSubmitting(true); // disable button immediately
 
-    const extrasTotal = addedExtras.reduce(
-      (total, item) => total + item.price * item.quantity * nights,
-      0
-    );
+    try {
+      const nights = getNumberOfNights();
 
-    //  REMEMBER ME — Save or Remove Local Storage
-    if (form.remember) {
-      localStorage.setItem("firstname", form.firstname);
-      localStorage.setItem("lastname", form.lastname);
-      localStorage.setItem("phone", form.phone);
-      localStorage.setItem("remember_info", "true");
-    } else {
-      localStorage.removeItem("firstname");
-      localStorage.removeItem("lastname");
-      localStorage.removeItem("phone");
-      localStorage.removeItem("remember_info");
+      const extrasTotal = addedExtras.reduce(
+        (total, item) => total + item.price * item.quantity * nights,
+        0
+      );
+
+      //  REMEMBER ME — Save or Remove Local Storage
+      if (form.remember) {
+        localStorage.setItem("firstname", form.firstname);
+        localStorage.setItem("lastname", form.lastname);
+        localStorage.setItem("phone", form.phone);
+        localStorage.setItem("remember_info", "true");
+      } else {
+        localStorage.removeItem("firstname");
+        localStorage.removeItem("lastname");
+        localStorage.removeItem("phone");
+        localStorage.removeItem("remember_info");
+      }
+
+      if (!form.terms) {
+        setIsSubmitting(false); // re-enable if terms not checked
+        return;
+      }
+
+      const payload = {
+        fullname: `${form.firstname} ${form.lastname}`,
+        phone: form.phone,
+        facility_id: Number(roomId),
+        check_in: selectedRange.from
+          ? selectedRange.from.toLocaleDateString("en-CA")
+          : null,
+        check_out: selectedRange.to
+          ? selectedRange.to.toLocaleDateString("en-CA")
+          : null,
+        nights,
+        extras: addedExtras.map((extra) => ({
+          id: extra.id,
+          name: extra.name,
+          quantity: extra.quantity,
+          price: extra.price,
+        })),
+        total_price: nights * Number(price) + extrasTotal,
+      };
+
+      // Await if submit returns a promise
+      await submit(payload);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false); // always re-enable after submission
     }
-
-    if (!form.terms) {
-      return;
-    }
-
-    const payload = {
-      fullname: `${form.firstname} ${form.lastname}`,
-      phone: form.phone,
-
-      facility_id: Number(roomId),
-
-      check_in: selectedRange.from
-        ? selectedRange.from.toLocaleDateString("en-CA")
-        : null,
-
-      check_out: selectedRange.to
-        ? selectedRange.to.toLocaleDateString("en-CA")
-        : null,
-
-      nights,
-      extras: addedExtras.map((extra) => ({
-        id: extra.id,
-        name: extra.name,
-        quantity: extra.quantity,
-        price: extra.price,
-      })),
-
-      total_price: nights * Number(price) + extrasTotal,
-    };
-
-    submit(payload);
   };
 
   // Function to handle adding selected extra to the list
@@ -363,6 +370,11 @@ function BookWithoutSigningIn() {
     setShowForm(null);
   };
 
+  const formattedPrice = Number(price).toLocaleString("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  });
+  const currentDate = new Date().toLocaleDateString();
   return (
     <>
       {toast && (
@@ -383,12 +395,14 @@ function BookWithoutSigningIn() {
           />
           <div className="w-full md:w-full lg:w-1/2  p-6 overflow-y-auto h-screen">
             <div className="w-full flex flex-row justify-between items-center mb-5 pb-1 border-b dark:border-gray-600 border-gray-300 ">
-              <h2 className="font-semibold text-sm dark:text-gray-200 text-gray-800">
+              {/* <h2 className="font-semibold text-sm dark:text-gray-200 text-gray-800">
                 Room Details
-              </h2>
-
+              </h2> */}
+              <h1 className="text-3xl dark:text-white text-gray-800 font-semibold">
+                {room_name}
+              </h1>
               <div className="flex flex-row items-center lg:gap-10 md:gap-10 gap-4">
-                <Button
+                {/* <Button
                   onClick={handlePreviousRoom}
                   label={
                     <>
@@ -397,7 +411,7 @@ function BookWithoutSigningIn() {
                     </>
                   }
                   style="flex flex-row items-center gap-1 text-sm text-blue-500 font-medium rounded-sm px-2 transition-all duration-300 transform hover:scale-105 mb-4"
-                />
+                /> */}
                 <Button
                   onClick={handleNextRoom}
                   label={
@@ -411,23 +425,20 @@ function BookWithoutSigningIn() {
               </div>
             </div>
 
-            <h1 className="text-3xl dark:text-white text-gray-800 font-semibold">
-              {room_name}
-            </h1>
-            <p className="text-lg dark:text-white text-gray-800 font-normal">
-              Price: {price} / per night
+            <p className="text-base md:text-lg dark:text-white text-gray-800 font-medium tracking-wide">
+              Price: {formattedPrice} / per night
             </p>
-            <p className="text-lg dark:text-white text-gray-800 font-normal">
+            <p className="text-base md:text-lg dark:text-white text-gray-800 font-medium tracking-wide">
               Capacity: {capacity} persons
             </p>
 
             {/*  Extras Dropdown */}
             <div className=" mt-4 border-t pt-4 dark:border-gray-600 border-gray-300 pb-4">
-              <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-sm">
+              <h3 className="font-normal mb-2 text-gray-800 dark:text-gray-50 text-sm">
                 Select your prepared date
               </h3>
               <div className="flex lg:flex-row md:flex-col flex-col gap-6 items-center">
-                <div className="scale-90 md:scale-100 w-fit border p-2 rounded-lg text-black dark:text-white bg-white dark:bg-gray-900">
+                <div className="lg:scale-90   md:scale-100 scale-100  w-fit border p-2 rounded-lg text-black dark:text-white bg-white dark:bg-gray-900">
                   <DayPicker
                     mode="range"
                     selected={selectedRange}
@@ -454,7 +465,7 @@ function BookWithoutSigningIn() {
                     {nights} night{nights !== 1 ? "s" : ""}
                   </p>
                   {selectedRange?.from && selectedRange?.to ? (
-                    <div className="flex flex-row mt-2 text-sm text-gray-700 dark:text-gray-300">
+                    <div className="flex lg:flex-row md:flex-row flex-col mt-2 text-sm text-gray-800 dark:text-gray-300">
                       <p>
                         📅 <strong>Check-in:</strong>{" "}
                         {selectedRange.from.toLocaleDateString()}
@@ -624,9 +635,10 @@ function BookWithoutSigningIn() {
           <div className="bg-white p-4 rounded-2xl shadow-xl w-[95%] max-w-5xl sm:max-h-[98vh] md:max-h-[98vh] lg:max-h-[97vh] overflow-y-auto relative">
             {/* HEADER */}
 
-            <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
+            <h2 className="text-lg md:text-2xl font-bold text-center text-gray-900 mb-8">
               Reservation Details & Your Information
             </h2>
+
             <icons.MdOutlineClose
               onClick={handleCloseFormModal}
               className="absolute top-2 right-2 text-2xl cursor-pointer"
@@ -637,12 +649,13 @@ function BookWithoutSigningIn() {
               {/* LEFT - SUMMARY */}
               <div className="md:w-1/2 mb-8 md:mb-0 pr-0 md:pr-6 border-r-0 sm:border-0 md:border-0 lg:border-r lg:border-gray-300">
                 {/* DATES SUMMARY */}
-                <div className="grid grid-cols-3 gap-6 mb-6 text-gray-700">
-                  <div className="flex flex-col items-center border-r border-gray-300 pr-4">
-                    <span className="text-sm uppercase font-semibold mb-1">
+                <div className="flex gap-4 mb-6 text-gray-700">
+                  {/* CHECK-IN */}
+                  <div className="flex-1 flex flex-col items-center border-r border-gray-300 pr-2">
+                    <span className="text-xs md:text-sm uppercase font-semibold mb-1">
                       Check-In
                     </span>
-                    <span className="text-sm font-medium">
+                    <span className="text-xs md:text-sm font-medium">
                       {selectedRange.from
                         ? selectedRange.from.toLocaleDateString(undefined, {
                             year: "numeric",
@@ -652,11 +665,13 @@ function BookWithoutSigningIn() {
                         : "—"}
                     </span>
                   </div>
-                  <div className="flex flex-col items-center border-r border-gray-300 px-4">
-                    <span className="text-sm uppercase font-semibold mb-1">
+
+                  {/* CHECK-OUT */}
+                  <div className="flex-1 flex flex-col items-center border-r border-gray-300 px-2">
+                    <span className="text-xs md:text-sm uppercase font-semibold mb-1">
                       Check-Out
                     </span>
-                    <span className="text-sm font-medium">
+                    <span className="text-xs md:text-sm font-medium">
                       {selectedRange.to
                         ? selectedRange.to.toLocaleDateString(undefined, {
                             year: "numeric",
@@ -666,11 +681,15 @@ function BookWithoutSigningIn() {
                         : "—"}
                     </span>
                   </div>
-                  <div className=" flex flex-col items-center ">
-                    <span className="text-sm uppercase font-semibold mb-1">
+
+                  {/* NIGHTS */}
+                  <div className="flex-[0.4] flex flex-col items-center">
+                    <span className="text-xs md:text-sm uppercase font-semibold mb-1">
                       Nights
                     </span>
-                    <span className="text-sm font-medium">{nights}</span>
+                    <span className="text-xs md:text-sm font-medium">
+                      {nights}
+                    </span>
                   </div>
                 </div>
 
@@ -741,7 +760,7 @@ function BookWithoutSigningIn() {
                   />
 
                   {/* REMEMBER ME */}
-                  <div className="flex items-center mb-3 text-sm">
+                  <div className="flex items-center mt-2 mb-3 text-xs md:text-sm">
                     <input
                       type="checkbox"
                       id="remember"
@@ -764,7 +783,7 @@ function BookWithoutSigningIn() {
                   </div>
 
                   {/* TERMS & CONDITIONS */}
-                  <div className="flex items-start mb-4 text-sm">
+                  <div className="flex items-start mb-4 text-xs md:text-sm">
                     <input
                       type="checkbox"
                       id="terms"
@@ -797,10 +816,16 @@ function BookWithoutSigningIn() {
                   {/* SUBMIT BUTTON */}
                   <Button
                     type="submit"
-                    style="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300 text-sm"
-                    label={formLoading ? "Submitting..." : "Submit"}
-                    disabled={formLoading}
                     onClick={handleSubmitBooking}
+                    disabled={isSubmitting}
+                    style={`w-full h-12 bg-blue-600 text-white font-semibold rounded-lg transition duration-300 ${
+                      isSubmitting
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:bg-blue-700"
+                    }`}
+                    label={
+                      isSubmitting ? "Submitting..." : "Submit Reservation"
+                    }
                   />
                 </form>
               </div>
@@ -810,169 +835,165 @@ function BookWithoutSigningIn() {
       )}
       {/* BOOKING SUMMARY MODAL */}
       {showSummaryModal && bookingSummary && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md p-4">
           <div
             ref={summaryRef}
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-[600px] p-8 relative max-h-[98vh] overflow-y-auto font-sans"
+            className="relative w-full max-w-[600px] max-h-[98vh] overflow-y-auto rounded-2xl shadow-2xl font-sans"
             style={{
               backgroundImage: `url(${natureLogo})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
           >
-            <div className="w-full flex flex-col items-center justify-center mb-2">
-              <p className="text-xs font-bold">
-                2JKLA NATURE HOT SPRING AND INN RESORT COPR.
-              </p>
-              <p className="text-xs font-normal">Monbon, Irosin, Sorsgon</p>
-            </div>
-            {/* Header */}
-            <h2 className="text-2xl font-extrabold mb-6 text-center text-gray-900 tracking-wide">
-              Reservation Details
-            </h2>
+            {/* Semi-transparent overlay for readability */}
+            <div className="absolute inset-0 bg-white/90 rounded-2xl"></div>
 
-            <div className="space-y-4 text-gray-800 text-sm leading-relaxed">
-              {/* Booking Info */}
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2 border-b border-gray-200 pb-4">
-                <p>
-                  <span className="font-semibold text-gray-700">Room:</span>{" "}
-                  {room_name}
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-700">
-                    Booking ID:
-                  </span>{" "}
-                  {bookingSummary.booking_id}
-                </p>
+            {/* Content */}
+            <div className="relative p-8 space-y-4 text-gray-900">
+              {/* Header info */}
+              <div className="w-full flex flex-col items-center mb-2 text-center">
+                <p className="text-xs">{currentDate}</p>
 
-                <p>
-                  <span className="font-semibold text-gray-700">Fullname:</span>{" "}
-                  {bookingSummary.fullname}
+                <p className="text-xs font-bold">
+                  2JKLA NATURE HOT SPRING AND INN RESORT COPR.
                 </p>
-                <p>
-                  <span className="font-semibold text-gray-700">Phone:</span>{" "}
-                  {bookingSummary.phone}
-                </p>
-                {bookingSummary.address && (
-                  <p className="col-span-2">
-                    <span className="font-semibold text-gray-700">
-                      Address:
-                    </span>{" "}
-                    {bookingSummary.address}
-                  </p>
-                )}
-                <p>
-                  <span className="font-semibold text-gray-700">Check-in:</span>{" "}
-                  {bookingSummary.start_date}
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-700">
-                    Check-out:
-                  </span>{" "}
-                  {bookingSummary.end_date}
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-700">Nights:</span>{" "}
-                  {bookingSummary.nights}
-                </p>
+                <p className="text-xs font-normal">Monbon, Irosin, Sorsgon</p>
               </div>
 
-              {/* Prices */}
-              <div className="border-b border-gray-200 pb-4 space-y-1">
-                <p>
-                  <span className="font-semibold text-gray-700">
-                    Base Price:
-                  </span>{" "}
-                  ₱{Number(bookingSummary.base_price).toLocaleString()}
-                </p>
+              <h2 className="text-2xl md:text-3xl font-extrabold mb-6 text-center tracking-wide">
+                Reservation Details
+              </h2>
 
-                {bookingSummary.extras_total > 0 && (
+              {/* Booking info */}
+              <div className="space-y-3 text-sm md:text-base leading-relaxed">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 border-b border-gray-200 pb-4">
                   <p>
-                    <span className="font-semibold text-gray-700">
-                      Extras Total:
-                    </span>{" "}
-                    ₱{Number(bookingSummary.extras_total).toLocaleString()}
+                    <span className="font-semibold">Room:</span> {room_name}
                   </p>
+                  <p>
+                    <span className="font-semibold">Booking ID:</span>{" "}
+                    {bookingSummary.booking_id}
+                  </p>
+
+                  <p>
+                    <span className="font-semibold">Fullname:</span>{" "}
+                    {bookingSummary.fullname}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Phone:</span>{" "}
+                    {bookingSummary.phone}
+                  </p>
+
+                  {bookingSummary.address && (
+                    <p className="col-span-2">
+                      <span className="font-semibold">Address:</span>{" "}
+                      {bookingSummary.address}
+                    </p>
+                  )}
+
+                  <p>
+                    <span className="font-semibold">Check-in:</span>{" "}
+                    {bookingSummary.start_date}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Check-out:</span>{" "}
+                    {bookingSummary.end_date}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Nights:</span>{" "}
+                    {bookingSummary.nights}
+                  </p>
+                </div>
+
+                {/* Prices */}
+                <div className="border-b border-gray-200 pb-4 space-y-1">
+                  <p>
+                    <span className="font-semibold">Base Price:</span> ₱
+                    {Number(bookingSummary.base_price).toLocaleString()}
+                  </p>
+                  {bookingSummary.extras_total > 0 && (
+                    <p>
+                      <span className="font-semibold">Extras Total:</span> ₱
+                      {Number(bookingSummary.extras_total).toLocaleString()}
+                    </p>
+                  )}
+                  <p className="font-extrabold text-lg md:text-xl text-blue-700">
+                    Total Price: ₱
+                    {Number(bookingSummary.total_price).toLocaleString()}
+                  </p>
+                </div>
+
+                {/* Extras */}
+                {bookingSummary.extras?.length > 0 && (
+                  <div className="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
+                    <h3 className="font-semibold mb-2">Extras</h3>
+                    <ul className="list-disc list-inside space-y-1">
+                      {bookingSummary.extras.slice(0, 2).map((extra, idx) => (
+                        <li key={idx} className="flex justify-between">
+                          <span>
+                            {extra.name} (x{extra.quantity})
+                          </span>
+                          <span className="font-semibold text-blue-600">
+                            ₱
+                            {Number(
+                              (extra.price || 0) * bookingSummary.nights
+                            ).toLocaleString()}
+                          </span>
+                        </li>
+                      ))}
+                      {bookingSummary.extras.length > 2 && (
+                        <li className="flex justify-between font-semibold text-blue-600">
+                          <span>
+                            and {bookingSummary.extras.length - 2} other
+                            {bookingSummary.extras.length - 2 > 1 ? "s" : ""}
+                          </span>
+                          <span>
+                            ₱
+                            {Number(
+                              bookingSummary.extras
+                                .slice(2)
+                                .reduce(
+                                  (sum, extra) =>
+                                    sum +
+                                    Number(extra.price || 0) *
+                                      bookingSummary.nights,
+                                  0
+                                )
+                            ).toLocaleString()}
+                          </span>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
                 )}
 
-                <p className="font-extrabold text-lg text-blue-700">
-                  Total Price: ₱
-                  {Number(bookingSummary.total_price).toLocaleString()}
-                </p>
-              </div>
-
-              {/* Extras */}
-              {bookingSummary.extras?.length > 0 && (
-                <div className="px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
-                  <h3 className="font-semibold mb-2 text-gray-800">Extras</h3>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
-                    {/* Show first 2 extras */}
-                    {bookingSummary.extras.slice(0, 2).map((extra, idx) => (
-                      <li key={idx} className="flex justify-between">
-                        <span>
-                          {extra.name} (x{extra.quantity})
-                        </span>
-                        <span className="font-semibold text-blue-600">
-                          ₱
-                          {Number(
-                            (extra.price || 0) * bookingSummary.nights
-                          ).toLocaleString()}
-                        </span>
-                      </li>
-                    ))}
-
-                    {/* Show "and X others" if more than 2 */}
-                    {bookingSummary.extras.length > 2 && (
-                      <li className="flex justify-between font-semibold text-blue-600">
-                        <span>
-                          and {bookingSummary.extras.length - 2} other
-                          {bookingSummary.extras.length - 2 > 1 ? "s" : ""}
-                        </span>
-                        <span>
-                          ₱
-                          {Number(
-                            bookingSummary.extras
-                              .slice(2)
-                              .reduce(
-                                (sum, extra) =>
-                                  sum +
-                                  Number(extra.price || 0) *
-                                    bookingSummary.nights,
-                                0
-                              )
-                          ).toLocaleString()}
-                        </span>
-                      </li>
-                    )}
-                  </ul>
+                {/* Payment Reminder */}
+                <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded shadow-sm text-yellow-800 text-xs md:text-sm font-semibold">
+                  Kindly settle the required{" "}
+                  <strong>50% advance payment</strong> within the day to secure
+                  the reservation. <br />
+                  <span className="block mt-1">
+                    ⚠️ If the advance payment is not received within the day,
+                    the reservation will automatically be removed.
+                  </span>
+                  <span className="block mt-1">
+                    ❌ This booking is <strong>non-refundable</strong> and{" "}
+                    <strong>cannot be cancelled</strong>.
+                  </span>
                 </div>
-              )}
-
-              {/* Payment Reminder */}
-              <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded shadow-sm text-yellow-800 text-sm font-semibold">
-                Kindly settle the required <strong>50% advance payment</strong>{" "}
-                within the day to secure the reservation. <br />
-                <span className="block mt-1">
-                  ⚠️ If the advance payment is not received within the day, the
-                  reservation will automatically be removed.
-                </span>
-                <span className="block mt-1">
-                  ❌ This booking is <strong>non-refundable</strong> and{" "}
-                  <strong>cannot be cancelled</strong>.
-                </span>
               </div>
-            </div>
 
-            {/* Close Button */}
-            <button
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 transition text-3xl font-bold"
-              onClick={() => setShowSummaryModal(false)}
-            >
-              &times;
-            </button>
+              {/* Close Button */}
+              {/* <button
+                className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 transition text-3xl font-bold"
+                onClick={() => setShowSummaryModal(false)}
+              >
+                &times;
+              </button> */}
+            </div>
           </div>
 
-          {/* SCREENSHOT OVERLAY (separate, covers whole screen) */}
+          {/* SCREENSHOT OVERLAY */}
           <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-auto">
             <div className="bg-black bg-opacity-60 flex items-center justify-center w-full h-full">
               <div className="bg-white rounded-xl p-6 text-center shadow-lg max-w-md w-full space-y-4 border border-gray-300">

@@ -3,13 +3,15 @@ import { motion } from "framer-motion";
 
 function SubtTitle({ title, hidden, hidden2 }) {
   return (
-    <div className="flex flex-row justify-center items-center gap-2">
+    <div
+      className={`flex flex-row lg:justify-start justify-center items-center gap-2`}
+    >
       <motion.div
         initial={{ opacity: 0, x: -50 }}
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6 }}
         viewport={{ once: false, amount: 0.5 }}
-        className={`h-[1px] w-[35px] bg-blue-400 ${hidden}`}
+        className={`h-[1px] w-[35px] bg-blue-400 lg:${hidden}`}
       ></motion.div>
       <motion.span
         initial={{ opacity: 0, y: -10 }}

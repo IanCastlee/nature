@@ -216,7 +216,7 @@ function RoomCard({ rooms }) {
                           ? "Unavailable"
                           : user
                           ? "Reserve Now"
-                          : "Choose Date to Reserve"
+                          : "Reserve Now"
                       }
                     />
                   </motion.div>

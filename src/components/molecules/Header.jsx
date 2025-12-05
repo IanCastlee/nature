@@ -4,11 +4,11 @@ import { images } from "../../constant/image";
 import { icons } from "../../constant/icon";
 import useThemeStore from "../../store/themeStore";
 import useAuthStore from "../../store/authStore";
-import Button from "../atoms/Button";
 import useGetData from "../../hooks/useGetData";
 import Notification from "../organisms/Notification";
 import { useForm } from "../../store/useRoomStore";
 import Announcement from "../pages/Announcement";
+import { motion, AnimatePresence } from "framer-motion";
 
 function Header({ isHome }) {
   const { user } = useAuthStore();
@@ -170,8 +170,8 @@ function Header({ isHome }) {
                   <Link
                     title={item.label}
                     {...(item.isLink
-                      ? { to: item.path } // use `to` for Link navigation
-                      : { onClick: item.action })} // use onClick for actions
+                      ? { to: item.path }
+                      : { onClick: item.action })}
                     className={`text-sm transition-colors duration-300 group-hover:text-blue-400
                     before:content-[''] before:absolute before:bottom-0 before:left-1/2
                     before:translate-x-[-50%] before:h-[2px] before:w-0
@@ -237,212 +237,207 @@ function Header({ isHome }) {
                 </div>
               </li>
             )}
-            <icons.RiMenuLine
+
+            <div
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className={`${
                 scrolled
                   ? "dark:text-gray-400 text-black"
-                  : "bg-transparent text-gray-400 "
+                  : "bg-transparent text-gray-400"
               } text-3xl cursor-pointer`}
-            />
+            >
+              {mobileMenuOpen ? <icons.MdOutlineClose /> : <icons.RiMenuLine />}
+            </div>
           </div>
         </div>
-
         {/* Mobile Menu (unchanged) */}
         {mobileMenuOpen && (
-          <div className="absolute top-full left-0 w-full bg-white dark:bg-gray-800 shadow-lg z-40 md:hidden">
-            {user && (
-              <div className="mt-8 px-4 w-full flex flex-row justify-between">
-                <div className="flex flex-row justify-start items-center gap-2">
-                  <icons.FaUserCircle className=" text-[40px] text-blue-600" />
-                  <span className="text-sm text-black dark:text-white font-medium">
-                    {user?.firstname.split(" ")[0]}
-                  </span>
-                </div>
-
-                <icons.IoSettingsOutline className="text-lg text-black cursor-pointer dark:text-gray-300" />
-              </div>
-            )}
-            <ul className="flex flex-col gap-4 p-4 text-sm text-black dark:text-white">
+          <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.25 }}
+              className="absolute top-full left-0 w-full bg-white dark:bg-gray-800 shadow-xl z-40 md:hidden"
+            >
+              {/* USER SECTION */}
               {user && (
-                <li>
-                  <Link
-                    to={`/my-booking/${user?.user_id}`}
-                    onClick={() => setMobileMenuOpen(false)} // close menu after click
-                    className="block w-full py-2 hover:bg-gray-100 pl-2 dark:hover:bg-gray-700 rounded"
-                  >
-                    My Booking
-                  </Link>
-                </li>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-center justify-between px-5 py-4 border-b dark:border-gray-700"
+                >
+                  <div className="flex items-center gap-3">
+                    <icons.FaUserCircle className="text-[44px] text-blue-600" />
+                    <span className="text-base font-medium text-gray-800 dark:text-white">
+                      {user?.firstname.split(" ")[0]}
+                    </span>
+                  </div>
+                  <icons.IoSettingsOutline className="text-2xl text-gray-700 dark:text-gray-300 cursor-pointer" />
+                </motion.div>
               )}
 
-              {/* Main Links */}
-              {["Home", "About", "Gallery"].map((item) => (
-                <li key={item}>
-                  <Link
-                    to={`/${item === "Home" ? "" : item.toLowerCase()}`}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full py-2 pl-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                  >
-                    {item}
-                  </Link>
-                </li>
-              ))}
-
-              {/* Offer Dropdown */}
-              <li>
-                <button
-                  className="w-full flex items-center justify-between py-2 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                  onClick={() => setMobileOfferOpen(!mobileOfferOpen)}
-                >
-                  <span>Offer</span>
-                  {mobileOfferOpen ? (
-                    <icons.MdOutlineKeyboardArrowUp className="text-lg" />
-                  ) : (
-                    <icons.MdOutlineKeyboardArrowDown className="text-lg" />
-                  )}
-                </button>
-
-                {/* Offer Submenu */}
-                {mobileOfferOpen && (
-                  <ul className="pl-4 mt-2 flex flex-col gap-2">
-                    {/* Room Categories */}
-                    <li>
-                      <button
-                        className="w-full flex items-center justify-between py-1 hover:underline rounded"
-                        onClick={() => setMobileRoomsOpen(!mobileRoomsOpen)}
-                      >
-                        Room Categories
-                        {mobileRoomsOpen ? (
-                          <icons.MdOutlineKeyboardArrowUp className="text-lg" />
-                        ) : (
-                          <icons.MdOutlineKeyboardArrowDown className="text-lg" />
-                        )}
-                      </button>
-
-                      {mobileRoomsOpen && (
-                        <ul className="pl-4 mt-1 flex flex-col gap-1">
-                          {data?.map((item) => (
-                            <li
-                              key={item.category_id}
-                              onClick={() => {
-                                navigate(`/room-category/${item.category_id}`);
-                                setMobileMenuOpen(false);
-                                setMobileOfferOpen(false);
-                                setMobileRoomsOpen(false);
-                              }}
-                              className="cursor-pointer text-xs hover:underline py-1"
-                            >
-                              {item.category}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </li>
-
-                    {/* Other Offer Links */}
-                    <li
-                      className="cursor-pointer py-1 hover:underline rounded"
-                      onClick={() => {
-                        navigate("/cottages");
-                        setMobileMenuOpen(false);
-                        setMobileOfferOpen(false);
-                      }}
+              {/* MENU LIST */}
+              <ul className="flex flex-col gap-2 px-5 py-4 text-gray-800 dark:text-gray-100 text-base">
+                {/* My Booking */}
+                {user && (
+                  <li>
+                    <Link
+                      to={`/my-booking/${user?.user_id}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
-                      Cottages
-                    </li>
-                    <li
-                      className="cursor-pointer py-1 hover:underline rounded"
-                      onClick={() => {
-                        navigate("/function-halls");
-                        setMobileMenuOpen(false);
-                        setMobileOfferOpen(false);
-                      }}
-                    >
-                      Function Hall
-                    </li>
-                    <li
-                      className="cursor-pointer py-1 hover:underline rounded"
-                      onClick={() => {
-                        navigate("/function-halls");
-                        setMobileMenuOpen(false);
-                        setMobileOfferOpen(false);
-                      }}
-                    >
-                      Function Hall
-                    </li>
-                  </ul>
+                      My Booking
+                    </Link>
+                  </li>
                 )}
-              </li>
 
-              {[
-                { label: "Announcement", form: "announcement" },
-                // { label: "House Rules", form: "house_rules" },
-                { label: "Contacts", form: "/contacts", navigate: true },
-              ].map((item) => (
-                <li key={item.label}>
-                  <div
-                    onClick={() => {
-                      if (item.navigate) {
-                        navigate(item.form);
-                      } else {
-                        setShowForm(item.form);
-                      }
-                      setMobileMenuOpen(false);
-                      setMobileOfferOpen(false);
-                    }}
-                    className="block w-full py-2 pl-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer"
-                  >
-                    {item.label}
-                  </div>
-                </li>
-              ))}
+                {/* Main Links */}
+                {["Home", "About", "Gallery"].map((item) => (
+                  <li key={item}>
+                    <Link
+                      to={`/${item === "Home" ? "" : item.toLowerCase()}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      {item}
+                    </Link>
+                  </li>
+                ))}
 
-              {/* Theme Toggle */}
-              <li>
-                <button
-                  onClick={toggleDarkMode}
-                  className="w-full py-2 px-2 flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                >
-                  {darkMode ? "Light Mode" : "Dark Mode"}
-                  {darkMode ? (
-                    <icons.IoSunnySharp className="text-yellow-500" />
-                  ) : (
-                    <icons.IoMoonSharp className="text-gray-500" />
-                  )}
-                </button>
-              </li>
-
-              {/* Sign In / User */}
-              {/* <li>
-                {user ? (
-                  <Button
-                    onClick={() => {
-                      useAuthStore.getState().logout();
-                      navigate("/signin");
-                    }}
-                    style="w-full flex flex-row justify-center items-center px-4 py-2 text-sm text-white hover:bg-gray-500 dark:hover:bg-gray-700 bg-red-600 rounded-full text-center gap-2"
-                    label={
-                      <>
-                        Logout{" "}
-                        <icons.IoIosLogOut className="text-lg text-white" />
-                      </>
-                    }
-                  />
-                ) : (
+                {/* OFFER */}
+                <li>
                   <button
-                    onClick={() => {
-                      navigate("/signin");
-                      setMobileMenuOpen(false);
-                    }}
-                    className="w-full py-2 px-2 bg-blue-400 text-white rounded-full text-xs text-center"
+                    className="w-full flex items-center justify-between py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                    onClick={() => setMobileOfferOpen(!mobileOfferOpen)}
                   >
-                    Sign In
+                    Offer
+                    {mobileOfferOpen ? (
+                      <icons.MdOutlineKeyboardArrowUp className="text-xl" />
+                    ) : (
+                      <icons.MdOutlineKeyboardArrowDown className="text-xl" />
+                    )}
                   </button>
-                )}
-              </li> */}
-            </ul>
-          </div>
+
+                  {/* Offer Dropdown Animation */}
+                  <AnimatePresence>
+                    {mobileOfferOpen && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="pl-4 mt-2 flex flex-col gap-2 overflow-hidden border-l dark:border-gray-700"
+                      >
+                        {/* ROOM CATEGORIES */}
+                        <li>
+                          <button
+                            className="w-full flex items-center justify-between py-1 hover:underline"
+                            onClick={() => setMobileRoomsOpen(!mobileRoomsOpen)}
+                          >
+                            Room Categories
+                            {mobileRoomsOpen ? (
+                              <icons.MdOutlineKeyboardArrowUp className="text-lg" />
+                            ) : (
+                              <icons.MdOutlineKeyboardArrowDown className="text-lg" />
+                            )}
+                          </button>
+
+                          <AnimatePresence>
+                            {mobileRoomsOpen && (
+                              <motion.ul
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.25 }}
+                                className="pl-4 mt-1 flex flex-col gap-1 overflow-hidden"
+                              >
+                                {data?.map((item) => (
+                                  <li
+                                    key={item.category_id}
+                                    onClick={() => {
+                                      navigate(
+                                        `/room-category/${item.category_id}`
+                                      );
+                                      setMobileMenuOpen(false);
+                                      setMobileOfferOpen(false);
+                                      setMobileRoomsOpen(false);
+                                    }}
+                                    className="cursor-pointer text-sm py-1 hover:underline"
+                                  >
+                                    {item.category}
+                                  </li>
+                                ))}
+                              </motion.ul>
+                            )}
+                          </AnimatePresence>
+                        </li>
+
+                        {/* OTHER OFFERS */}
+                        <li
+                          className="cursor-pointer py-1 hover:underline"
+                          onClick={() => {
+                            navigate("/cottages");
+                            setMobileMenuOpen(false);
+                            setMobileOfferOpen(false);
+                          }}
+                        >
+                          Cottages
+                        </li>
+
+                        <li
+                          className="cursor-pointer py-1 hover:underline"
+                          onClick={() => {
+                            navigate("/function-halls");
+                            setMobileMenuOpen(false);
+                            setMobileOfferOpen(false);
+                          }}
+                        >
+                          Function Hall
+                        </li>
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+                </li>
+
+                {/* OTHER LINKS */}
+                {[
+                  { label: "Announcement", form: "announcement" },
+                  { label: "Contacts", form: "/contacts", navigate: true },
+                ].map((item) => (
+                  <li key={item.label}>
+                    <div
+                      onClick={() => {
+                        item.navigate
+                          ? navigate(item.form)
+                          : setShowForm(item.form);
+                        setMobileMenuOpen(false);
+                        setMobileOfferOpen(false);
+                      }}
+                      className="block py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                    >
+                      {item.label}
+                    </div>
+                  </li>
+                ))}
+
+                {/* THEME TOGGLE */}
+                <li>
+                  <button
+                    onClick={toggleDarkMode}
+                    className="w-full flex items-center justify-between py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    {darkMode ? "Light Mode" : "Dark Mode"}
+                    {darkMode ? (
+                      <icons.IoSunnySharp className="text-yellow-500" />
+                    ) : (
+                      <icons.IoMoonSharp className="text-gray-500" />
+                    )}
+                  </button>
+                </li>
+              </ul>
+            </motion.div>
+          </AnimatePresence>
         )}
       </header>
 
@@ -453,10 +448,6 @@ function Header({ isHome }) {
       {showForm === "announcement" && (
         <Announcement close={() => setShowForm(null)} />
       )}
-
-      {/* {showForm === "house_rules" && (
-        <HouseRules close={() => setShowForm(null)} />
-      )} */}
     </>
   );
 }
