@@ -52,16 +52,29 @@ if ($action === "set_approve") {
 
 /**
  * ========================================================
- *  DECLINE BOOKING
+ *  DECLINE BOOKING WITH NOTE
  * ========================================================
  */
 if ($action === "set_decline") {
+
     if (!$id) {
         http_response_code(400);
         echo json_encode(["error" => "Missing booking id"]);
         exit;
     }
 
+    // Get decline reason
+    $reason = trim($_POST['reason'] ?? "");
+
+    if ($reason === "") {
+        echo json_encode([
+            "success" => false,
+            "message" => "Decline reason is required."
+        ]);
+        exit;
+    }
+
+    // 1. UPDATE BOOKING STATUS
     $stmt = $conn->prepare("
         UPDATE room_booking 
         SET status = 'declined'
@@ -69,12 +82,33 @@ if ($action === "set_decline") {
     ");
     $stmt->bind_param("i", $id);
 
-    echo $stmt->execute()
-        ? json_encode(["success" => true, "message" => "Booking declined."])
-        : json_encode(["success" => false, "message" => $stmt->error]);
+    if (!$stmt->execute()) {
+        echo json_encode(["success" => false, "message" => $stmt->error]);
+        exit;
+    }
 
+    // 2. INSERT INTO booking_note
+    $noteStmt = $conn->prepare("
+        INSERT INTO booking_note (booking_id, note)
+        VALUES (?, ?)
+    ");
+    $noteStmt->bind_param("is", $id, $reason);
+
+    if (!$noteStmt->execute()) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Declined but failed to save note: " . $noteStmt->error
+        ]);
+        exit;
+    }
+
+    echo json_encode([
+        "success" => true,
+        "message" => "Booking declined and note saved."
+    ]);
     exit;
 }
+
 
 /**
  * ========================================================

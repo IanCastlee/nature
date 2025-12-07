@@ -13,13 +13,13 @@ export const availableRoomColumns = [
         />
 
         {/* Fixed preview on hover */}
-        <div className="hidden group-hover:flex fixed inset-0 bg-black/70 justify-center items-center z-50">
+        {/* <div className="hidden group-hover:flex fixed inset-0 bg-black/70 justify-center items-center z-50">
           <img
             src={`${uploadUrl.uploadurl}/rooms/${item.images[0]}`}
             alt={item.room_name}
             className="max-w-[90%] max-h-[90%] object-cover rounded-lg shadow-lg border border-white"
           />
-        </div>
+        </div> */}
       </div>
     ),
   },
@@ -38,6 +38,10 @@ export const availableRoomColumns = [
   {
     title: "Duration",
     key: "duration",
+  },
+  {
+    title: "Time In/Out",
+    key: "time_in_out",
   },
   {
     title: "Last Maintenance",

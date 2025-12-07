@@ -105,7 +105,7 @@ function PendingPost() {
       {/* Search + Add Button */}
       <div className="w-full flex flex-row justify-between items-center mb-4">
         <span className="dark:text-gray-100 text-xs font-medium">
-          Showing {filteredData.length} pending post
+          Showing {filteredData.length} post(s)
           {filteredData.length !== 1 ? "s" : ""}
         </span>
 

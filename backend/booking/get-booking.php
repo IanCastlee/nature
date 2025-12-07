@@ -7,7 +7,6 @@ $user = require_auth($conn);
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Accept raw JSON if sent
 if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
     $input = json_decode(file_get_contents("php://input"), true);
     $_POST = $input;
@@ -15,29 +14,34 @@ if ($method === "POST" && strpos($_SERVER["CONTENT_TYPE"], "application/json") !
 
 if ($method === "GET") {
 
-    // NEW: support ?id=BOOKING_ID
     $bookingId = $_GET['id'] ?? null;
     $userId    = $_GET['user_id'] ?? null;
     $status    = $_GET['status'] ?? null;
 
-    // Base SQL with joins and extras LEFT JOIN
     $baseSql = "
         SELECT 
-            rb.booking_id, rb.user_id, rb.facility_id, rb.fullname, rb.phone, rb.start_date, rb.end_date, rb.nights, rb.status, rb.price AS booking_price, rb.paid AS booking_paid,
+            rb.booking_id, rb.user_id, rb.facility_id, rb.fullname, rb.phone, rb.start_date, rb.end_date,
+            rb.nights, rb.status, rb.price AS booking_price, rb.paid AS booking_paid,
+
             u.firstname, u.lastname, u.email,
+
             r.room_id, r.room_name, r.price AS room_price, r.capacity, r.duration,
-            be.name AS extra_name, be.quantity AS extra_quantity, be.price AS extra_price
+
+            be.name AS extra_name, be.quantity AS extra_quantity, be.price AS extra_price,
+
+            bn.note AS note   -- <-- ADDED HERE
         FROM room_booking AS rb
         JOIN users AS u ON u.user_id = rb.user_id
         JOIN rooms AS r ON rb.facility_id = r.room_id
+
         LEFT JOIN booking_extras AS be ON be.booking_id = rb.booking_id
+        LEFT JOIN booking_note AS bn ON bn.booking_id = rb.booking_id   -- <-- JOIN NOTE
     ";
 
     $params = [];
     $types = "";
     $conditions = [];
 
-    // NEW: filter by booking_id
     if ($bookingId) {
         $conditions[] = "rb.booking_id = ?";
         $params[] = $bookingId;
@@ -56,7 +60,6 @@ if ($method === "GET") {
         $types .= "s";
     }
 
-    // Build WHERE clause if conditions exist
     if (!empty($conditions)) {
         $baseSql .= " WHERE " . implode(" AND ", $conditions);
     }
@@ -64,7 +67,6 @@ if ($method === "GET") {
     $baseSql .= " ORDER BY rb.booking_id DESC";
 
     $stmt = $conn->prepare($baseSql);
-
     if (!empty($params)) {
         $stmt->bind_param($types, ...$params);
     }
@@ -92,6 +94,7 @@ if ($method === "GET") {
                 'fullname' => $row['fullname'],
                 'phone' => $row['phone'],
                 'email' => $row['email'],
+
                 'room' => [
                     'room_id' => $row['room_id'],
                     'room_name' => $row['room_name'],
@@ -99,11 +102,16 @@ if ($method === "GET") {
                     'capacity' => $row['capacity'],
                     'duration' => $row['duration']
                 ],
+
+                // ADD NOTE ONLY IF DECLINED
+                'note' => ($row['status'] === 'declined')
+                    ? ($row['note'] ?? null)
+                    : null,
+
                 'extras' => []
             ];
         }
 
-        // Add extras if exist
         if (!empty($row['extra_name'])) {
             $bookings[$id]['extras'][] = [
                 'name' => $row['extra_name'],

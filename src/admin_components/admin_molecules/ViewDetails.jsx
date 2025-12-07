@@ -17,7 +17,6 @@ function ViewDetails({ id }) {
     return <p className="text-center text-red-500">Error loading details.</p>;
   if (!details || details.length === 0) return null;
 
-  // since the API returns array
   const info = details[0];
 
   return (
@@ -30,7 +29,7 @@ function ViewDetails({ id }) {
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-50">
+          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-50">
             Booking Details
           </h3>
 
@@ -49,22 +48,15 @@ function ViewDetails({ id }) {
             <strong>Status:</strong>{" "}
             <span className="capitalize">{info.status}</span>
           </p>
-
           <p>
             <strong>Full Name:</strong> {info.fullname}
           </p>
-          {/* <p>
-            <strong>Email:</strong> {info.email}
-          </p> */}
-
           <p>
             <strong>Phone:</strong> {info.phone}
           </p>
-
           <p>
             <strong>Start Date:</strong> {info.start_date}
           </p>
-
           <p>
             <strong>End Date:</strong> {info.end_date}
           </p>
@@ -75,11 +67,10 @@ function ViewDetails({ id }) {
 
         {/* Room Info */}
         <div className="border-t dark:border-gray-700 border-gray-200 pt-4 mb-6">
-          <h4 className="text-md font-semibold mb-2 dark:text-white">
+          <h4 className="text-sm font-semibold mb-2 dark:text-white">
             Room Information
           </h4>
-
-          <div className="text-sm text-gray-700 dark:text-gray-300">
+          <div className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
             <p>
               <strong>Room:</strong> {info.room.room_name}
             </p>
@@ -98,10 +89,9 @@ function ViewDetails({ id }) {
 
         {/* Payment */}
         <div className="border-t dark:border-gray-700 border-gray-200 pt-4 mb-6">
-          <h4 className="text-md font-semibold dark:text-white mb-2">
+          <h4 className="text-sm font-semibold dark:text-white mb-2">
             Payment Details
           </h4>
-
           <p className="text-sm dark:text-gray-300 text-gray-700">
             <strong>Total Price:</strong> ₱
             {parseFloat(info.price).toLocaleString()}
@@ -115,16 +105,39 @@ function ViewDetails({ id }) {
           </p>
         </div>
 
+        {/* DECLINE NOTE — Professional UI */}
+        {info.status === "declined" && info.note && (
+          <div className="border-t dark:border-gray-700 border-gray-200 pt-4 mb-6">
+            <h4 className="text-sm font-semibold dark:text-white mb-3">
+              Decline Reason
+            </h4>
+
+            <div
+              className="
+              bg-red-50 
+              border border-red-200 
+              dark:bg-red-900/20 
+              dark:border-red-800 
+              p-3 rounded-md
+            "
+            >
+              <p className="text-sm text-red-800 dark:text-red-300 whitespace-pre-line leading-relaxed">
+                {info.note}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Extras */}
         <div className="border-t dark:border-gray-700 border-gray-200 pt-4">
-          <h4 className="text-md font-semibold dark:text-white mb-2">Extras</h4>
+          <h4 className="text-sm font-semibold dark:text-white mb-2">Extras</h4>
 
           {info.extras.length === 0 ? (
             <p className="text-gray-500 dark:text-gray-400 text-sm">
               No extras selected.
             </p>
           ) : (
-            <ul className="text-sm text-gray-700 dark:text-gray-300">
+            <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
               {info.extras.map((x, i) => (
                 <li key={i}>
                   {x.quantity} × {x.name} — ₱

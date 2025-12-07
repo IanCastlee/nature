@@ -278,7 +278,7 @@ function OtherFacilitiesBookingPage() {
         md:h-[350px] 
         lg:h-screen
       "
-            className="w-full h-full object-cover rounded-b-lg lg:rounded-none"
+            className="w-full h-full object-cover "
           />
 
           {/* RIGHT PANEL */}
@@ -302,16 +302,6 @@ function OtherFacilitiesBookingPage() {
               </h1>
 
               <div className="flex items-center gap-3 md:gap-6 lg:gap-8">
-                {/* <Button
-                  onClick={handlePreviousRoom}
-                  label={
-                    <>
-                      <icons.BsArrowRight className="transform -scale-x-100" />
-                      Previous
-                    </>
-                  }
-                  style="flex items-center gap-1 text-sm text-blue-500 font-medium rounded px-2 py-1 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
-                /> */}
                 <Button
                   onClick={handleNextRoom}
                   label={
@@ -335,10 +325,6 @@ function OtherFacilitiesBookingPage() {
 
             {/* BOOKING SECTION */}
             <div className="mt-8">
-              <h3 className="text-lg md:text-xl font-normal text-gray-700 dark:text-white mb-3">
-                Book This Facility
-              </h3>
-
               {/* DATE + TIME ROW */}
               <div className="w-full flex flex-col sm:flex-row gap-6">
                 {/* DATE PICKER */}
@@ -347,7 +333,7 @@ function OtherFacilitiesBookingPage() {
                     Select Date:
                   </label>
 
-                  <div className="border rounded-lg p-2 bg-white dark:bg-gray-800 shadow-sm">
+                  <div className="border rounded-lg p-2 bg-white dark:bg-gray-800 shadow-sm dark:text-white text-black">
                     <DayPicker
                       mode="single"
                       selected={selectedDate}
@@ -411,19 +397,20 @@ function OtherFacilitiesBookingPage() {
       {/* FORM MODAL WITH ADJUSTED WIDTH */}
       {showForm === "add_user_details" && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
-          <div className="bg-white p-8 rounded-2xl shadow-xl w-[95%] max-w-5xl max-h-[98vh] overflow-y-auto relative">
-            <h2 className="text-lg md:text-2xl font-bold text-center text-gray-900 mb-8">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-[95%] max-w-5xl max-h-[98vh] overflow-y-auto relative text-gray-900 dark:text-gray-100">
+            <h2 className="text-lg md:text-2xl font-bold text-center mb-8">
               Reservation Details & Your Information
             </h2>
             <icons.MdOutlineClose
               onClick={handleCloseFormModal}
-              className="absolute top-2 right-2 text-2xl cursor-pointer"
+              className="absolute top-2 right-2 text-2xl cursor-pointer text-gray-900 dark:text-gray-100"
             />
+
             <div className="flex flex-col md:flex-row md:gap-12">
-              <div className="md:w-3/5 mb-8 md:mb-0 pr-6 border-r border-gray-300">
-                <div className="grid grid-cols-3 gap-6 mb-6 text-gray-700">
+              <div className="md:w-3/5 mb-8 md:mb-0 pr-6 border-r border-gray-300 dark:border-gray-600">
+                <div className="grid grid-cols-3 gap-6 mb-6 text-gray-700 dark:text-gray-300">
                   {/* Make "Choosen Date" span 2 columns */}
-                  <div className="flex flex-col items-center border-r border-gray-300 pr-4 col-span-2">
+                  <div className="flex flex-col items-center border-r border-gray-300 dark:border-gray-600 pr-4 col-span-2">
                     <span className="text-xs md:text-sm uppercase font-semibold mb-1">
                       Choosen Date
                     </span>
@@ -443,11 +430,9 @@ function OtherFacilitiesBookingPage() {
                 </div>
 
                 {/* Total Price */}
-                <div className="p-4 rounded-lg border border-gray-300 bg-gray-50 text-center font-bold text-xl text-gray-900">
+                <div className="p-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-center font-bold text-xl">
                   Total Price: ₱
-                  {price.toLocaleString("en-PH", {
-                    minimumFractionDigits: 2,
-                  })}
+                  {price.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
                 </div>
               </div>
 
@@ -561,106 +546,103 @@ function OtherFacilitiesBookingPage() {
 
       {/* BOOKING SUMMARY MODAL */}
       {showSummaryModal && bookingSummary && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md p-4">
           <div
             ref={summaryRef}
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-[600px] p-8 relative max-h-[90vh] overflow-y-auto font-sans"
+            className="relative w-full max-w-[600px] max-h-[98vh] overflow-y-auto rounded-2xl shadow-2xl font-sans"
             style={{
               backgroundImage: `url(${natureLogo})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
           >
-            <div className="w-full flex flex-col items-center justify-center mb-2">
-              <p className="text-xs">{currentDate}</p>
+            {/* Semi-transparent overlay for readability */}
+            <div className="absolute inset-0 bg-white/90 rounded-2xl"></div>
 
-              <p className="text-xs font-bold">
-                2JKLA NATURE HOT SPRING AND INN RESORT COPR.
-              </p>
-              <p className="text-xs font-normal">Monbon, Irosin, Sorsgon</p>
-            </div>
-            {/* Header */}
-            <h2 className="text-2xl font-extrabold mb-6 text-center text-gray-900 tracking-wide">
-              Reservation Details
-            </h2>
+            {/* Content */}
+            <div className="relative p-8 space-y-4 text-gray-900">
+              {/* Header info */}
+              <div className="w-full flex flex-col items-center mb-2 text-center">
+                <p className="text-xs">{currentDate}</p>
+                <p className="text-xs font-bold">
+                  2JKLA NATURE HOT SPRING AND INN RESORT COPR.
+                </p>
+                <p className="text-xs font-normal">Monbon, Irosin, Sorsgon</p>
+              </div>
 
-            <div className="space-y-4 text-gray-800 text-sm leading-relaxed">
+              {/* Modal Title */}
+              <h2 className="text-lg md:text-3xl font-extrabold mb-6 text-center tracking-wide">
+                Reservation Details
+              </h2>
+
               {/* Booking Info */}
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2 border-b border-gray-200 pb-4">
-                <p>
-                  <span className="font-semibold text-gray-700">Room:</span>{" "}
-                  {name}
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-700">
-                    Booking ID:
-                  </span>{" "}
-                  {bookingSummary.booking_id}
-                </p>
+              <div className="space-y-3 text-sm md:text-base leading-relaxed">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 border-b border-gray-200 pb-4">
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Room:</span> {name}
+                  </p>
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Booking ID:</span>{" "}
+                    {bookingSummary.booking_id}
+                  </p>
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Fullname:</span>{" "}
+                    {bookingSummary.fullname}
+                  </p>
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Phone:</span>{" "}
+                    {bookingSummary.phone}
+                  </p>
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Chosen Date:</span>{" "}
+                    {bookingSummary.date}
+                  </p>
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Start Time:</span>{" "}
+                    {bookingSummary.start_time}
+                  </p>
+                </div>
 
-                <p>
-                  <span className="font-semibold text-gray-700">Fullname:</span>{" "}
-                  {bookingSummary.fullname}
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-700">Phone:</span>{" "}
-                  {bookingSummary.phone}
-                </p>
+                {/* Prices */}
+                <div className="border-b border-gray-200 pb-4 space-y-1">
+                  <p>
+                    <span className="font-semibold">Base Price:</span> ₱
+                    {Number(bookingSummary.base_price).toLocaleString()}
+                  </p>
+                  <p className="font-extrabold text-lg md:text-xl text-blue-700">
+                    Total Price: ₱
+                    {Number(bookingSummary.total_price).toLocaleString()}
+                  </p>
+                </div>
 
-                <p>
-                  <span className="font-semibold text-gray-700">
-                    Choosen Date :
-                  </span>{" "}
-                  {bookingSummary.date}
-                </p>
-                <p>
-                  <span className="font-semibold text-gray-700">
-                    Start Time :
-                  </span>{" "}
-                  {bookingSummary.start_time}
-                </p>
+                {/* Payment Reminder */}
+                <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded shadow-sm text-yellow-800 text-xs md:text-sm font-semibold">
+                  Kindly settle the required{" "}
+                  <strong>50% advance payment</strong> within the day to secure
+                  the reservation.
+                  <br />
+                  <span className="block mt-1">
+                    ⚠️ If the advance payment is not received within the day,
+                    the reservation will automatically be removed.
+                  </span>
+                  <span className="block mt-1">
+                    ❌ This booking is <strong>non-refundable</strong> and{" "}
+                    <strong>cannot be cancelled</strong>.
+                  </span>
+                </div>
               </div>
 
-              {/* Prices */}
-              <div className="border-b border-gray-200 pb-4 space-y-1">
-                <p>
-                  <span className="font-semibold text-gray-700">
-                    Base Price:
-                  </span>{" "}
-                  ₱{Number(bookingSummary.base_price).toLocaleString()}
-                </p>
-
-                <p className="font-extrabold text-lg text-blue-700">
-                  Total Price: ₱
-                  {Number(bookingSummary.total_price).toLocaleString()}
-                </p>
-              </div>
-
-              {/* Payment Reminder */}
-              <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded shadow-sm text-yellow-800 text-xs md:text-sm font-semibold">
-                Kindly settle the required <strong>50% advance payment</strong>{" "}
-                within the day to secure the reservation. <br />
-                <span className="block mt-1">
-                  ⚠️ If the advance payment is not received within the day, the
-                  reservation will automatically be removed.
-                </span>
-                <span className="block mt-1">
-                  ❌ This booking is <strong>non-refundable</strong> and{" "}
-                  <strong>cannot be cancelled</strong>.
-                </span>
-              </div>
+              {/* Close Button */}
+              <button
+                className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 transition text-3xl font-bold"
+                onClick={() => setShowSummaryModal(false)}
+              >
+                &times;
+              </button>
             </div>
-
-            {/* Close Button */}
-            <button
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 transition text-3xl font-bold"
-              onClick={() => setShowSummaryModal(false)}
-            >
-              &times;
-            </button>
           </div>
 
-          {/* SCREENSHOT OVERLAY (separate, covers whole screen) */}
+          {/* SCREENSHOT OVERLAY */}
           <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-auto">
             <div className="bg-black bg-opacity-60 flex items-center justify-center w-full h-full">
               <div className="bg-white rounded-xl p-6 text-center shadow-lg max-w-md w-full space-y-4 border border-gray-300">
@@ -676,7 +658,7 @@ function OtherFacilitiesBookingPage() {
                   onClick={handleScreenshot}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition shadow-md"
                 >
-                  📸Take Screenshot
+                  📸 Take Screenshot
                 </button>
               </div>
             </div>

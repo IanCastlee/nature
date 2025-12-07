@@ -33,29 +33,29 @@ const Dashboard = () => {
 
   const stats = [
     {
-      title: "Room Pending Booking",
+      title: "Room  Booking",
       value: data ? data.pendingRoomBookings : "-",
       //  percent: data ? `+${data.pendingRoomBookings}%` : "-",
       color: "green",
     },
     {
-      title: "Function Hall Bookings",
+      title: "Function Hall  Booking",
       value: data ? data.functionHallBookings : "-",
       // percent: data ? `+${data.functionHallBookings}%` : "-",
       color: "red",
     },
-    {
-      title: "Not Verified Users",
-      value: data ? data.notVerifiedUsers : "-",
-      // percent: data ? `+${data.notVerifiedUsers}%` : "-",
-      color: "blue",
-    },
-    {
-      title: "Verified Users",
-      value: data ? data.verifiedUsers : "-",
-      // percent: data ? `+${data.verifiedUsers}%` : "-",
-      color: "yellow",
-    },
+    // {
+    //   title: "Not Verified Users",
+    //   value: data ? data.notVerifiedUsers : "-",
+    //   // percent: data ? `+${data.notVerifiedUsers}%` : "-",
+    //   color: "blue",
+    // },
+    // {
+    //   title: "Verified Users",
+    //   value: data ? data.verifiedUsers : "-",
+    //   // percent: data ? `+${data.verifiedUsers}%` : "-",
+    //   color: "yellow",
+    // },
   ];
 
   const facilities = [

@@ -336,6 +336,7 @@ function BookWithoutSigningIn() {
     room_name,
     price,
     capacity,
+    time_in_out,
     description,
     category,
     amenities,
@@ -460,49 +461,56 @@ function BookWithoutSigningIn() {
                   />
                 </div>
 
-                <div className=" w-full flex flex-col justify-center items-center">
-                  <p className="text-xs text-gray-600 dark:text-gray-300 ml-4 dark:bg-gray-900 py-1 px-3 rounded-full  text-center bg-gray-100">
-                    {nights} night{nights !== 1 ? "s" : ""}
-                  </p>
-                  {selectedRange?.from && selectedRange?.to ? (
-                    <div className="flex lg:flex-row md:flex-row flex-col mt-2 text-sm text-gray-800 dark:text-gray-300">
-                      <p>
-                        📅 <strong>Check-in:</strong>{" "}
-                        {selectedRange.from.toLocaleDateString()}
-                      </p>
-                      {"/"}
-                      {selectedRange.from !== selectedRange.to ? (
-                        <p>
-                          📅 <strong>Check-out:</strong>{" "}
-                          {selectedRange.to.toLocaleDateString()}
-                        </p>
-                      ) : (
-                        <p className="text-xs dark:text-gray-400 text-gray-600 max-w-[100px] ml-4">
-                          Select your check-out date
-                        </p>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="text-xs dark:text-gray-300 text-gray-700">
-                      Select Your Date
+                {selectedRange?.from && (
+                  <div
+                    className="w-full flex flex-col lg:justify-center md:justify-start justify-start items-center 
+               bg-gray-50 dark:bg-gray-800 p-4 rounded-xl 
+               shadow-md md:shadow-md lg:shadow-none"
+                  >
+                    <p className="text-xs text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 py-1 px-3 rounded-full text-center">
+                      {nights} night{nights !== 1 ? "s" : ""}
                     </p>
-                  )}
-                </div>
+
+                    {selectedRange?.to ? (
+                      <div className="flex lg:flex-col md:flex-row flex-col mt-2 text-sm text-gray-800 dark:text-gray-300 gap-2">
+                        <p className="lg:text-lg text-sm font-semibold">
+                          <span className="mr-2">Check-in:</span>{" "}
+                          {selectedRange.from.toLocaleDateString()}
+                        </p>
+
+                        {selectedRange.from !== selectedRange.to ? (
+                          <p className="lg:text-lg text-sm font-semibold">
+                            <span className="mr-2">Check-out:</span>{" "}
+                            {selectedRange.to.toLocaleDateString()}
+                          </p>
+                        ) : (
+                          <p className="text-xs dark:text-gray-400 text-gray-600 max-w-[100px] ml-4">
+                            Select your check-out date
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-xs dark:text-gray-300 text-gray-700 mt-2">
+                        Select Your Date
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
             {extras && (
-              <div className="w-full flex flex-row justify-start items-center  border-t dark:border-gray-600 border-gray-300 pb-4">
-                <div className="lg:w-[60%] md:w-full w-full mt-5 ">
-                  {/* Label + Icon */}
-                  <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-sm">
+              <div className="w-full flex justify-center lg:mt-6 mt-0">
+                <div className="w-full lg:w-[60%] bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md p-4">
+                  {/* Label */}
+                  <h3 className="font-semibold mb-4 text-gray-800 dark:text-gray-100 text-sm">
                     Add Extras
                   </h3>
 
-                  <div className="flex flex-col  md:flex-row lg:flex-row  gap-2 justify-center items-center">
-                    <div className="w-[70%]">
+                  <div className="flex flex-col md:flex-row gap-4 items-center">
+                    {/* Dropdown */}
+                    <div className="flex-1">
                       <CustomDropDownn
-                        label="Extras"
                         options={extrasData}
                         value={selectedExtraId}
                         onChange={(selectedId) =>
@@ -513,8 +521,9 @@ function BookWithoutSigningIn() {
                       />
                     </div>
 
-                    <div className="flex flex-row justify-center items-center gap-1">
-                      <div className="w-[30%]">
+                    {/* Quantity + Add button */}
+                    <div className="flex gap-2 items-end">
+                      <div className="w-[120px]">
                         <Input
                           label="Quantity"
                           type="number"
@@ -523,9 +532,7 @@ function BookWithoutSigningIn() {
                           value={extraQty}
                           onChange={(e) => {
                             const val = Number(e.target.value);
-                            if (!isNaN(val) && val > 0) {
-                              setExtraQty(val);
-                            }
+                            if (!isNaN(val) && val > 0) setExtraQty(val);
                           }}
                         />
                       </div>
@@ -533,10 +540,10 @@ function BookWithoutSigningIn() {
                       <Button
                         disabled={isSubmitDisabled}
                         label="Add"
-                        style={`bg-blue-600 text-white px-4 py-1 h-[35px] rounded text-sm mt-6 ${
+                        style={`bg-blue-600 text-white px-4 py-2 h-[38px] rounded text-sm transition-colors duration-300 ${
                           isSubmitDisabled
                             ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-blue-600"
+                            : "hover:bg-blue-700"
                         }`}
                         onClick={handleAddExtra}
                       />
@@ -560,7 +567,7 @@ function BookWithoutSigningIn() {
                       <ul className="text-xs text-gray-800 dark:text-gray-200 space-y-1 list-disc ml-4">
                         {addedExtras.map((extra, idx) => (
                           <li key={idx} className="flex items-center gap-2">
-                            <span>
+                            <span className="dark:text-gray-200 text-black font-medium">
                               {extra.name} x {extra.quantity} x {nights} night
                               {nights > 1 ? "s" : ""} = ₱
                               {(
@@ -584,7 +591,7 @@ function BookWithoutSigningIn() {
                       </ul>
 
                       {/* Total for Extras */}
-                      <div className="mt-2 font-normal text-sm text-gray-800 dark:text-gray-200 border-t dark:border-gray-600 border-gray-300 ml-4 pt-2">
+                      <div className="mt-2 font-medium text-sm text-black dark:text-gray-200 border-t dark:border-gray-600 border-gray-300 ml-4 pt-2">
                         Total Extras for {nights} night{nights > 1 ? "s" : ""}:
                         ₱
                         {extrasTotal.toLocaleString("en-PH", {
@@ -598,12 +605,17 @@ function BookWithoutSigningIn() {
                 <div className="flex flex-row gap-1">
                   {/* Total Price */}
                   <div className="w-full flex flex-col justify-between items-center  p-4 rounded-lg dark:bg-gray-900 bg-white   border">
-                    <div>
-                      <div className=" text-md font-bold text-gray-800 dark:text-gray-100 mb-4">
-                        Total Price: ₱
-                        {grandTotal.toLocaleString("en-PH", {
-                          minimumFractionDigits: 2,
-                        })}
+                    <div className="w-full items-center flex flex-row justify-between">
+                      <div className="flex lg:flex-row flex-col lg:text-lg md:text-sm text-sm font-bold text-gray-800 dark:text-gray-100 ">
+                        <span className="dark:text-gray-200 text-gray-700 mr-2">
+                          Total Price:
+                        </span>
+                        <strong className="dark:text-gray-200 text-gray-700">
+                          ₱
+                          {grandTotal.toLocaleString("en-PH", {
+                            minimumFractionDigits: 2,
+                          })}
+                        </strong>
                       </div>
                       <Button
                         label={formLoading ? "Submitting..." : "Reserve Now"}
@@ -611,8 +623,7 @@ function BookWithoutSigningIn() {
                           isSubmitDisabled
                             ? "bg-gray-400 cursor-not-allowed"
                             : "bg-green-600"
-                        } text-white px-4 py-1 h-[35px] rounded text-sm`}
-                        // onClick={handleSubmitBooking}
+                        } text-white font-normal px-4 py-1 h-[35px] rounded lg:text-sm md:text-sm text-xs`}
                         onClick={() => setShowForm("add_user_details")}
                         disabled={isSubmitDisabled}
                       />
@@ -625,33 +636,32 @@ function BookWithoutSigningIn() {
         </div>
       </div>
       <icons.FiArrowLeftCircle
-        className="text-2xl text-white cursor-pointer absolute top-8 left-8 z-20"
+        className="text-2xl text-white cursor-pointer absolute top-8 lg:left-8 left-4 z-20"
         onClick={() => navigate(-1)}
       />
       {/* {showNote && <Note onContinue={handleContinue} />} */}
       {showForm === "add_user_details" && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
           {/* MODAL BOX */}
-          <div className="bg-white p-4 rounded-2xl shadow-xl w-[95%] max-w-5xl sm:max-h-[98vh] md:max-h-[98vh] lg:max-h-[97vh] overflow-y-auto relative">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-xl w-[95%] max-w-5xl sm:max-h-[98vh] md:max-h-[98vh] lg:max-h-[97vh] overflow-y-auto relative text-gray-900 dark:text-gray-100">
             {/* HEADER */}
-
-            <h2 className="text-lg md:text-2xl font-bold text-center text-gray-900 mb-8">
+            <h2 className="text-lg md:text-2xl font-bold text-center mb-8">
               Reservation Details & Your Information
             </h2>
 
             <icons.MdOutlineClose
               onClick={handleCloseFormModal}
-              className="absolute top-2 right-2 text-2xl cursor-pointer"
+              className="absolute top-2 right-2 text-2xl cursor-pointer text-gray-900 dark:text-gray-100"
             />
 
             {/* FLEX CONTAINER: summary (left) + form (right) */}
             <div className="flex flex-col md:flex-row md:gap-12">
               {/* LEFT - SUMMARY */}
-              <div className="md:w-1/2 mb-8 md:mb-0 pr-0 md:pr-6 border-r-0 sm:border-0 md:border-0 lg:border-r lg:border-gray-300">
+              <div className="md:w-1/2 mb-8 md:mb-0 pr-0 md:pr-6 border-r-0 sm:border-0 md:border-0 lg:border-r lg:border-gray-300 dark:border-gray-600">
                 {/* DATES SUMMARY */}
-                <div className="flex gap-4 mb-6 text-gray-700">
+                <div className="flex gap-4 mb-6 text-gray-700 dark:text-gray-300">
                   {/* CHECK-IN */}
-                  <div className="flex-1 flex flex-col items-center border-r border-gray-300 pr-2">
+                  <div className="flex-1 flex flex-col items-center border-r border-gray-300 dark:border-gray-600 pr-2">
                     <span className="text-xs md:text-sm uppercase font-semibold mb-1">
                       Check-In
                     </span>
@@ -667,7 +677,7 @@ function BookWithoutSigningIn() {
                   </div>
 
                   {/* CHECK-OUT */}
-                  <div className="flex-1 flex flex-col items-center border-r border-gray-300 px-2">
+                  <div className="flex-1 flex flex-col items-center border-r border-gray-300 dark:border-gray-600 px-2">
                     <span className="text-xs md:text-sm uppercase font-semibold mb-1">
                       Check-Out
                     </span>
@@ -696,10 +706,10 @@ function BookWithoutSigningIn() {
                 {/* AMENITIES / EXTRAS */}
                 {addedExtras.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3 border-b border-gray-300 pb-2">
+                    <h3 className="lg:text-lg text-sm font-semibold mb-3 border-b border-gray-300 dark:border-gray-600 pb-2">
                       Amenities / Extras
                     </h3>
-                    <ul className="list-disc list-inside space-y-1 text-gray-700 max-h-40 overflow-y-auto">
+                    <ul className="list-disc list-inside space-y-1 max-h-40 overflow-y-auto lg:text-sm text-xs text-gray-700 dark:text-gray-300">
                       {addedExtras.map((item) => (
                         <li key={item.id} className="flex justify-between">
                           <span>
@@ -715,7 +725,7 @@ function BookWithoutSigningIn() {
                 )}
 
                 {/* TOTAL PRICE */}
-                <div className="p-4 rounded-lg border border-gray-300 bg-gray-50 text-center font-bold text-xl text-gray-900">
+                <div className="p-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-center font-bold text-xl">
                   Total Price: ₱
                   {grandTotal.toLocaleString("en-PH", {
                     minimumFractionDigits: 2,
@@ -860,47 +870,52 @@ function BookWithoutSigningIn() {
                 <p className="text-xs font-normal">Monbon, Irosin, Sorsgon</p>
               </div>
 
-              <h2 className="text-2xl md:text-3xl font-extrabold mb-6 text-center tracking-wide">
+              <h2 className="text-lg md:text-3xl font-extrabold mb-6 text-center tracking-wide">
                 Reservation Details
               </h2>
 
               {/* Booking info */}
               <div className="space-y-3 text-sm md:text-base leading-relaxed">
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 border-b border-gray-200 pb-4">
-                  <p>
-                    <span className="font-semibold">Room:</span> {room_name}
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Room:</span>{" "}
+                    {room_name}
                   </p>
-                  <p>
-                    <span className="font-semibold">Booking ID:</span>{" "}
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Booking ID:</span>{" "}
                     {bookingSummary.booking_id}
                   </p>
 
-                  <p>
-                    <span className="font-semibold">Fullname:</span>{" "}
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Fullname:</span>{" "}
                     {bookingSummary.fullname}
                   </p>
-                  <p>
-                    <span className="font-semibold">Phone:</span>{" "}
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Phone:</span>{" "}
                     {bookingSummary.phone}
                   </p>
 
                   {bookingSummary.address && (
                     <p className="col-span-2">
-                      <span className="font-semibold">Address:</span>{" "}
+                      <span className="font-semibold text-xs">Address:</span>{" "}
                       {bookingSummary.address}
                     </p>
                   )}
 
-                  <p>
-                    <span className="font-semibold">Check-in:</span>{" "}
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Check-in:</span>{" "}
                     {bookingSummary.start_date}
                   </p>
-                  <p>
-                    <span className="font-semibold">Check-out:</span>{" "}
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Check-out:</span>{" "}
                     {bookingSummary.end_date}
                   </p>
-                  <p>
-                    <span className="font-semibold">Nights:</span>{" "}
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Time In/Out:</span>{" "}
+                    {time_in_out}
+                  </p>
+                  <p className="text-xs">
+                    <span className="font-semibold text-xs">Nights:</span>{" "}
                     {bookingSummary.nights}
                   </p>
                 </div>
@@ -929,7 +944,7 @@ function BookWithoutSigningIn() {
                     <h3 className="font-semibold mb-2">Extras</h3>
                     <ul className="list-disc list-inside space-y-1">
                       {bookingSummary.extras.slice(0, 2).map((extra, idx) => (
-                        <li key={idx} className="flex justify-between">
+                        <li key={idx} className="flex justify-between text-xs">
                           <span>
                             {extra.name} (x{extra.quantity})
                           </span>

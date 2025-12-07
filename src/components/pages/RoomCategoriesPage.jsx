@@ -44,22 +44,26 @@ function RoomCategoriesPage() {
       ? roomDetails[0].category
       : "NO ROOM AVAILABLE";
 
-  console.log("ROOM DETAILS: ", roomDetails);
+  console.log("Error: ", error);
 
   return (
     <>
       <main className="w-full min-h-screen dark:bg-black scroll-smooth pb-20 mt-[50px]">
-        <section className="w-full h-[270px] relative">
+        <section className="w-full h-[180px] md:h-[240px] lg:h-[270px] relative flex items-center justify-center">
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${images.topcover})` }}
           />
+
+          {/* Overlays */}
           <div className="absolute inset-0">
             <div className="w-full h-full bg-gradient-to-b from-black/70 via-black/40 to-transparent"></div>
             <div className="absolute inset-0 bg-black/50 blur-3xl opacity-40"></div>
           </div>
-          <div className="relative z-10 flex flex-col justify-center items-center h-full px-4">
-            <h1 className="text-white lg:text-3xl md:text-2xl text-2xl mb-4 font-semibold text-center max-w-[550px] mt-[100px]">
+
+          {/* Centered Content */}
+          <div className="relative z-10 text-center px-4 mt-6">
+            <h1 className="text-white text-lg md:text-2xl lg:text-3xl font-semibold max-w-[550px] mx-auto">
               {title}
             </h1>
           </div>
@@ -71,10 +75,11 @@ function RoomCategoriesPage() {
           <div className="flex flex-row justify-end items-center gap-2 mb-2">
             <button
               onClick={() => setShowHouseRules(true)}
-              className="dark:bg-blue-400 bg-gray-900 dark:border-blue-400 border border-gray-700 
-            text-white dark:text-white py-1 px-2 rounded-lg text-sm 
-            flex flex-row items-center gap-2 transition-all duration-300 
-            hover:bg-blue-500 hover:text-white dark:hover:bg-blue-400 dark:hover:text-gray-900"
+              className="bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-500 dark:to-blue-600 
+             text-white dark:text-white p-1 rounded-sm shadow-md 
+             flex flex-row items-center gap-2 text-xs font-medium 
+             transition-all duration-300 hover:from-blue-700 hover:to-blue-600 
+             dark:hover:from-blue-600 dark:hover:to-blue-700 hover:shadow-lg"
             >
               <icons.GrNotes className="text-sm" />
               View House Rules

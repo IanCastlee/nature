@@ -1,7 +1,7 @@
 <?php
 include("../header.php");
 include("../dbConn.php");
-require_once("../auth/auth_middleware.php"); 
+//require_once("../auth/auth_middleware.php"); 
 
 // ==========================
 // 1. AUTHENTICATE USER

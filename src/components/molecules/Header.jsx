@@ -156,9 +156,9 @@ function Header({ isHome }) {
 
               {[
                 {
-                  label: "How to Reserve",
-                  action: () => setShowForm("how_to_reserve"),
-                  isLink: false, // this one uses onClick
+                  label: "Announcement",
+                  isLink: false, // important: it's not a Link
+                  action: () => setShowForm("announcement"), // onClick handler
                 },
                 {
                   label: "Contacts",
@@ -173,36 +173,17 @@ function Header({ isHome }) {
                       ? { to: item.path }
                       : { onClick: item.action })}
                     className={`text-sm transition-colors duration-300 group-hover:text-blue-400
-                    before:content-[''] before:absolute before:bottom-0 before:left-1/2
-                    before:translate-x-[-50%] before:h-[2px] before:w-0
-                    before:bg-blue-400 before:transition-all before:duration-300
-                    group-hover:before:w-full ${
-                      !scrolled && isHome
-                        ? "text-white"
-                        : "text-black dark:text-white"
-                    }`}
+        before:content-[''] before:absolute before:bottom-0 before:left-1/2
+        before:translate-x-[-50%] before:h-[2px] before:w-0
+        before:bg-blue-400 before:transition-all before:duration-300
+        group-hover:before:w-full ${
+          !scrolled && isHome ? "text-white" : "text-black dark:text-white"
+        }`}
                   >
                     {item.label}
                   </Link>
                 </li>
               ))}
-
-              <li className="relative group">
-                <Link
-                  title="Announcement"
-                  onClick={() => setShowForm("announcement")}
-                  className={`text-sm transition-colors duration-300 group-hover:text-blue-400
-
-                    before:bg-blue-400 before:transition-all before:duration-300
-                    group-hover:before:w-full ${
-                      !scrolled && isHome
-                        ? "text-white"
-                        : "text-gray-500 dark:text-white"
-                    }`}
-                >
-                  <icons.BiSolidMegaphone className="text-2xl" />
-                </Link>
-              </li>
 
               {/* Theme Toggle */}
               <button onClick={toggleDarkMode}>
@@ -243,7 +224,7 @@ function Header({ isHome }) {
               className={`${
                 scrolled
                   ? "dark:text-gray-400 text-black"
-                  : "bg-transparent text-gray-400"
+                  : "bg-transparent text-gray-200"
               } text-3xl cursor-pointer`}
             >
               {mobileMenuOpen ? <icons.MdOutlineClose /> : <icons.RiMenuLine />}

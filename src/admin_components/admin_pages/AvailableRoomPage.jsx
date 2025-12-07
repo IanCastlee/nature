@@ -47,8 +47,10 @@ function AvailableRoomPage() {
     price: "",
     capacity: "",
     duration: "",
+    duration: "",
+    time_in_out: "",
     description: "",
-    images: [], // ✅ multiple images
+    images: [],
     photo_sphere: null,
   });
 
@@ -83,6 +85,8 @@ function AvailableRoomPage() {
   } = useGetData(
     `/admin/room-inclusion.php?room_id_get=${otherRoomDetailForm.room_id}`
   );
+
+  console.log("ROOM ID : ", otherRoomDetailForm.room_id);
 
   //fetch  extrasData
   const {
@@ -151,8 +155,8 @@ function AvailableRoomPage() {
     setShowForm(null);
     clealAddModalField();
 
-    setPreviews([]); // clear previews
-    setForm((prev) => ({ ...prev, images: [] })); // reset images in form
+    setPreviews([]);
+    setForm((prev) => ({ ...prev, images: [] }));
   });
 
   //amenity
@@ -189,6 +193,8 @@ function AvailableRoomPage() {
   //  HANDLE SUBMIT //
   //===============//
 
+  console.log("SBNDJSDBJS: ", form);
+
   //rooms
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -202,9 +208,10 @@ function AvailableRoomPage() {
     formData.append("category", form.category);
     formData.append("capacity", form.capacity);
     formData.append("duration", form.duration);
+    formData.append("time_in_out", form.time_in_out);
     formData.append("description", form.description);
 
-    // ✅ Multiple image upload
+    //  Multiple image upload
     if (form.images && form.images.length > 0) {
       form.images.forEach((file) => formData.append("images[]", file));
     }
@@ -305,6 +312,7 @@ function AvailableRoomPage() {
       price: item.price,
       capacity: item.capacity,
       duration: item.duration,
+      time_in_out: item.time_in_out,
       description: item.description,
       image: null,
     });

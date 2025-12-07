@@ -55,7 +55,7 @@ function AdminFhBookingArrived() {
       const search = searchTerm.toLowerCase();
 
       return (
-        (item?.firstname || "").toLowerCase().includes(search) ||
+        (item?.fullname || "").toLowerCase().includes(search) ||
         (item?.lastname || "").toLowerCase().includes(search) ||
         (item?.room_name || "").toLowerCase().includes(search) ||
         (item?.start_date || "").toLowerCase().includes(search) ||

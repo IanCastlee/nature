@@ -189,22 +189,36 @@ export default function ModalForm_Room({
 
           {/* Capacity & Duration */}
           <div className="flex flex-col md:flex-row gap-3">
-            <Input
-              label="Capacity"
-              name="capacity"
-              type="number"
-              value={form.capacity}
-              onChange={handleChange}
-              required
-            />
-            <Input
-              label="Duration"
-              name="duration"
-              type="text"
-              value={form.duration}
-              onChange={handleChange}
-              required
-            />
+            <div className="w-[40%]">
+              {" "}
+              <Input
+                label="Capacity"
+                name="capacity"
+                type="number"
+                value={form.capacity}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="w-[60%] flex flex-row items-center gap-1">
+              <Input
+                label="Time Duration"
+                name="duration"
+                type="text"
+                value={form.duration}
+                onChange={handleChange}
+                required
+              />
+              <Input
+                label="Time In/Out"
+                name="time_in_out"
+                type="text"
+                value={form.time_in_out}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
 
           {/* Description */}

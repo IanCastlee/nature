@@ -9,10 +9,13 @@ import GenericTable from "../admin_molecules/GenericTable";
 import { bookingDeclined } from "../../constant/tableColumns";
 
 import Toaster from "../../components/molecules/Toaster";
+import { renderActionsBookingDeclined } from "../admin_molecules/RenderActions";
+import ViewDetails from "../admin_molecules/ViewDetails";
 
 function AdminBookingDeclined() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
+  const [viewDetailsId, setViewDetailsId] = useState(null);
 
   const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
   const [toast, setToast] = useState(null);
@@ -28,6 +31,8 @@ function AdminBookingDeclined() {
     `/booking/get-booking.php?status=declined`
   );
 
+  console.log(data);
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -40,8 +45,7 @@ function AdminBookingDeclined() {
       const s = searchTerm.toLowerCase();
 
       return (
-        (item?.firstname || "").toLowerCase().includes(s) ||
-        (item?.lastname || "").toLowerCase().includes(s) ||
+        (item?.fullname || "").toLowerCase().includes(s) ||
         (item?.room_name || "").toLowerCase().includes(s) ||
         (item?.start_date || "").toLowerCase().includes(s) ||
         (item?.end_date || "").toLowerCase().includes(s) ||
@@ -55,12 +59,6 @@ function AdminBookingDeclined() {
     indexOfLastData
   );
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-  // VIEW FH DETAILS
-  const viewFHDetails = (item) => {
-    setShowForm("view fh-hall");
-    setViewFHDetailsId(item);
-  };
 
   // FORMAT TABLE DATA
   const formattedData = currentData.map((item) => ({
@@ -84,6 +82,11 @@ function AdminBookingDeclined() {
     })}`,
   }));
 
+  //
+  const viewDetails = (item) => {
+    setShowForm("view_details");
+    setViewDetailsId(item);
+  };
   return (
     <>
       {toast && (
@@ -126,6 +129,12 @@ function AdminBookingDeclined() {
             data={formattedData}
             loading={loading}
             noDataComponent={<NoData />}
+            renderActions={(item) =>
+              renderActionsBookingDeclined({
+                item,
+                onSetViewDetails: (item) => viewDetails(item),
+              })
+            }
           />
         </div>
 
@@ -137,6 +146,7 @@ function AdminBookingDeclined() {
           />
         )}
       </div>
+      {showForm === "view_details" && <ViewDetails id={viewDetailsId} />}
     </>
   );
 }

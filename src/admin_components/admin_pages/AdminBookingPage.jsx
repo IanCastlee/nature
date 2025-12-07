@@ -11,6 +11,7 @@ import DeleteModal from "../../components/molecules/DeleteModal";
 import { bookingPending } from "../../constant/tableColumns";
 import Toaster from "../../components/molecules/Toaster";
 import ViewDetails from "../admin_molecules/ViewDetails";
+import DeclineModal from "../admin_molecules/DeclineModal";
 
 function AdminBookingPage() {
   const showForm = useForm((state) => state.showForm);
@@ -50,8 +51,7 @@ function AdminBookingPage() {
       const search = searchTerm.toLowerCase();
 
       return (
-        (item?.firstname || "").toLowerCase().includes(search) ||
-        (item?.lastname || "").toLowerCase().includes(search) ||
+        (item?.fullname || "").toLowerCase().includes(search) ||
         (item?.room_name || "").toLowerCase().includes(search) ||
         (item?.start_date || "").toLowerCase().includes(search) ||
         (item?.end_date || "").toLowerCase().includes(search) ||
@@ -205,23 +205,23 @@ function AdminBookingPage() {
 
       {/* DECLINE MODAL */}
       {declinedItem?.booking_id && (
-        <DeleteModal
+        <DeclineModal
           item={declinedItem}
-          name={declinedItem?.firstname}
           loading={declinedLoading}
           onCancel={() => setDeclinedItem(null)}
-          label="Yes, Decline"
-          label2="decline this booking"
-          label3="Are you sure you want to decline this booking?"
-          onConfirm={() => {
+          onConfirm={(reason) => {
             setDeclined({
-              id: declinedItem?.booking_id,
+              id: declinedItem.booking_id,
               action: "set_decline",
+              reason: reason,
             });
+
             setToast({
               message: "The booking has been declined.",
               type: "success",
             });
+
+            setDeclinedItem(null);
           }}
         />
       )}

@@ -42,8 +42,7 @@ function AdminBookingHistoryLog() {
       const s = searchTerm.toLowerCase();
 
       return (
-        (item?.firstname || "").toLowerCase().includes(s) ||
-        (item?.lastname || "").toLowerCase().includes(s) ||
+        (item?.fullname || "").toLowerCase().includes(s) ||
         (item?.room_name || "").toLowerCase().includes(s) ||
         (item?.start_date || "").toLowerCase().includes(s) ||
         (item?.end_date || "").toLowerCase().includes(s) ||

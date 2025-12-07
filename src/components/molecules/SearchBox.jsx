@@ -10,7 +10,7 @@ function SearchBox() {
   const navigate = useNavigate();
   const { data } = useGetData("/admin/room-category.php");
 
-  const [toast, setToast] = useState(null); // ✅ for custom notification
+  const [toast, setToast] = useState(null);
 
   const [searchData, setSearchData] = useState({
     checkIn: "",
@@ -30,7 +30,7 @@ function SearchBox() {
       setToast({
         message: "Please fill all fields before searching.",
         type: "error",
-      }); // ✅ show toast instead of alert
+      });
       return;
     }
 
@@ -53,7 +53,7 @@ function SearchBox() {
 
   return (
     <>
-      {/* ✅ Toast Notification */}
+      {/*  Toast Notification */}
       {toast && (
         <Toaster
           message={toast.message}
@@ -64,52 +64,51 @@ function SearchBox() {
 
       <div className="absolute bottom-8 lg:left-16 left-0 right-0 px-4 z-30 flex justify-center lg:justify-start">
         <div
-          className="backdrop-blur-md bg-white/10 border border-white/20 rounded-md shadow-lg 
+          className="backdrop-blur-md border border-gray-300 dark:border-gray-600 rounded-md shadow-lg
           p-4 sm:p-5 flex flex-col md:flex-row gap-3 md:items-end w-full
-          max-w-full sm:max-w-4xl md:max-w-5xl lg:max-w-[80%] xl:max-w-6xl 2xl:max-w-[75%]"
+          max-w-full sm:max-w-4xl md:max-w-5xl lg:max-w-[80%] xl:max-w-6xl 2xl:max-w-[75%]
+          bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
         >
           {/* Dates (stack on mobile) */}
           <div className="flex flex-row gap-1">
             {/* Check-in date */}
             <div className="flex-1">
-              <label className="text-white text-xs block mb-1">Check-In</label>
+              <label className="text-xs block mb-1">Check-In</label>
               <input
                 type="date"
                 value={searchData.checkIn}
                 onChange={(e) => handleChange("checkIn", e.target.value)}
                 min={minDate}
-                className="w-full bg-transparent text-white border border-white/30 rounded-lg px-4 py-2 outline-none text-sm"
+                className="w-full bg-transparent border border-gray-400 dark:border-gray-600 rounded-lg px-4 py-2 outline-none text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
 
             {/* Check-out date */}
             <div className="flex-1">
-              <label className="text-white text-xs block mb-1">Check-Out</label>
+              <label className="text-xs block mb-1">Check-Out</label>
               <input
                 type="date"
                 value={searchData.checkOut}
                 onChange={(e) => handleChange("checkOut", e.target.value)}
                 min={minDate}
-                className="w-full bg-transparent text-white border border-white/30 rounded-lg px-4 py-2 outline-none text-sm"
+                className="w-full bg-transparent border border-gray-400 dark:border-gray-600 rounded-lg px-4 py-2 outline-none text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
           </div>
 
           {/* Guests */}
           <div className="w-full sm:w-auto flex-1">
-            <label className="text-white text-xs block mb-1">
-              Number of Guests
-            </label>
+            <label className="text-xs block mb-1">Number of Guests</label>
             <select
               value={searchData.guests}
               onChange={(e) => handleChange("guests", e.target.value)}
-              className="w-full bg-transparent text-white border border-white/30 rounded-lg px-4 py-2 outline-none text-sm"
+              className="w-full bg-transparent border border-gray-400 dark:border-gray-600 rounded-lg px-4 py-2 outline-none text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             >
-              <option value="" disabled hidden className="text-black">
+              <option value="" disabled hidden>
                 Select Guests
               </option>
               {[...Array(10)].map((_, i) => (
-                <option key={i + 1} value={i + 1} className="text-black">
+                <option key={i + 1} value={i + 1}>
                   {i + 1} Guest{i > 0 ? "s" : ""}
                 </option>
               ))}
@@ -118,9 +117,7 @@ function SearchBox() {
 
           {/* Category dropdown */}
           <div className="w-full sm:w-auto flex-1">
-            <label className="text-white text-xs block mb-1">
-              Room Category
-            </label>
+            <label className="text-xs block mb-1">Room Category</label>
             <CustomDropDownn
               top={true}
               options={data}
@@ -139,7 +136,7 @@ function SearchBox() {
               justify-center items-center px-4 py-2 rounded-lg transition w-full md:w-auto mt-3 md:mt-0"
               label={
                 <>
-                  <span>Search</span>
+                  <span>Search Room</span>
                   <icons.IoSearch className="text-lg text-white ml-1" />
                 </>
               }

@@ -147,65 +147,57 @@ if ($action === "set_backtoapproved") {
 }
 
 
-
 /**---------------------------------------------------------
- * 2. DECLINE BOOKING + INSERT NOTIFICATION
+ * 2. DECLINE BOOKING + INSERT NOTE
  *--------------------------------------------------------*/
 if ($action === "set_decline" || $action === "set_declined") {
+
     if (!$id) {
         http_response_code(400);
         echo json_encode(["error" => "Missing booking id"]);
         exit;
     }
 
-    // Update status
-    // $stmt = $conn->prepare("UPDATE other_facilities_booking SET status = 'declined' WHERE id = ?");
-    // $stmt->bind_param("i", $id);
-    // $stmt->execute();
+    $note = trim($_POST['note'] ?? "");
+    if ($note === "") {
+        http_response_code(400);
+        echo json_encode(["error" => "Decline note is required."]);
+        exit;
+    }
 
-    // // Get user_id
-    // $userStmt = $conn->prepare("SELECT user_id FROM other_facilities_booking WHERE id = ?");
-    // $userStmt->bind_param("i", $id);
-    // $userStmt->execute();
-    // $userRes = $userStmt->get_result();
+    $conn->begin_transaction();
+    try {
+        // 1. Check booking exists
+        $getBooking = $conn->prepare("SELECT id FROM other_facilities_booking WHERE id = ?");
+        $getBooking->bind_param("i", $id);
+        $getBooking->execute();
+        $res = $getBooking->get_result();
 
-    // if ($userRes->num_rows === 0) {
-    //     echo json_encode(["success" => false, "message" => "Booking not found."]);
-    //     exit;
-    // }
+        if ($res->num_rows === 0) throw new Exception("Booking not found.");
 
-    // $userId = $userRes->fetch_assoc()['user_id'];
+        // 2. Update booking status
+        $stmt = $conn->prepare("UPDATE other_facilities_booking SET status = 'declined' WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        if (!$stmt->execute()) throw new Exception($stmt->error);
 
-    // // Insert notification
-    // $reason = trim($_POST['reason'] ?? "Your booking has been declined.");
-    // $notifStmt = $conn->prepare("
-    //     INSERT INTO notifications (`from_`, `to_`, `message`, `is_read`, `created_at`)
-    //     VALUES ('admin', ?, ?, 0, NOW())
-    // ");
-    // $notifStmt->bind_param("is", $userId, $reason);
-    // $notifStmt->execute();
+        // 3. Insert decline note
+        $noteStmt = $conn->prepare("INSERT INTO booking_note_fh (booking_id, note) VALUES (?, ?)");
+        $noteStmt->bind_param("is", $id, $note);
+        if (!$noteStmt->execute()) throw new Exception("Booking declined but note failed to save.");
 
-    // echo json_encode([
-    //     "success" => true,
-    //     "message" => "Booking declined and user notified."
-    // ]);
-    // exit;
+        $conn->commit();
 
+        echo json_encode(["success" => true, "message" => "Booking declined and note saved."]);
 
-
-     $stmt = $conn->prepare("
-        UPDATE other_facilities_booking 
-        SET status = 'declined'
-        WHERE id = ?
-    ");
-    $stmt->bind_param("i", $id);
-
-    echo $stmt->execute()
-        ? json_encode(["success" => true, "message" => "Booking declined."])
-        : json_encode(["success" => false, "message" => $stmt->error]);
+    } catch (Exception $e) {
+        $conn->rollback();
+        http_response_code(500);
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
 
     exit;
 }
+
 
 /**---------------------------------------------------------
  * 3. CREATE BOOKING (MAIN PART)
