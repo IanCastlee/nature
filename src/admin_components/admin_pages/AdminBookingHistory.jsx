@@ -12,24 +12,25 @@ import useSetInactive from "../../hooks/useSetInactive";
 import Toaster from "../../components/molecules/Toaster";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import ViewDetails from "../admin_molecules/ViewDetails";
+import ReSchedBooking from "../admin_molecules/ReSchedBooking";
 
 function AdminBookingHistory() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
-
+  const [showResched, setShowResched] = useState(false);
   const [viewDetailsId, setViewDetailsId] = useState(null);
   const [toast, setToast] = useState(null);
   const [approveItem, setApproveItem] = useState(null);
-  const [approveAction, setApproveAction] = useState(""); // <-- ADDED
+  const [reschedItem, setReschedItem] = useState(null);
 
+  const [approveAction, setApproveAction] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  //==============//
-  //  DATA FETCH  //
-  //==============//
-
+  //==================//
+  //     GET DATA     //
+  //==================//
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-booking.php?status=approved`
   );
@@ -38,16 +39,13 @@ function AdminBookingHistory() {
     setCurrentPage(pageNumber);
   };
 
-  //=================//
-  // DATA FILTERING //
-  //===============//
-
+  //==================//
+  //    FILTER DATA   //
+  //==================//
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
-
       const search = searchTerm.toLowerCase();
-
       return (
         (item?.fullname || "").toLowerCase().includes(search) ||
         (item?.room_name || "").toLowerCase().includes(search) ||
@@ -63,12 +61,17 @@ function AdminBookingHistory() {
   const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  //=====================//
-  //  view room details  //
-  //=====================//
+  //==================//
+  //   VIEW DETAILS   //
+  //==================//
+  const viewDetails = (item) => {
+    setShowForm("view_details");
+    setViewDetailsId(item);
+  };
+
   const viewFHDetails = (item) => {
     setShowForm("view fh-hall");
-    setViewFHDetailsId(item);
+    setViewDetailsId(item);
   };
 
   const formattedData = currentData.map((item) => ({
@@ -95,7 +98,9 @@ function AdminBookingHistory() {
     })}`,
   }));
 
-  //set approved
+  //==================//
+  //   UPDATE STATUS  //
+  //==================//
   const {
     setInactive,
     loading: approveLoading,
@@ -103,23 +108,18 @@ function AdminBookingHistory() {
   } = useSetInactive("/booking/booking.php", () => {
     refetch();
     setApproveItem(null);
-    setApproveAction(""); // reset action
+    setApproveAction("");
+
     setToast({
       message:
         approveAction === "set_arrived"
           ? "Booking marked as arrived"
+          : approveAction === "set_not_attended"
+          ? "Booking marked as Not Attended"
           : "Booking back to pending",
       type: "success",
     });
   });
-
-  //=====================//
-  //  view  details  //
-  //=====================//
-  const viewDetails = (item) => {
-    setShowForm("view_details");
-    setViewDetailsId(item);
-  };
 
   return (
     <>
@@ -164,8 +164,8 @@ function AdminBookingHistory() {
             data={formattedData}
             loading={loading}
             noDataComponent={<NoData />}
-            renderActions={(item) => {
-              return renderActionsBookingHistory({
+            renderActions={(item) =>
+              renderActionsBookingHistory({
                 item,
                 setShowForm,
 
@@ -173,14 +173,24 @@ function AdminBookingHistory() {
                   setApproveItem(item);
                   setApproveAction("set_pending");
                 },
-                onSetViewDetails: (item) => viewDetails(item),
 
                 onSetArrived: (item) => {
                   setApproveItem(item);
                   setApproveAction("set_arrived");
                 },
-              });
-            }}
+
+                onSetNotAttended: (item) => {
+                  setApproveItem(item);
+                  setApproveAction("set_not_attended");
+                },
+                onSetReshed: (item) => {
+                  setReschedItem(item);
+                  setShowResched(true);
+                },
+
+                onSetViewDetails: (item) => viewDetails(item),
+              })
+            }
           />
         </div>
 
@@ -193,6 +203,7 @@ function AdminBookingHistory() {
         )}
       </div>
 
+      {/* MODAL FOR ARRIVED / PENDING / NOT ATTENDED */}
       {approveItem?.booking_id && (
         <DeleteModal
           item={approveItem}
@@ -205,12 +216,22 @@ function AdminBookingHistory() {
           label={
             approveAction === "set_arrived"
               ? "Yes, Mark as Arrived"
+              : approveAction === "set_not_attended"
+              ? "Yes, Mark as Not Attended"
               : "Yes, Move to Pending"
           }
-          label2={approveAction === "set_arrived" ? "arrived" : "pending"}
+          label2={
+            approveAction === "set_arrived"
+              ? "arrived"
+              : approveAction === "set_not_attended"
+              ? "not attended"
+              : "pending"
+          }
           label3={
             approveAction === "set_arrived"
-              ? "Are you sure you want to mark this booking as arrived?"
+              ? "This booking will be moved and marked as Arrived."
+              : approveAction === "set_not_attended"
+              ? "This booking will be moved and marked as Not Attended."
               : "Are you sure you want to move this booking back to pending?"
           }
           onConfirm={() => {
@@ -223,6 +244,13 @@ function AdminBookingHistory() {
       )}
 
       {showForm === "view_details" && <ViewDetails id={viewDetailsId} />}
+
+      {showResched && reschedItem && (
+        <ReSchedBooking
+          booking={reschedItem}
+          onClose={() => setShowResched(false)}
+        />
+      )}
     </>
   );
 }

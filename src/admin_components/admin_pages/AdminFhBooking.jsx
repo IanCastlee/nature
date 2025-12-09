@@ -19,54 +19,44 @@ function AdminFhBooking() {
 
   const [approveItem, setApproveItem] = useState(null);
   const [declinedItem, setDeclinedItem] = useState(null);
-
-  const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
-
+  const [viewFHDetailsData, setViewFHDetailsData] = useState(null);
   const [toast, setToast] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  //=====================//
   // FETCH DATA
-  //=====================//
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-fhbooking.php?status=pending`
   );
 
-  //=====================//
   // PAGINATION
-  //=====================//
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  //=====================//
-  // FILTER DATA
-  //=====================//
+  // FILTERING
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
-      const search = searchTerm.toLowerCase();
+      const s = searchTerm.toLowerCase();
       return (
-        (item?.fullname || "").toLowerCase().includes(search) ||
-        (item?.name || "").toLowerCase().includes(search) ||
-        (item?.start_time || "").toLowerCase().includes(search) ||
-        (item?.end_time || "").toLowerCase().includes(search) ||
-        (item?.date?.toString() || "").includes(search) ||
-        (item?.status || "").toLowerCase().includes(search)
+        (item?.fullname || "").toLowerCase().includes(s) ||
+        (item?.name || "").toLowerCase().includes(s) ||
+        (item?.start_time || "").toLowerCase().includes(s) ||
+        (item?.end_time || "").toLowerCase().includes(s) ||
+        (item?.date?.toString() || "").includes(s) ||
+        (item?.status || "").toLowerCase().includes(s)
       );
     }) || [];
 
-  const indexOfLastData = currentPage * itemsPerPage;
-  const indexOfFirstData = indexOfLastData - itemsPerPage;
-  const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
+  const currentData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  //=====================//
-  // APPROVE / DECLINE
-  //=====================//
+  // API ACTIONS
   const {
     setInactive,
     loading: approveLoading,
@@ -74,7 +64,7 @@ function AdminFhBooking() {
   } = useSetInactive("/booking/fh-booking.php", () => {
     refetch();
     setApproveItem(null);
-    setToast({ message: "Booking set as approved", type: "success" });
+    setToast({ message: "Booking approved successfully", type: "success" });
   });
 
   const {
@@ -86,12 +76,10 @@ function AdminFhBooking() {
     setDeclinedItem(null);
   });
 
-  //=====================//
-  // VIEW DETAILS
-  //=====================//
+  // VIEW DETAILS MODAL
   const viewFHDetails = (item) => {
-    setShowForm("view fh-hall");
-    setViewFHDetailsId(item);
+    setShowForm("view_fh_hall");
+    setViewFHDetailsData(item);
   };
 
   const formattedData = currentData.map((item) => ({
@@ -106,6 +94,7 @@ function AdminFhBooking() {
     })}`,
   }));
 
+  console.log("DATA  : ", data);
   return (
     <>
       {toast && (
@@ -115,6 +104,7 @@ function AdminFhBooking() {
           onClose={() => setToast(null)}
         />
       )}
+
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
           Function Hall Booking Record
@@ -127,38 +117,40 @@ function AdminFhBooking() {
           </p>
         )}
 
-        <div className="w-full flex flex-row justify-between items-center mb-2">
-          <span className="dark:text-gray-100 text-xs font-medium">
+        {/* SEARCH + COUNT */}
+        <div className="w-full flex justify-between items-center mb-2">
+          <span className="text-xs dark:text-gray-100 font-medium">
             Showing {filteredData.length} Booking
           </span>
 
-          <div className="flex flex-row items-center gap-2">
-            <SearchInput
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              disabled={loading}
-            />
-          </div>
+          <SearchInput
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            disabled={loading}
+          />
         </div>
 
+        {/* TABLE */}
         <div className="overflow-x-auto">
           <GenericTable
             columns={fhbooking}
             data={formattedData}
             loading={loading}
             noDataComponent={<NoData />}
-            renderActions={(item) => {
-              return renderActionsFhBooking({
+            renderActions={(item) =>
+              renderActionsFhBooking({
                 item,
                 setShowForm,
-                onSetApprove: (item) => setApproveItem(item),
-                onSetDeClined: (item) => setDeclinedItem(item),
-              });
-            }}
+                onSetApprove: setApproveItem,
+                onSetDeClined: setDeclinedItem,
+                onViewDetails: () => viewFHDetails(item),
+              })
+            }
           />
         </div>
 
+        {/* PAGINATION */}
         {!loading && totalPages > 1 && (
           <Pagination
             currentPage={currentPage}
@@ -169,7 +161,7 @@ function AdminFhBooking() {
       </div>
 
       {/* APPROVE MODAL */}
-      {approveItem?.id && (
+      {approveItem && (
         <DeleteModal
           item={approveItem}
           name={approveItem?.firstname}
@@ -178,17 +170,14 @@ function AdminFhBooking() {
           label="Yes, Approve"
           label2="approve this booking"
           label3="Are you sure you want to approve this booking?"
-          onConfirm={() => {
-            setInactive({
-              id: approveItem?.id,
-              action: "set_approve",
-            });
-          }}
+          onConfirm={() =>
+            setInactive({ id: approveItem.id, action: "set_approve" })
+          }
         />
       )}
 
       {/* DECLINE MODAL */}
-      {declinedItem?.id && (
+      {declinedItem && (
         <DeclineModal
           item={declinedItem}
           loading={declinedLoading}
@@ -197,20 +186,20 @@ function AdminFhBooking() {
             setDeclined({
               id: declinedItem.id,
               action: "set_decline",
-              note, // ✅ send as 'note'
+              note,
             });
-
             setToast({
-              message: "Booking has been declined with a note.",
+              message: "Booking declined successfully",
               type: "success",
             });
-
-            setDeclinedItem(null);
           }}
         />
       )}
 
-      {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
+      {/* VIEW DETAILS MODAL */}
+      {showForm === "view_fh_hall" && viewFHDetailsData && (
+        <ViewFHDetails booking={viewFHDetailsData} />
+      )}
     </>
   );
 }

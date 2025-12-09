@@ -264,6 +264,60 @@ if ($action === "set_backtoapproved") {
     exit;
 }
 
+/**
+ * ========================================================
+ *  SET BOOKING AS NOT ATTENDED
+ * ========================================================
+ */
+if ($action === "set_not_attended") {
+    if (!$id) {
+        http_response_code(400);
+        echo json_encode(["error" => "Missing booking id"]);
+        exit;
+    }
+
+    // 1. Update booking status
+    $stmt = $conn->prepare("
+        UPDATE room_booking 
+        SET status = 'not_attended'
+        WHERE booking_id = ?
+    ");
+    $stmt->bind_param("i", $id);
+    if (!$stmt->execute()) {
+        echo json_encode(["success" => false, "message" => $stmt->error]);
+        exit;
+    }
+
+    // 2. Get user ID for notification
+    $userStmt = $conn->prepare("SELECT user_id FROM room_booking WHERE booking_id = ?");
+    $userStmt->bind_param("i", $id);
+    $userStmt->execute();
+    $userResult = $userStmt->get_result();
+
+    if ($userResult->num_rows === 0) {
+        echo json_encode(["success" => false, "message" => "Booking not found"]);
+        exit;
+    }
+
+    $userId = $userResult->fetch_assoc()['user_id'];
+
+    // 3. Insert notification for the user
+    $from = 'admin';
+    $reason = trim($_POST['reason'] ?? "Your booking was marked as Not Attended.");
+
+    $notifStmt = $conn->prepare("
+        INSERT INTO notifications (`from_`, `to_`, `message`, `is_read`, `created_at`)
+        VALUES (?, ?, ?, 0, NOW())
+    ");
+    $notifStmt->bind_param("sis", $from, $userId, $reason);
+
+    echo $notifStmt->execute()
+        ? json_encode(["success" => true, "message" => "Booking marked as Not Attended and user notified."])
+        : json_encode(["success" => false, "message" => "Failed to notify user."]);
+
+    exit;
+}
+
 
 /**
  * ========================================================

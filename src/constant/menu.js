@@ -22,8 +22,12 @@ export const menuItems = [
       },
 
       {
-        name: "Booking History",
+        name: "Arrived Booking",
         to: "/admin/booking-history",
+      },
+      {
+        name: "Not Attended Booking",
+        to: "/admin/not-attended",
       },
       {
         name: "Declined Booking",
@@ -46,8 +50,12 @@ export const menuItems = [
       },
 
       {
-        name: "Booking History",
+        name: "Arrived History",
         to: "/admin/fhbooking-history",
+      },
+      {
+        name: "Not Attended Booking",
+        to: "/admin/fhbooking-not-attended",
       },
       {
         name: "Declined Booking",
@@ -103,21 +111,6 @@ export const menuItems = [
       },
     ],
   },
-
-  // {
-  //   name: "Users",
-  //   icon: icons.LuUsers,
-  //   children: [
-  //     {
-  //       name: "Verified Users",
-  //       to: "/admin/verified-users",
-  //     },
-  //     {
-  //       name: "Not-Verified Users",
-  //       to: "/admin/notverified-users",
-  //     },
-  //   ],
-  // },
 
   {
     name: "Gallery",

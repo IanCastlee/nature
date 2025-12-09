@@ -58,6 +58,7 @@ import { BiSolidMegaphone } from "react-icons/bi";
 import { VscMegaphone } from "react-icons/vsc";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { RiShakeHandsLine } from "react-icons/ri";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 
 import { IoMdNotifications } from "react-icons/io";
 import { IoIosInformationCircleOutline } from "react-icons/io";
@@ -67,6 +68,7 @@ import { MdLocalPhone } from "react-icons/md";
 
 export const icons = {
   FaPhoneAlt,
+  IoIosCloseCircleOutline,
   RiShakeHandsLine,
   IoMailSharp,
   MdLocalPhone,

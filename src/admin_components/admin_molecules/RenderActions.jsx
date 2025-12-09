@@ -261,16 +261,38 @@ export const renderActionsBookingHistory = ({
   onSetPending,
   onSetViewCottageDetails,
   onSetViewDetails,
+  onSetNotAttended,
+  onSetReshed,
 }) => {
   return (
     <div className="flex flex-row gap-2 items-center justify-end">
       <button
         onClick={() => onSetArrived(item)}
-        className="bg-blue-500 text-white w-auto h-[27px] rounded-sm flex justify-center items-center mr-4 ml-2 px-2 text-sm"
+        className="bg-green-500 hover:bg-green-600 text-white w-auto h-[27px] rounded-sm 
+             flex justify-center items-center ml-2 px-2 text-xs whitespace-nowrap"
         title="Set as arrived"
       >
         Arrived <icons.IoMdCheckmarkCircleOutline />
       </button>
+
+      <button
+        onClick={() => onSetNotAttended(item)}
+        className="bg-red-500 hover:bg-red-600 text-white w-auto h-[27px] rounded-sm 
+             flex justify-center items-center ml-2 px-2 text-xs whitespace-nowrap"
+        title="Mark as not attended"
+      >
+        Not Attended
+      </button>
+
+      <button
+        onClick={() => onSetReshed(item)}
+        className="bg-amber-500 hover:bg-amber-600 text-white w-auto h-[27px] rounded-sm 
+             flex justify-center items-center mr-4 ml-2 px-2 text-xs whitespace-nowrap"
+        title="Re-schedule"
+      >
+        Re-Sched
+      </button>
+
       <button
         onClick={() => onSetPending(item)}
         className="bg-green-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
@@ -333,11 +355,10 @@ export const renderActionsBookingDeclined = ({
     </div>
   );
 };
-
 //render action fh booking
 export const renderActionsFhBooking = ({
   item,
-
+  onViewDetails,
   onSetViewCottageDetails,
   onSetApprove,
   onSetDeClined,
@@ -370,7 +391,7 @@ export const renderActionsFhBooking = ({
       )}
 
       <button
-        onClick={() => onSetViewCottageDetails(item.cottage_id)}
+        onClick={() => onViewDetails(item)}
         className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
         title="View Room Details"
       >
@@ -384,18 +405,40 @@ export const renderActionsFhBooking = ({
 export const renderActionsFhBookingApproved = ({
   item,
   onSetArrived,
+  viewFHDetails,
   onSetPending,
   onSetViewCottageDetails,
+  onSetNotAttended,
 }) => {
   return (
     <div className="flex items-center justify-end gap-2">
       <button
         onClick={() => onSetArrived(item)}
-        className="bg-blue-500 text-white w-auto h-[27px] rounded-sm flex justify-center items-center mr-4 ml-2 px-2 text-xs"
+        className="bg-green-500 hover:bg-green-600 text-white w-auto h-[27px] rounded-sm 
+             flex justify-center items-center ml-2 px-2 text-xs whitespace-nowrap"
         title="Set as arrived"
       >
-        Mark as Arrived <icons.IoMdCheckmarkCircleOutline className="ml-1" />
+        Arrived <icons.IoMdCheckmarkCircleOutline />
       </button>
+
+      <button
+        onClick={() => onSetNotAttended(item)}
+        className="bg-red-500 hover:bg-red-600 text-white w-auto h-[27px] rounded-sm 
+             flex justify-center items-center ml-2 px-2 text-xs whitespace-nowrap"
+        title="Mark as not attended"
+      >
+        Not Attended
+      </button>
+
+      <button
+        onClick={() => onResched(item)}
+        className="bg-amber-500 hover:bg-amber-600 text-white w-auto h-[27px] rounded-sm 
+             flex justify-center items-center mr-4 ml-2 px-2 text-xs whitespace-nowrap"
+        title="Re-schedule"
+      >
+        Re-Sched
+      </button>
+
       <button
         onClick={() => onSetPending(item)}
         className="bg-green-500 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
@@ -405,7 +448,7 @@ export const renderActionsFhBookingApproved = ({
       </button>
 
       <button
-        onClick={() => onSetViewCottageDetails(item.cottage_id)}
+        onClick={() => viewFHDetails(item)}
         className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
         title="View Room Details"
       >
@@ -440,6 +483,21 @@ export const renderActionsFhBookingArrived = ({
 
       <button
         onClick={() => onSetViewCottageDetails(item.cottage_id)}
+        className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="View Room Details"
+      >
+        <icons.AiOutlineInfoCircle />
+      </button>
+    </div>
+  );
+};
+
+//render action fh booking
+export const renderActionsFhBookingDeclined = ({ item, onSetViewDetails }) => {
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <button
+        onClick={() => onSetViewDetails(item)}
         className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
         title="View Room Details"
       >

@@ -221,13 +221,21 @@ function Header({ isHome }) {
 
             <div
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`${
-                scrolled
-                  ? "dark:text-gray-400 text-black"
-                  : "bg-transparent text-gray-200"
-              } text-3xl cursor-pointer`}
+              className={`flex items-center justify-center w-10 h-10 rounded-md cursor-pointer transition-all
+    ${
+      mobileMenuOpen
+        ? "bg-red-500 text-white"
+        : scrolled
+        ? "bg-white text-black shadow-md"
+        : "bg-gray-700 text-white"
+    }        // Default (top of page)
+  `}
             >
-              {mobileMenuOpen ? <icons.MdOutlineClose /> : <icons.RiMenuLine />}
+              {mobileMenuOpen ? (
+                <icons.MdOutlineClose className="text-2xl" />
+              ) : (
+                <icons.RiMenuLine className="text-2xl" />
+              )}
             </div>
           </div>
         </div>

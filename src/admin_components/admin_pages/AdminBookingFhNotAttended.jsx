@@ -5,15 +5,15 @@ import useGetData from "../../hooks/useGetData";
 import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
-import { renderActionsFhBookingApproved } from "../admin_molecules/RenderActions";
-import { fhbookingApproved } from "../../constant/tableColumns";
+import { renderActionsFhBookingArrived } from "../admin_molecules/RenderActions";
+import { fhbookingHistory } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import { useLocation } from "react-router-dom";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import Toaster from "../../components/molecules/Toaster";
 import useSetInactive from "../../hooks/useSetInactive";
 
-function AdminBookingFhApproved() {
+function AdminBookingFhNotAttended() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
@@ -35,9 +35,12 @@ function AdminBookingFhApproved() {
   //==============//
   //  DATA FETCH  //
   //==============//
+
   const { data, loading, refetch, error } = useGetData(
-    `/booking/get-fhbooking.php?status=approved`
+    `/booking/get-fhbooking.php?status=not_attended`
   );
+
+  console.log("DTAA : ", data);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -46,10 +49,13 @@ function AdminBookingFhApproved() {
   //=================//
   // FILTERING //
   //=================//
+
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
+
       const search = searchTerm.toLowerCase();
+
       return (
         (item?.fullname || "").toLowerCase().includes(search) ||
         (item?.lastname || "").toLowerCase().includes(search) ||
@@ -66,63 +72,36 @@ function AdminBookingFhApproved() {
   const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  //==========================//
-  //  VIEW FH DETAILS //
-  //==========================//
-  const viewFHDetails = (item) => {
-    setShowForm("view fh-hall");
-    setViewFHDetailsId(item); // Pass the full booking object
-  };
-
-  // Format prices in table
   const formattedData = currentData.map((item) => ({
     ...item,
-    paid: `₱${Number(item.paid || 0).toLocaleString("en-PH", {
+
+    paid: `₱${Number(item.paid).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`,
-    price: `₱${Number(item.price?.replace(/[^\d.-]/g, "") || 0).toLocaleString(
-      "en-PH",
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }
-    )}`,
-    half_price: `₱${Number(
-      (item.price?.replace(/[^\d.-]/g, "") || 0) / 2
-    ).toLocaleString("en-PH", {
+    price: `₱${Number(item.price).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    half_price: `₱${Number(item.price / 2).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`,
   }));
 
-  //=========================//
-  // APPROVAL HANDLING //
-  //=========================//
-  const {
-    setInactive,
-    loading: approveLoading,
-    error: approveError,
-  } = useSetInactive("/booking/fh-booking.php", () => {
-    refetch();
-    setApproveItem(null);
-    setApproveAction("");
-    setToast({
-      message:
-        approveAction === "set_arrived"
-          ? "Booking marked as arrived"
-          : approveAction === "set_pending"
-          ? "Booking moved back to pending"
-          : approveAction === "set_not_attended"
-          ? "Booking marked as Not Attended"
-          : "",
-      type: "success",
-    });
-  });
-
-  console.log("approveError : ", approveError);
-  console.log("DATA : ", data);
-
+  // SET BACK TO APPROVED
+  const { setInactive, loading: approveLoading } = useSetInactive(
+    "/booking/fh-booking.php",
+    () => {
+      refetch();
+      setApproveItem(null);
+      setApproveAction("");
+      setToast({
+        message: "Booking moved back to approved",
+        type: "success",
+      });
+    }
+  );
   return (
     <>
       {toast && (
@@ -135,7 +114,7 @@ function AdminBookingFhApproved() {
 
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
-          Approved Function Hall Booking
+          Not Attended Booking
         </h1>
 
         {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
@@ -162,29 +141,19 @@ function AdminBookingFhApproved() {
 
         <div className="overflow-x-auto">
           <GenericTable
-            columns={fhbookingApproved}
+            columns={fhbookingHistory}
             data={formattedData}
             loading={loading}
             noDataComponent={<NoData />}
             renderActions={(item) =>
-              renderActionsFhBookingApproved({
+              renderActionsFhBookingArrived({
                 isNotAvailablePage,
                 item,
                 setShowForm,
-                viewFHDetails,
 
-                // 🔥 ADD THESE ACTIONS
-                onSetPending: (item) => {
+                onSetBackToApproved: (item) => {
                   setApproveItem(item);
-                  setApproveAction("set_pending");
-                },
-                onSetArrived: (item) => {
-                  setApproveItem(item);
-                  setApproveAction("set_arrived");
-                },
-                onSetNotAttended: (item) => {
-                  setApproveItem(item);
-                  setApproveAction("set_not_attended");
+                  setApproveAction("set_backtoapproved");
                 },
               })
             }
@@ -204,53 +173,27 @@ function AdminBookingFhApproved() {
       {approveItem?.id && (
         <DeleteModal
           item={approveItem}
+          name={approveItem?.firstname}
           loading={approveLoading}
           onCancel={() => {
             setApproveItem(null);
             setApproveAction("");
           }}
-          label={
-            approveAction === "set_pending"
-              ? "Yes, Back to Pending"
-              : approveAction === "set_arrived"
-              ? "Yes, Mark as Arrived"
-              : approveAction === "set_not_attended"
-              ? "Yes, Mark as Not Attended"
-              : ""
-          }
-          label2={
-            approveAction === "set_pending"
-              ? "pending"
-              : approveAction === "set_arrived"
-              ? "arrived"
-              : approveAction === "set_not_attended"
-              ? "not attended"
-              : ""
-          }
-          label3={
-            approveAction === "set_pending"
-              ? "This booking will be moved back to pending."
-              : approveAction === "set_arrived"
-              ? "This booking will be moved and marked as Arrived."
-              : approveAction === "set_not_attended"
-              ? "This booking will be moved and marked as Not Attended."
-              : "Are you sure you want to proceed?"
-          }
-          onConfirm={() => {
+          label="Yes, Back to Approved"
+          label2="approved"
+          label3="This booking will be move back to approved."
+          onConfirm={() =>
             setInactive({
               id: approveItem?.id,
               action: approveAction,
-            });
-          }}
+            })
+          }
         />
       )}
 
-      {/* 🔥 VIEW FUNCTION HALL DETAILS */}
-      {showForm === "view fh-hall" && viewFHDetailsId && (
-        <ViewFHDetails booking={viewFHDetailsId} />
-      )}
+      {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
     </>
   );
 }
 
-export default AdminBookingFhApproved;
+export default AdminBookingFhNotAttended;

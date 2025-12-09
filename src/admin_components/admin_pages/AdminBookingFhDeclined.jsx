@@ -5,56 +5,35 @@ import useGetData from "../../hooks/useGetData";
 import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
-
 import { fhbookingDeclined } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
-import { useLocation } from "react-router-dom";
+import { renderActionsFhBookingDeclined } from "../admin_molecules/RenderActions";
+
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 function AdminBookingFhDeclined() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
-  const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
+  const [viewFHDetailsData, setViewFHDetailsData] = useState(null);
 
-  const location = useLocation();
-  const isNotAvailablePage = location.pathname.includes("fhbooking-approved");
+  const { data, loading } = useGetData(
+    `/booking/get-fhbooking.php?status=declined`
+  );
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  //==============//
-  //  DATA FETCH  //
-  //==============//
-
-  // fetch booking data
-  const { data, loading, refetch, error } = useGetData(
-    `/booking/get-fhbooking.php?status=declined`
-  );
-
-  //handlePageChange
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  //=================//
-  // DATA FILTERING //
-  //===============//
-
-  //Filtered data
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
-
-      const search = searchTerm.toLowerCase();
-
+      const s = searchTerm.toLowerCase();
       return (
-        (item?.fullname || "").toLowerCase().includes(search) ||
-        (item?.room_name || "").toLowerCase().includes(search) ||
-        (item?.start_date || "").toLowerCase().includes(search) ||
-        (item?.end_date || "").toLowerCase().includes(search) ||
-        (item?.nights?.toString() || "").includes(search) ||
-        (item?.status || "").toLowerCase().includes(search)
+        (item.fullname || "").toLowerCase().includes(s) ||
+        (item.facility_type || "").toLowerCase().includes(s) ||
+        (item.status || "").toLowerCase().includes(s)
       );
     }) || [];
 
@@ -63,34 +42,70 @@ function AdminBookingFhDeclined() {
   const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  //=====================//
-  //  view room details  //
-  //=====================//
   const viewFHDetails = (item) => {
-    setShowForm("view fh-hall");
-    setViewFHDetailsId(item);
+    setViewFHDetailsData(item);
+    setShowForm("view_fhall");
+  };
+
+  const downloadPDF = () => {
+    const doc = new jsPDF("portrait", "mm", "a4"); // Portrait A4
+
+    doc.setFontSize(14);
+    doc.text("Declined Function Hall Bookings", 14, 12);
+
+    const tableColumn = [
+      "Guest Name",
+      "Phone",
+      "Function Hall",
+      "Event Date",
+      "Start Time",
+      "Total Price",
+      "Status",
+    ];
+
+    const tableRows = filteredData.map((item) => [
+      item.fullname,
+      item.phone,
+      item.facility_type,
+      item.date,
+      item.start_time,
+      Number(item.price).toFixed(2), // clean number without peso sign
+      item.status,
+    ]);
+
+    autoTable(doc, {
+      startY: 18,
+      head: [tableColumn],
+      body: tableRows,
+      theme: "grid",
+      styles: { fontSize: 9, cellPadding: 2 },
+      headStyles: { fillColor: [40, 40, 40], textColor: 255, halign: "center" },
+      tableWidth: "auto",
+    });
+
+    doc.save("Declined_FH_Bookings.pdf");
   };
 
   return (
     <>
-      <div className="scroll-smooth">
+      <div>
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
           Declined Function Hall Booking
         </h1>
-
-        {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
-        {error && (
-          <p className="text-red-500 text-sm mb-4">
-            {error.message || "Something went wrong."}
-          </p>
-        )}
 
         <div className="w-full flex flex-row justify-between items-center mb-2">
           <span className="dark:text-gray-100 text-xs font-medium">
             Showing {filteredData.length} Booking
           </span>
 
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex gap-2">
+            <button
+              onClick={downloadPDF}
+              className="bg-blue-600 text-white px-3 py-1 rounded text-xs"
+            >
+              Download PDF
+            </button>
+
             <SearchInput
               placeholder="Search..."
               value={searchTerm}
@@ -106,19 +121,27 @@ function AdminBookingFhDeclined() {
             data={currentData}
             loading={loading}
             noDataComponent={<NoData />}
+            renderActions={(item) =>
+              renderActionsFhBookingDeclined({
+                item,
+                onSetViewDetails: () => viewFHDetails(item),
+              })
+            }
           />
         </div>
 
-        {!loading && totalPages > 1 && (
+        {totalPages > 1 && (
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={handlePageChange}
+            onPageChange={setCurrentPage}
           />
         )}
       </div>
 
-      {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
+      {showForm === "view_fhall" && (
+        <ViewFHDetails booking={viewFHDetailsData} />
+      )}
     </>
   );
 }
