@@ -65,6 +65,7 @@ import AdminWhyChooseUs from "./admin_components/admin_pages/AdminWhyChooseUs";
 import Contacts from "./components/pages/Contacts";
 import AdminBookingNotAttended from "./admin_components/admin_pages/AdminBookingNotAttended";
 import AdminBookingFhNotAttended from "./admin_components/admin_pages/AdminBookingFhNotAttended";
+import AdminBookingReschedLog from "./admin_components/admin_pages/AdminBookingReschedLog";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -196,6 +197,7 @@ const AdminLayout = () => {
           <Route path="/declined-booking" element={<AdminBookingDeclined />} />
           <Route path="/not-attended" element={<AdminBookingNotAttended />} />
           <Route path="/booking-history" element={<AdminBookingHistoryLog />} />
+          <Route path="/rescheduled-log" element={<AdminBookingReschedLog />} />
 
           <Route path="/fh-booking" element={<AdminFhBooking />} />
           <Route

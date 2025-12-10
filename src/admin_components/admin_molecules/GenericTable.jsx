@@ -9,7 +9,7 @@ function GenericTable({
     <div className="overflow-x-auto">
       <table className="min-w-full border-collapse border border-gray-300">
         <thead>
-          <tr className="dark:bg-gray-900 bg-white ">
+          <tr className="dark:bg-gray-900 bg-white">
             {columns.map((col, index) => (
               <th
                 key={index}
@@ -24,7 +24,7 @@ function GenericTable({
               </th>
             ))}
             {renderActions && (
-              <th className="p-2 dark:text-gray-100 text-right font-medium text-sm border border-gray-300">
+              <th className="p-2 dark:text-gray-100 text-right font-medium text-xs border dark:border-gray-700 border-gray-300">
                 Actions
               </th>
             )}
@@ -45,7 +45,7 @@ function GenericTable({
                     } ${
                       ["price", "paid", "half_price"].includes(col.key)
                         ? "font-bold bg-yellow-50 dark:bg-yellow-900"
-                        : ""
+                        : "font-medium"
                     }`}
                     style={
                       col.width ? { width: col.width, maxWidth: col.width } : {}
@@ -63,7 +63,7 @@ function GenericTable({
                   </td>
                 ))}
                 {renderActions && (
-                  <td className="p-2 border text-right dark:border-gray-700 border-gray-300">
+                  <td className="p-2 border text-xs text-right font-medium dark:border-gray-700 border-gray-300">
                     {renderActions(item)}
                   </td>
                 )}
@@ -73,7 +73,7 @@ function GenericTable({
             <tr>
               <td
                 colSpan={columns.length + (renderActions ? 1 : 0)}
-                className="text-center py-4 text-gray-500 dark:text-gray-400"
+                className="text-center py-4 text-xs text-gray-500 dark:text-gray-400"
               >
                 {noDataComponent}
               </td>

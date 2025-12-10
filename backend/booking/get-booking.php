@@ -16,7 +16,7 @@ if ($method === "GET") {
 
     $bookingId = $_GET['id'] ?? null;
     $userId    = $_GET['user_id'] ?? null;
-    $status    = $_GET['status'] ?? null;
+    $status    = $_GET['status'] ?? null; // Can be comma-separated
 
     $baseSql = "
         SELECT 
@@ -29,13 +29,12 @@ if ($method === "GET") {
 
             be.name AS extra_name, be.quantity AS extra_quantity, be.price AS extra_price,
 
-            bn.note AS note   -- <-- ADDED HERE
+            bn.note AS note
         FROM room_booking AS rb
         JOIN users AS u ON u.user_id = rb.user_id
         JOIN rooms AS r ON rb.facility_id = r.room_id
-
         LEFT JOIN booking_extras AS be ON be.booking_id = rb.booking_id
-        LEFT JOIN booking_note AS bn ON bn.booking_id = rb.booking_id   -- <-- JOIN NOTE
+        LEFT JOIN booking_note AS bn ON bn.booking_id = rb.booking_id
     ";
 
     $params = [];
@@ -55,9 +54,12 @@ if ($method === "GET") {
     }
 
     if ($status) {
-        $conditions[] = "rb.status = ?";
-        $params[] = $status;
-        $types .= "s";
+        // Allow multiple statuses via comma-separated string
+        $statusArray = array_map('trim', explode(',', $status));
+        $placeholders = implode(',', array_fill(0, count($statusArray), '?'));
+        $conditions[] = "rb.status IN ($placeholders)";
+        $params = array_merge($params, $statusArray);
+        $types .= str_repeat('s', count($statusArray));
     }
 
     if (!empty($conditions)) {
@@ -103,10 +105,7 @@ if ($method === "GET") {
                     'duration' => $row['duration']
                 ],
 
-                // ADD NOTE ONLY IF DECLINED
-                'note' => ($row['status'] === 'declined')
-                    ? ($row['note'] ?? null)
-                    : null,
+                'note' => ($row['status'] === 'declined') ? ($row['note'] ?? null) : null,
 
                 'extras' => []
             ];

@@ -12,6 +12,8 @@ import { useLocation } from "react-router-dom";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import Toaster from "../../components/molecules/Toaster";
 import useSetInactive from "../../hooks/useSetInactive";
+import ReschedBookingFh from "../admin_molecules/ReschedBookingFh";
+import ReSchedBookingFh from "../admin_molecules/ReschedBookingFh";
 
 function AdminBookingFhApproved() {
   const showForm = useForm((state) => state.showForm);
@@ -22,6 +24,8 @@ function AdminBookingFhApproved() {
   // 🔥 APPROVAL STATES
   const [approveItem, setApproveItem] = useState(null);
   const [approveAction, setApproveAction] = useState("");
+  const [reschedItem, setReschedItem] = useState(null);
+  const [showResched, setShowResched] = useState(false);
 
   const [toast, setToast] = useState(null);
 
@@ -39,9 +43,7 @@ function AdminBookingFhApproved() {
     `/booking/get-fhbooking.php?status=approved`
   );
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
   //=================//
   // FILTERING //
@@ -74,6 +76,14 @@ function AdminBookingFhApproved() {
     setViewFHDetailsId(item); // Pass the full booking object
   };
 
+  //==========================//
+  //  OPEN RESCHED MODAL //
+  //==========================//
+  const openResched = (item) => {
+    setReschedItem(item);
+    setShowResched(true);
+  };
+
   // Format prices in table
   const formattedData = currentData.map((item) => ({
     ...item,
@@ -99,30 +109,27 @@ function AdminBookingFhApproved() {
   //=========================//
   // APPROVAL HANDLING //
   //=========================//
-  const {
-    setInactive,
-    loading: approveLoading,
-    error: approveError,
-  } = useSetInactive("/booking/fh-booking.php", () => {
-    refetch();
-    setApproveItem(null);
-    setApproveAction("");
-    setToast({
-      message:
-        approveAction === "set_arrived"
-          ? "Booking marked as arrived"
-          : approveAction === "set_pending"
-          ? "Booking moved back to pending"
-          : approveAction === "set_not_attended"
-          ? "Booking marked as Not Attended"
-          : "",
-      type: "success",
-    });
-  });
+  const { setInactive, loading: approveLoading } = useSetInactive(
+    "/booking/fh-booking.php",
+    () => {
+      refetch();
+      setApproveItem(null);
+      setApproveAction("");
+      setToast({
+        message:
+          approveAction === "set_arrived"
+            ? "Booking marked as arrived"
+            : approveAction === "set_pending"
+            ? "Booking moved back to pending"
+            : approveAction === "set_not_attended"
+            ? "Booking marked as Not Attended"
+            : "",
+        type: "success",
+      });
+    }
+  );
 
-  console.log("approveError : ", approveError);
-  console.log("DATA : ", data);
-
+  console.log("DTAA : ", reschedItem);
   return (
     <>
       {toast && (
@@ -172,8 +179,11 @@ function AdminBookingFhApproved() {
                 item,
                 setShowForm,
                 viewFHDetails,
+                onSetReshed: (item) => {
+                  setReschedItem(item);
+                  setShowResched(true);
+                },
 
-                // 🔥 ADD THESE ACTIONS
                 onSetPending: (item) => {
                   setApproveItem(item);
                   setApproveAction("set_pending");
@@ -248,6 +258,14 @@ function AdminBookingFhApproved() {
       {/* 🔥 VIEW FUNCTION HALL DETAILS */}
       {showForm === "view fh-hall" && viewFHDetailsId && (
         <ViewFHDetails booking={viewFHDetailsId} />
+      )}
+
+      {/* 🔥 RESCHED MODAL */}
+      {showResched && reschedItem && (
+        <ReSchedBookingFh
+          booking={reschedItem}
+          onClose={() => setShowResched(false)}
+        />
       )}
     </>
   );

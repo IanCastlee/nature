@@ -355,6 +355,25 @@ export const renderActionsBookingDeclined = ({
     </div>
   );
 };
+
+//render Action for booking declined
+export const renderActionsBookingResched = ({
+  item,
+
+  onSetViewDetails,
+}) => {
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <button
+        onClick={() => onSetViewDetails(item)}
+        className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="View Room Details"
+      >
+        <icons.AiOutlineInfoCircle />
+      </button>
+    </div>
+  );
+};
 //render action fh booking
 export const renderActionsFhBooking = ({
   item,
@@ -409,6 +428,7 @@ export const renderActionsFhBookingApproved = ({
   onSetPending,
   onSetViewCottageDetails,
   onSetNotAttended,
+  onSetReshed,
 }) => {
   return (
     <div className="flex items-center justify-end gap-2">
@@ -431,7 +451,7 @@ export const renderActionsFhBookingApproved = ({
       </button>
 
       <button
-        onClick={() => onResched(item)}
+        onClick={() => onSetReshed(item)}
         className="bg-amber-500 hover:bg-amber-600 text-white w-auto h-[27px] rounded-sm 
              flex justify-center items-center mr-4 ml-2 px-2 text-xs whitespace-nowrap"
         title="Re-schedule"

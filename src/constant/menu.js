@@ -33,6 +33,10 @@ export const menuItems = [
         name: "Declined Booking",
         to: "/admin/declined-booking",
       },
+      {
+        name: "Rescheduled Booking",
+        to: "/admin/rescheduled-log",
+      },
     ],
   },
 

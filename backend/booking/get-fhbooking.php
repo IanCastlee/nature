@@ -14,8 +14,10 @@ if ($method === "GET") {
     $userId = $_GET['user_id'] ?? null;
     $status = $_GET['status'] ?? null;
 
-    // Function to fetch bookings with optional status filter
-    function fetchBookings($conn, $status = null) {
+    // ----------------------------------------------------
+    // UNIVERSAL FETCH FUNCTION WITH MULTIPLE STATUS SUPPORT
+    // ----------------------------------------------------
+    function fetchBookings($conn, $statuses = []) {
         $query = "
             SELECT 
                 orb.*, 
@@ -31,10 +33,13 @@ if ($method === "GET") {
             LEFT JOIN booking_note_fh AS bn ON bn.booking_id = orb.id
         ";
 
-        if ($status) {
-            $query .= " WHERE orb.status = ?";
+        if (!empty($statuses)) {
+            $placeholders = implode(",", array_fill(0, count($statuses), "?"));
+            $query .= " WHERE orb.status IN ($placeholders)";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("s", $status);
+
+            $types = str_repeat("s", count($statuses));
+            $stmt->bind_param($types, ...$statuses);
         } else {
             $stmt = $conn->prepare($query);
         }
@@ -48,7 +53,7 @@ if ($method === "GET") {
     // PENDING BOOKINGS
     // -----------------------------
     if ($status === "pending") {
-        $data = fetchBookings($conn, "pending");
+        $data = fetchBookings($conn, ["pending"]);
         echo json_encode(["success" => true, "data" => $data]);
         exit;
     }
@@ -57,16 +62,16 @@ if ($method === "GET") {
     // DECLINED BOOKINGS
     // -----------------------------
     if ($status === "declined") {
-        $data = fetchBookings($conn, "declined");
+        $data = fetchBookings($conn, ["declined"]);
         echo json_encode(["success" => true, "data" => $data]);
         exit;
     }
 
     // -----------------------------
-    // APPROVED BOOKINGS
+    // APPROVED BOOKINGS + RESCHEDULED (combined)
     // -----------------------------
     if ($status === "approved") {
-        $data = fetchBookings($conn, "approved");
+        $data = fetchBookings($conn, ["approved", "rescheduled"]);
         echo json_encode(["success" => true, "data" => $data]);
         exit;
     }
@@ -75,7 +80,7 @@ if ($method === "GET") {
     // ARRIVED BOOKINGS
     // -----------------------------
     if ($status === "arrived") {
-        $data = fetchBookings($conn, "arrived");
+        $data = fetchBookings($conn, ["arrived"]);
         echo json_encode(["success" => true, "data" => $data]);
         exit;
     }
@@ -84,7 +89,7 @@ if ($method === "GET") {
     // NOT ATTENDED BOOKINGS
     // -----------------------------
     if ($status === "not_attended") {
-        $data = fetchBookings($conn, "not_attended");
+        $data = fetchBookings($conn, ["not_attended"]);
         echo json_encode(["success" => true, "data" => $data]);
         exit;
     }

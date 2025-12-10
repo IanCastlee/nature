@@ -25,7 +25,12 @@ if ($facilityId <= 0) {
     exit;
 }
 
-$sql = "SELECT start_date, end_date FROM room_booking WHERE facility_id = ? AND status != 'declined'";
+$sql = "SELECT start_date, end_date 
+FROM room_booking 
+WHERE facility_id = ? 
+  AND (status != 'declined' AND status != 'resched');
+";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $facilityId);
 $stmt->execute();

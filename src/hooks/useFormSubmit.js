@@ -20,7 +20,7 @@ function useFormSubmit(url, onSuccess) {
         console.log("⚠️ Form submission returned error state:", res.data);
       }
     } catch (err) {
-      setError(err.message);
+      setError(err);
     } finally {
       setLoading(false);
     }

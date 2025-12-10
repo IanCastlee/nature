@@ -13,7 +13,6 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
   const [openDropdowns, setOpenDropdowns] = useState({});
   const location = useLocation();
 
-  //  Open dropdowns on route change
   useEffect(() => {
     const newOpen = {};
     menuItems.forEach((item) => {
@@ -28,7 +27,6 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
   }, [location.pathname]);
 
   const currentYear = new Date().getFullYear();
-
   const toggleItem = (itemName) => {
     setOpenDropdowns((prev) => ({
       ...prev,
@@ -47,7 +45,7 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
         isCollapsed ? "w-20" : "w-64"
       } fixed top-0 left-0 h-screen bg-white dark:bg-gray-900 text-gray-100 flex flex-col transition-all duration-300 z-40 overflow-y-auto hide-scrollbar`}
     >
-      {/*  Top controls */}
+      {/* Top controls */}
       <div className="flex flex-row items-center gap-1 justify-between dark:bg-gray-800 mb-4 p-1">
         <button onClick={toggleDarkMode}>
           {darkMode ? (
@@ -75,10 +73,10 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
         </button>
       </div>
 
-      {/* 🏞 Logo */}
+      {/* Logo */}
       <div className="w-full flex flex-row justify-center mb-4">
         {!isCollapsed ? (
-          <h3 className="text-lg font-medium dark:text-gray-100 text-gray-800">
+          <h3 className="text-lg font-semibold dark:text-gray-100 text-gray-800">
             <span className="text-blue-400 font-semibold">NATURE</span> HOT
             SPRING
           </h3>
@@ -91,7 +89,7 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
         )}
       </div>
 
-      {/*  Menu items */}
+      {/* Menu items */}
       <ul className="flex flex-col gap-4 p-2">
         {menuItems.map((item) => {
           const hasChildren =
@@ -104,13 +102,13 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
                 location.pathname.startsWith(child.to)
               ));
 
-          //  Handle Logout
+          // Handle Logout
           if (item.action === "logout") {
             return (
               <li key={item.name}>
                 <button
                   onClick={handleLogout}
-                  className={`flex items-center gap-2 w-full h-[35px] px-2 rounded-md text-left text-sm font-semibold transition-colors dark:text-gray-400 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800`}
+                  className="flex items-center gap-2 w-full h-[35px] px-2 rounded-md text-left text-sm font-semibold transition-colors dark:text-gray-400 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                   <item.icon className="text-blue-700 text-lg" />
                   {!isCollapsed && <span>{item.name}</span>}
@@ -132,9 +130,7 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
                 <NavLink
                   to={item.to || "#"}
                   className={({ isActive }) =>
-                    `flex items-center gap-2 w-full h-full dark:text-gray-400 text-gray-700 text-sm font-semibold ${
-                      isActive ? "font-semibold" : ""
-                    }`
+                    `flex items-center gap-2 w-full h-full dark:text-gray-400 text-gray-700 text-sm font-semibold`
                   }
                 >
                   <item.icon className="text-blue-700 text-lg" />
@@ -152,7 +148,7 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
                 )}
               </div>
 
-              {/*  Submenu */}
+              {/* Submenu */}
               {hasChildren && openDropdowns[item.name] && !isCollapsed && (
                 <ul className="ml-6 mt-1 flex flex-col gap-1">
                   {item.children.map((subItem) => (
@@ -160,10 +156,10 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
                       <NavLink
                         to={subItem.to}
                         className={({ isActive }) =>
-                          `flex items-center gap-2 h-[30px] dark:text-gray-400 text-gray-700 text-sm px-2 rounded-md transition-colors ${
+                          `flex items-center gap-2 h-[28px] text-xs px-2 rounded-md transition-colors ${
                             isActive
-                              ? "bg-gray-200 dark:bg-gray-800"
-                              : "dark:hover:bg-gray-800 hover:bg-gray-100"
+                              ? "bg-gray-200 dark:bg-gray-800 font-semibold text-gray-800 dark:text-gray-100"
+                              : "bg-transparent text-gray-700 dark:text-gray-400 font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
                           }`
                         }
                       >
@@ -178,7 +174,7 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
         })}
       </ul>
 
-      {/*  Footer */}
+      {/* Footer */}
       {!isCollapsed && (
         <footer className="mt-auto p-2 border-t dark:border-gray-700 border-gray-300 text-sm text-gray-600 text-center flex flex-col items-center justify-center">
           © {currentYear} Nature Hot Spring. All rights reserved.
