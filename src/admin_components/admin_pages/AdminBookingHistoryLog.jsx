@@ -12,6 +12,9 @@ import useSetInactive from "../../hooks/useSetInactive";
 import Toaster from "../../components/molecules/Toaster";
 import DeleteModal from "../../components/molecules/DeleteModal";
 
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 function AdminBookingHistoryLog() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
@@ -25,7 +28,6 @@ function AdminBookingHistoryLog() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // FETCH BOOKING HISTORY
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-booking.php?status=arrived`
   );
@@ -34,19 +36,16 @@ function AdminBookingHistoryLog() {
     setCurrentPage(pageNumber);
   };
 
-  // FILTERING
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
-
       const s = searchTerm.toLowerCase();
-
       return (
-        (item?.fullname || "").toLowerCase().includes(s) ||
-        (item?.room_name || "").toLowerCase().includes(s) ||
-        (item?.start_date || "").toLowerCase().includes(s) ||
-        (item?.end_date || "").toLowerCase().includes(s) ||
-        (item?.status || "").toLowerCase().includes(s)
+        (item.fullname || "").toLowerCase().includes(s) ||
+        (item.room?.room_name || "").toLowerCase().includes(s) ||
+        (item.start_date || "").toLowerCase().includes(s) ||
+        (item.end_date || "").toLowerCase().includes(s) ||
+        (item.status || "").toLowerCase().includes(s)
       );
     }) || [];
 
@@ -57,45 +56,126 @@ function AdminBookingHistoryLog() {
   );
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  // VIEW FH DETAILS
   const viewFHDetails = (item) => {
     setShowForm("view fh-hall");
     setViewFHDetailsId(item);
   };
 
-  // FORMAT TABLE DATA
+  // Format table for display
   const formattedData = currentData.map((item) => ({
     ...item,
-    email: item.user_id === 12 ? "No Email Provided" : item.email,
+    extras: item.extras && item.extras.length > 0 ? "Yes" : "None",
     room_name: item.room?.room_name || "N/A",
-    extras:
-      item.extras && item.extras.length > 0
-        ? item.extras
-            .map((extra) => `${extra.name} (x${extra.quantity})`)
-            .join(", ")
-        : "None",
     paid: `₱${Number(item.paid).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
     })}`,
     price: `₱${Number(item.price).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
     })}`,
-    half_price: `₱${Number(item.price / 2).toLocaleString("en-PH", {
-      minimumFractionDigits: 2,
-    })}`,
   }));
 
-  // SET BACK TO APPROVED
+  // PDF export filtered by current month
+  const downloadMonthlyPDF = () => {
+    const doc = new jsPDF("portrait", "mm", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    const now = new Date();
+    const currentMonthName = now.toLocaleString("default", { month: "long" });
+    const currentYear = now.getFullYear();
+
+    // Resort Name - Bold, centered
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text(
+      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      pageWidth / 2,
+      12,
+      { align: "center" }
+    );
+
+    // Address - Normal, smaller font, centered
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Monbon, Irosin, Sorsgon", pageWidth / 2, 18, { align: "center" });
+
+    // Horizontal line separator
+    doc.setLineWidth(0.5);
+    doc.line(14, 22, pageWidth - 14, 22);
+
+    // Booking Log Title - Larger, bold, centered
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text("Booking Log", pageWidth / 2, 30, { align: "center" });
+
+    // Month & Year subtitle - Normal, smaller, centered, with some spacing
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 36, {
+      align: "center",
+    });
+
+    // Filter data for current month and year
+    const monthlyData = filteredData.filter((item) => {
+      const bookingDate = new Date(item.start_date);
+      return (
+        bookingDate.getMonth() === now.getMonth() &&
+        bookingDate.getFullYear() === currentYear
+      );
+    });
+
+    if (monthlyData.length === 0) {
+      alert("No bookings found for the current month.");
+      return;
+    }
+
+    const tableColumn = [
+      "Booking ID",
+      "Guest Name",
+      "Phone",
+      "Check-In Date",
+      "Check-Out Date",
+      "Nights",
+      "Extras",
+      "Price",
+      "Paid",
+      "Room",
+      "Status",
+    ];
+
+    const tableRows = monthlyData.map((item) => [
+      item.booking_id,
+      item.fullname,
+      item.phone,
+      item.start_date,
+      item.end_date,
+      item.nights,
+      item.extras && item.extras.length > 0 ? "Yes" : "None",
+      Number(item.price), // plain number
+      Number(item.paid), // plain number
+      item.room?.room_name || "N/A",
+      item.status.charAt(0).toUpperCase() + item.status.slice(1),
+    ]);
+
+    autoTable(doc, {
+      startY: 42, // Leave space after subtitle
+      head: [tableColumn],
+      body: tableRows,
+      theme: "grid",
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [40, 40, 40], textColor: 255, halign: "center" },
+      tableWidth: "auto",
+    });
+
+    doc.save(`Booking_History_${currentMonthName}_${currentYear}.pdf`);
+  };
+
   const { setInactive, loading: approveLoading } = useSetInactive(
     "/booking/booking.php",
     () => {
       refetch();
       setApproveItem(null);
       setApproveAction("");
-      setToast({
-        message: "Booking moved back to approved",
-        type: "success",
-      });
+      setToast({ message: "Booking moved back to approved", type: "success" });
     }
   );
 
@@ -132,6 +212,12 @@ function AdminBookingHistoryLog() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            <button
+              onClick={downloadMonthlyPDF}
+              className="bg-green-600 text-white px-3 py-1 rounded text-xs"
+            >
+              Download PDF (Current Month)
+            </button>
           </div>
         </div>
 
@@ -145,7 +231,6 @@ function AdminBookingHistoryLog() {
               renderActionsBookingHistoryLog({
                 item,
                 setShowForm,
-
                 onSetBackToApproved: (item) => {
                   setApproveItem(item);
                   setApproveAction("set_backtoapproved");
@@ -177,10 +262,7 @@ function AdminBookingHistoryLog() {
           label2="back_approved"
           label3="Are you sure you want to move this booking back to approved?"
           onConfirm={() =>
-            setInactive({
-              id: approveItem?.booking_id,
-              action: approveAction,
-            })
+            setInactive({ id: approveItem?.booking_id, action: approveAction })
           }
         />
       )}

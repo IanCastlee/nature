@@ -66,6 +66,7 @@ import Contacts from "./components/pages/Contacts";
 import AdminBookingNotAttended from "./admin_components/admin_pages/AdminBookingNotAttended";
 import AdminBookingFhNotAttended from "./admin_components/admin_pages/AdminBookingFhNotAttended";
 import AdminBookingReschedLog from "./admin_components/admin_pages/AdminBookingReschedLog";
+import AdminBookingReschedLogFh from "./admin_components/admin_pages/AdminBookingReschedLogFh";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -228,6 +229,10 @@ const AdminLayout = () => {
           <Route
             path="/announcement-history"
             element={<AdminAnnouncementHistory />}
+          />
+          <Route
+            path="/rescheduled-fh-log"
+            element={<AdminBookingReschedLogFh />}
           />
 
           <Route path="/terms" element={<AdminTermsAndConditions />} />

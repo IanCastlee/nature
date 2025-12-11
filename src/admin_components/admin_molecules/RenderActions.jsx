@@ -527,6 +527,25 @@ export const renderActionsFhBookingDeclined = ({ item, onSetViewDetails }) => {
   );
 };
 
+//render Action for booking rescheduled
+export const renderActionsBookingReschedLg = ({
+  item,
+
+  onSetViewDetails,
+}) => {
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <button
+        onClick={() => onSetViewDetails(item)}
+        className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
+        title="View Room Details"
+      >
+        <icons.AiOutlineInfoCircle />
+      </button>
+    </div>
+  );
+};
+
 //render action gallery
 export const renderActionsGallery = ({
   item,

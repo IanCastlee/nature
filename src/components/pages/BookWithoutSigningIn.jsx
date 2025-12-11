@@ -484,8 +484,22 @@ function BookWithoutSigningIn() {
                             {selectedRange.to.toLocaleDateString()}
                           </p>
                         ) : (
-                          <p className="text-xs dark:text-gray-400 text-gray-600 max-w-[100px] ml-4">
-                            Select your check-out date
+                          <p
+                            className="
+    text-xs 
+    font-medium 
+    bg-yellow-100 
+    text-yellow-800 
+    dark:bg-yellow-900/40 
+    dark:text-yellow-300 
+    px-3 py-1.5 
+    rounded-md 
+    ml-4 
+    whitespace-nowrap 
+    shadow-sm
+  "
+                          >
+                            ⚠ Select your check-out date
                           </p>
                         )}
                       </div>

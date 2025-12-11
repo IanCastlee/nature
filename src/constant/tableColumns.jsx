@@ -160,6 +160,7 @@ export const availableCottageColumns = [
 
 //booking
 export const bookingPending = [
+  { title: "ID", key: "booking_id" },
   { title: "Name", key: "fullname" },
   { title: "Phone", key: "phone" },
   { title: "Room Name", key: "room_name" },
@@ -178,6 +179,7 @@ export const bookingPending = [
 ];
 
 export const bookingApproved = [
+  { title: "ID", key: "booking_id" },
   { title: "Name", key: "fullname" },
   { title: "Phone", key: "phone" },
   { title: "Room Name", key: "room_name" },
@@ -197,6 +199,8 @@ export const bookingApproved = [
 ];
 
 export const bookingHistory = [
+  { title: "ID", key: "booking_id" },
+
   { title: "Name", key: "fullname" },
   { title: "Phone", key: "phone" },
   { title: "Room Name", key: "room_name" },
@@ -216,6 +220,8 @@ export const bookingHistory = [
 ];
 
 export const bookingDeclined = [
+  { title: "ID", key: "booking_id" },
+
   { title: "Name", key: "fullname" },
   { title: "Phone", key: "phone" },
   { title: "Room Name", key: "room_name" },
@@ -234,6 +240,8 @@ export const bookingDeclined = [
 ];
 
 export const booking = [
+  { title: "ID", key: "booking_id" },
+
   { title: "Name", key: "fullname" },
   { title: "Email", key: "email" },
   { title: "Room Name", key: "room_name" },
@@ -262,6 +270,30 @@ export const bookingRescheduled = [
   { title: "Paid (Original)", key: "sched_paid_payment" },
   { title: "Paid (Rescheduled)", key: "resched_paid_payment" },
   { title: "Refund / Charge", key: "refund_charge" },
+  { title: "Created At", key: "created_at" },
+];
+
+export const bookingRescheduledFh = [
+  { title: "Full Name", key: "fullname" },
+  { title: "Phone", key: "phone" },
+  { title: "Previous Facility", key: "prev_facility" },
+  { title: "New Facility", key: "new_facility" },
+  { title: "Original Date", key: "sched_date" },
+  { title: "Original Time", key: "sched_time" },
+
+  { title: "Rescheduled Date", key: "resched_date" },
+  { title: "Rescheduled Time", key: "resched_time" },
+
+  { title: "Original Price", key: "sched_total_price" },
+  { title: "Rescheduled Price", key: "resched_total_price" },
+
+  { title: "Paid (Original)", key: "sched_paid_payment" },
+  { title: "Paid (Rescheduled)", key: "resched_paid_payment" },
+
+  { title: "Refund / Charge", key: "refund_charge" },
+
+  { title: "Rescheduled Booking ID", key: "rescheduled_booking_id" },
+
   { title: "Created At", key: "created_at" },
 ];
 

@@ -34,7 +34,7 @@ export const menuItems = [
         to: "/admin/declined-booking",
       },
       {
-        name: "Rescheduled Booking",
+        name: "Rescheduled Booking Log",
         to: "/admin/rescheduled-log",
       },
     ],
@@ -64,6 +64,10 @@ export const menuItems = [
       {
         name: "Declined Booking",
         to: "/admin/fhbooking-declined",
+      },
+      {
+        name: "Rescheduled Booking Log",
+        to: "/admin/rescheduled-fh-log",
       },
     ],
   },
