@@ -72,7 +72,18 @@ function RoomCategoriesPage() {
         {/* <SearchBox /> */}
 
         <section className="w-full px-2 md:px-2 lg:px-[130px] pt-10">
-          <div className="flex flex-row justify-end items-center gap-2 mb-2">
+          <div className="flex flex-row justify-between items-end gap-2 mb-2">
+            <p
+              className="
+    text-xs 
+    px-3 py-1.5 rounded-md inline-block
+    bg-white text-black
+    dark:bg-gray-800 dark:text-white
+  "
+            >
+              Business Hours: <br /> 8:00 AM – 5:00 PM (Every Day)
+            </p>
+
             <button
               onClick={() => setShowHouseRules(true)}
               className="bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-500 dark:to-blue-600 

@@ -11,7 +11,7 @@ import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import useSetInactive from "../../hooks/useSetInactive";
 import Toaster from "../../components/molecules/Toaster";
 import DeleteModal from "../../components/molecules/DeleteModal";
-
+import { icons } from "../../constant/icon";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -31,7 +31,7 @@ function AdminBookingHistoryLog() {
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-booking.php?status=arrived`
   );
-
+  console.log("DATA : ", data);
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -74,6 +74,16 @@ function AdminBookingHistoryLog() {
     })}`,
   }));
 
+  const { setInactive, loading: approveLoading } = useSetInactive(
+    "/booking/booking.php",
+    () => {
+      refetch();
+      setApproveItem(null);
+      setApproveAction("");
+      setToast({ message: "Booking moved back to approved", type: "success" });
+    }
+  );
+
   // PDF export filtered by current month
   const downloadMonthlyPDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
@@ -83,34 +93,38 @@ function AdminBookingHistoryLog() {
     const currentMonthName = now.toLocaleString("default", { month: "long" });
     const currentYear = now.getFullYear();
 
-    // Resort Name - Bold, centered
+    // Resort Name - Smaller + Bold + Center
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
+    doc.setFontSize(12); // smaller
     doc.text(
       "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
       pageWidth / 2,
-      12,
+      10,
       { align: "center" }
     );
 
-    // Address - Normal, smaller font, centered
+    // Address - Smaller
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text("Monbon, Irosin, Sorsogon", pageWidth / 2, 15, {
+      align: "center",
+    });
+
+    // Line separator
+    doc.setLineWidth(0.4);
+    doc.line(14, 19, pageWidth - 14, 19);
+
+    // Booking Log Title - Smaller Bold
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13); // smaller
+    doc.text("Arrived Room Booking Records", pageWidth / 2, 26, {
+      align: "center",
+    });
+
+    // Month & Year subtitle - Small
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text("Monbon, Irosin, Sorsgon", pageWidth / 2, 18, { align: "center" });
-
-    // Horizontal line separator
-    doc.setLineWidth(0.5);
-    doc.line(14, 22, pageWidth - 14, 22);
-
-    // Booking Log Title - Larger, bold, centered
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.text("Booking Log", pageWidth / 2, 30, { align: "center" });
-
-    // Month & Year subtitle - Normal, smaller, centered, with some spacing
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 36, {
+    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 31, {
       align: "center",
     });
 
@@ -134,13 +148,21 @@ function AdminBookingHistoryLog() {
       "Phone",
       "Check-In Date",
       "Check-Out Date",
-      "Nights",
+      "Night(s)",
       "Extras",
       "Price",
       "Paid",
       "Room",
+      "Room Price",
       "Status",
     ];
+
+    // format numerical values
+    const formatNum = (num) =>
+      Number(num).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
     const tableRows = monthlyData.map((item) => [
       item.booking_id,
@@ -150,34 +172,29 @@ function AdminBookingHistoryLog() {
       item.end_date,
       item.nights,
       item.extras && item.extras.length > 0 ? "Yes" : "None",
-      Number(item.price), // plain number
-      Number(item.paid), // plain number
+      formatNum(item.price),
+      formatNum(item.paid),
       item.room?.room_name || "N/A",
+      item.room?.price || "N/A",
       item.status.charAt(0).toUpperCase() + item.status.slice(1),
     ]);
 
     autoTable(doc, {
-      startY: 42, // Leave space after subtitle
+      startY: 36, // adjusted for smaller header
       head: [tableColumn],
       body: tableRows,
       theme: "grid",
-      styles: { fontSize: 8, cellPadding: 2 },
-      headStyles: { fillColor: [40, 40, 40], textColor: 255, halign: "center" },
+      styles: { fontSize: 7, cellPadding: 1.8 }, // SMALL TABLE TEXT
+      headStyles: {
+        fillColor: [40, 40, 40],
+        textColor: 255,
+        halign: "center",
+      },
       tableWidth: "auto",
     });
 
     doc.save(`Booking_History_${currentMonthName}_${currentYear}.pdf`);
   };
-
-  const { setInactive, loading: approveLoading } = useSetInactive(
-    "/booking/booking.php",
-    () => {
-      refetch();
-      setApproveItem(null);
-      setApproveAction("");
-      setToast({ message: "Booking moved back to approved", type: "success" });
-    }
-  );
 
   return (
     <>
@@ -191,7 +208,7 @@ function AdminBookingHistoryLog() {
 
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
-          Booking History
+          Arrived Booking
         </h1>
 
         {loading && <p className="text-blue-500 text-sm">Loading...</p>}
@@ -207,17 +224,19 @@ function AdminBookingHistoryLog() {
           </span>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={downloadMonthlyPDF}
+              title="Download PDF for Current Month"
+              className="bg-green-600 text-white px-3 py-1 rounded text-xs whitespace-nowrap flex items-center gap-1"
+            >
+              <icons.MdOutlineFileDownload /> PDF
+            </button>
+
             <SearchInput
               placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button
-              onClick={downloadMonthlyPDF}
-              className="bg-green-600 text-white px-3 py-1 rounded text-xs"
-            >
-              Download PDF (Current Month)
-            </button>
           </div>
         </div>
 

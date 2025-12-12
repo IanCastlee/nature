@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Line } from "react-chartjs-2";
+import { icons } from "../../constant/icon";
 import {
   Chart as ChartJS,
   LineElement,
@@ -13,6 +14,7 @@ import {
 import useGetData from "../../hooks/useGetData";
 import Button from "../admin_atoms/Button";
 import CurrentOccupants from "./CurrentOccupants";
+import AdminSetting from "./AdminSetting";
 
 ChartJS.register(
   LineElement,
@@ -27,7 +29,7 @@ ChartJS.register(
 const Dashboard = () => {
   const [selectedYear, setSelectedYear] = useState("2025");
   const [showCurrentOccupants, setShowCurrentOccupants] = useState(false);
-
+  const [showSetting, setShowSetting] = useState(false);
   // Fetch data count
   const { data, loading, refetch, error } = useGetData(`/admin/counts.php`);
 
@@ -44,18 +46,18 @@ const Dashboard = () => {
       // percent: data ? `+${data.functionHallBookings}%` : "-",
       color: "red",
     },
-    // {
-    //   title: "Not Verified Users",
-    //   value: data ? data.notVerifiedUsers : "-",
-    //   // percent: data ? `+${data.notVerifiedUsers}%` : "-",
-    //   color: "blue",
-    // },
-    // {
-    //   title: "Verified Users",
-    //   value: data ? data.verifiedUsers : "-",
-    //   // percent: data ? `+${data.verifiedUsers}%` : "-",
-    //   color: "yellow",
-    // },
+    {
+      title: "Not Verified Users",
+      value: data ? data.notVerifiedUsers : "-",
+      // percent: data ? `+${data.notVerifiedUsers}%` : "-",
+      color: "blue",
+    },
+    {
+      title: "Verified Users",
+      value: data ? data.verifiedUsers : "-",
+      // percent: data ? `+${data.verifiedUsers}%` : "-",
+      color: "yellow",
+    },
   ];
 
   const facilities = [
@@ -164,12 +166,19 @@ const Dashboard = () => {
             Dashboard Overview
           </h1>
 
-          <Button
-            onClick={() => setShowCurrentOccupants(true)}
-            className="flex flex-row items-center h-[35px] bg-gray-700 hover:bg-gray-800
+          <div className="flex flex-row items-center gap-2">
+            <Button
+              onClick={() => setShowCurrentOccupants(true)}
+              className="flex flex-row items-center h-[35px] bg-gray-700 hover:bg-gray-800
              text-white text-xs font-medium px-3 rounded-md transition-colors"
-            label={<>Current Occupants</>}
-          />
+              label={<>Current Occupants</>}
+            />
+
+            <icons.IoSettingsOutline
+              className="text-2xl cursor-pointer dark:text-white text-black"
+              onClick={() => setShowSetting(true)}
+            />
+          </div>
         </div>
 
         {/* Top Cards */}
@@ -248,6 +257,8 @@ const Dashboard = () => {
       </div>
 
       {showCurrentOccupants && <CurrentOccupants close={handleClose} />}
+
+      {showSetting && <AdminSetting />}
     </>
   );
 };

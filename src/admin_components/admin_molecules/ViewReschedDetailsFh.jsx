@@ -19,24 +19,26 @@ function ViewReschedDetailsFh({ data, onClose }) {
 
       {/* Modal */}
       <div className="fixed inset-0 flex items-center justify-center z-50 p-6">
-        <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-2xl w-full max-w-3xl relative text-sm">
+        <div className="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-2xl w-full max-w-3xl relative text-xs">
+          {" "}
+          {/* text-xs for smaller font */}
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-lg"
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-base"
           >
             ✕
           </button>
-
           {/* Header */}
-          <h2 className="text-2xl font-bold mb-6 dark:text-gray-100 border-b pb-3">
+          <h2 className="text-lg font-bold mb-3 dark:text-gray-100 border-b pb-1">
+            {" "}
+            {/* smaller heading */}
             Function Hall Rescheduled Booking Details
           </h2>
-
           {/* Details */}
-          <div className="space-y-4 text-gray-700 dark:text-gray-200 text-sm">
+          <div className="space-y-2 text-gray-700 dark:text-gray-200">
             {/* Name & Phone */}
-            <div className="flex justify-between space-x-6 bg-gray-100 dark:bg-gray-800 p-3 rounded">
+            <div className="flex justify-between space-x-3 bg-gray-100 dark:bg-gray-800 p-1.5 rounded">
               <div>
                 <span className="font-semibold">Full Name:</span>
                 <div className="font-medium">{data.fullname}</div>
@@ -48,7 +50,7 @@ function ViewReschedDetailsFh({ data, onClose }) {
             </div>
 
             {/* Facility Info */}
-            <div className="flex justify-between space-x-6 bg-gray-50 dark:bg-gray-700 p-3 rounded">
+            <div className="flex justify-between space-x-3 bg-gray-50 dark:bg-gray-700 p-1.5 rounded">
               <div>
                 <span className="font-semibold">Previous Facility:</span>
                 <div className="font-medium">{data.prev_facility}</div>
@@ -60,7 +62,7 @@ function ViewReschedDetailsFh({ data, onClose }) {
             </div>
 
             {/* Schedule Info */}
-            <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded space-y-2">
+            <div className="bg-gray-100 dark:bg-gray-800 p-1.5 rounded space-y-1">
               <span className="font-semibold">Original Schedule:</span>
               <div className="font-medium">
                 Date: {data.sched_date}
@@ -69,7 +71,7 @@ function ViewReschedDetailsFh({ data, onClose }) {
               </div>
             </div>
 
-            <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded space-y-2">
+            <div className="bg-gray-100 dark:bg-gray-800 p-1.5 rounded space-y-1">
               <span className="font-semibold">Rescheduled Schedule:</span>
               <div className="font-medium">
                 Date: {data.resched_date}
@@ -79,7 +81,7 @@ function ViewReschedDetailsFh({ data, onClose }) {
             </div>
 
             {/* Prices */}
-            <div className="flex justify-between space-x-6 bg-gray-50 dark:bg-gray-700 p-3 rounded">
+            <div className="flex justify-between space-x-3 bg-gray-50 dark:bg-gray-700 p-1.5 rounded">
               <div>
                 <span className="font-semibold">Original Price:</span>
                 <div className="font-medium">
@@ -95,7 +97,7 @@ function ViewReschedDetailsFh({ data, onClose }) {
             </div>
 
             {/* Payments */}
-            <div className="flex justify-between space-x-6 bg-gray-100 dark:bg-gray-800 p-3 rounded">
+            <div className="flex justify-between space-x-3 bg-gray-100 dark:bg-gray-800 p-1.5 rounded">
               <div>
                 <span className="font-semibold">Paid (Original):</span>
                 <div className="font-medium">
@@ -111,7 +113,7 @@ function ViewReschedDetailsFh({ data, onClose }) {
             </div>
 
             {/* Refund / Charge */}
-            <div className="flex justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded">
+            <div className="flex justify-between bg-gray-50 dark:bg-gray-700 p-1.5 rounded">
               <span className="font-semibold">Refund / Charge:</span>
               <span className={`font-medium ${refundColor}`}>
                 {formatCurrency(data.refund_charge)}
@@ -119,7 +121,7 @@ function ViewReschedDetailsFh({ data, onClose }) {
             </div>
 
             {/* Created At */}
-            <div className="flex justify-between bg-gray-100 dark:bg-gray-800 p-3 rounded">
+            <div className="flex justify-between bg-gray-100 dark:bg-gray-800 p-1.5 rounded">
               <span className="font-semibold">Created At:</span>
               <span className="font-medium">{data.created_at}</span>
             </div>

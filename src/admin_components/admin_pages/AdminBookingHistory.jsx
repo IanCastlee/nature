@@ -12,6 +12,9 @@ import Toaster from "../../components/molecules/Toaster";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import ViewDetails from "../admin_molecules/ViewDetails";
 import ReSchedBooking from "../admin_molecules/ReSchedBooking";
+import { icons } from "../../constant/icon";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 function AdminBookingHistory() {
   const showForm = useForm((state) => state.showForm);
@@ -33,6 +36,8 @@ function AdminBookingHistory() {
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-booking.php?status=approved,rescheduled`
   );
+
+  console.log("DATA : ", data);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -120,6 +125,118 @@ function AdminBookingHistory() {
     });
   });
 
+  // -------------------------------------------
+  // 📌 PDF EXPORT FOR APPROVED BOOKINGS
+  // -------------------------------------------
+  const downloadDeclinedPDF = () => {
+    const doc = new jsPDF("portrait", "mm", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    const now = new Date();
+    const currentMonthName = now.toLocaleString("default", { month: "long" });
+    const currentYear = now.getFullYear();
+
+    // Resort Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text(
+      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      pageWidth / 2,
+      10,
+      {
+        align: "center",
+      }
+    );
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text("Monbon, Irosin, Sorsogon", pageWidth / 2, 15, {
+      align: "center",
+    });
+
+    doc.setLineWidth(0.4);
+    doc.line(14, 19, pageWidth - 14, 19);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("Approved Room Booking Records", pageWidth / 2, 26, {
+      align: "center",
+    });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 31, {
+      align: "center",
+    });
+
+    // Filter by START DATE (monthly)
+    const monthlyData = filteredData.filter((item) => {
+      const bookingDate = new Date(item.start_date);
+      return (
+        bookingDate.getMonth() === now.getMonth() &&
+        bookingDate.getFullYear() === currentYear
+      );
+    });
+
+    if (monthlyData.length === 0) {
+      alert("No approved bookings found for this month.");
+      return;
+    }
+
+    const tableColumn = [
+      "Booking ID",
+      "Guest Name",
+      "Phone",
+      "Check-In Date",
+      "Check-Out Date",
+      "Night(s)",
+      "Extras",
+      "Price",
+      "Paid",
+      "Room",
+      "Room Price",
+      "Status",
+    ];
+
+    const formatNum = (num) =>
+      Number(num).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+    const tableRows = monthlyData.map((item) => [
+      item.booking_id,
+      item.fullname,
+      item.phone,
+      item.start_date,
+      item.end_date,
+      item.nights,
+      item.extras?.length > 0 ? "Yes" : "None",
+      formatNum(item.price),
+      formatNum(item.paid),
+      item.room?.room_name || "N/A",
+      item.room?.price || "N/A",
+      item.status,
+    ]);
+
+    autoTable(doc, {
+      startY: 36,
+      head: [tableColumn],
+      body: tableRows,
+      theme: "grid",
+      styles: { fontSize: 7, cellPadding: 1.8 },
+      headStyles: {
+        fillColor: [30, 30, 30],
+        textColor: 255,
+        halign: "center",
+      },
+      tableWidth: "auto",
+    });
+
+    doc.save(`Approved_Bookings_${currentMonthName}_${currentYear}.pdf`);
+  };
+
+  // -------------------------------------------
   return (
     <>
       {toast && (
@@ -148,6 +265,13 @@ function AdminBookingHistory() {
           </span>
 
           <div className="flex flex-row items-center gap-2">
+            <button
+              onClick={downloadDeclinedPDF}
+              title="Download PDF for Current Month"
+              className="bg-green-600 text-white px-3 py-1 rounded text-xs whitespace-nowrap flex items-center gap-1"
+            >
+              <icons.MdOutlineFileDownload /> PDF
+            </button>
             <SearchInput
               placeholder="Search..."
               value={searchTerm}

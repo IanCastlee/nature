@@ -54,7 +54,7 @@ export const menuItems = [
       },
 
       {
-        name: "Arrived History",
+        name: "Arrived Booking",
         to: "/admin/fhbooking-history",
       },
       {

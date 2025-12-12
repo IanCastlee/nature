@@ -1024,21 +1024,39 @@ function BookWithoutSigningIn() {
 
           {/* SCREENSHOT OVERLAY */}
           <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-auto">
-            <div className="bg-black bg-opacity-60 flex items-center justify-center w-full h-full">
-              <div className="bg-white rounded-xl p-6 text-center shadow-lg max-w-md w-full space-y-4 border border-gray-300">
-                <p className="text-blue-800 text-sm font-medium">
-                  Please take a screenshot of this summary and send it to{" "}
-                  <strong>Nature Hot Spring</strong> to confirm your booking.
+            <div className="bg-black bg-opacity-50 flex items-center justify-center w-full h-full p-4">
+              <div className="bg-white rounded-xl p-5 text-center shadow-xl max-w-md w-full space-y-3 border border-gray-200">
+                {/* Pending Booking Note with Contact */}
+                <p className="text-gray-600 text-sm">
+                  Your booking is currently <strong>pending</strong>. To make it
+                  approved, kindly contact{" "}
+                  <a
+                    href="/contacts"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline font-semibold"
+                  >
+                    Nature Hot Spring
+                  </a>{" "}
+                  for the <strong>50% advance payment</strong>.
                 </p>
-                <p className="text-red-600 text-xs font-semibold">
-                  ⚠️ Do not delete this screenshot. You will need it for entry
-                  and confirmation.
+
+                {/* Booking Confirmation Note */}
+
+                {/* Business Hours */}
+                <p className="text-gray-500 text-xs mt-1">
+                  <span className="font-semibold">Business Hours:</span>{" "}
+                  <span className="px-2 py-1 rounded-md bg-gray-100 text-black dark:bg-gray-200 dark:text-black text-[0.7rem]">
+                    8:00 AM – 5:00 PM (Every Day)
+                  </span>
                 </p>
+
+                {/* Screenshot Button */}
                 <button
                   onClick={handleScreenshot}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition shadow-md"
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-5 rounded-lg transition-shadow shadow-md"
                 >
-                  📸Take Screenshot
+                  📸 Save Reservation Details
                 </button>
               </div>
             </div>

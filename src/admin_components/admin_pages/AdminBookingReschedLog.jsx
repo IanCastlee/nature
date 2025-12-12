@@ -5,57 +5,45 @@ import useGetData from "../../hooks/useGetData";
 import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
-
-import {
-  bookingDeclined,
-  bookingRescheduled,
-} from "../../constant/tableColumns";
+import { icons } from "../../constant/icon";
+import { bookingRescheduled } from "../../constant/tableColumns";
 
 import Toaster from "../../components/molecules/Toaster";
-import {
-  renderActionsBookingDeclined,
-  renderActionsBookingResched,
-} from "../admin_molecules/RenderActions";
-import ViewDetails from "../admin_molecules/ViewDetails";
+import { renderActionsBookingResched } from "../admin_molecules/RenderActions";
 import ViewReschedDetails from "../admin_molecules/ViewReschedDetails";
+
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 function AdminBookingReschedLog() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
   const [viewDetailsId, setViewDetailsId] = useState(null);
-
-  const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
   const [toast, setToast] = useState(null);
-  const [approveItem, setApproveItem] = useState(null);
-  const [approveAction, setApproveAction] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // FETCH BOOKING HISTORY
+  // FETCH RESCHEDULED BOOKINGS
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-resched.php`
   );
-
   console.log("DATA : ", data);
-
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  // FILTERING
+  // FILTERING BY SEARCH TERM
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
-
       const s = searchTerm.toLowerCase();
-
       return (
         (item?.fullname || "").toLowerCase().includes(s) ||
         (item?.room_name || "").toLowerCase().includes(s) ||
-        (item?.start_date || "").toLowerCase().includes(s) ||
-        (item?.end_date || "").toLowerCase().includes(s) ||
+        (item?.sched_date || "").toLowerCase().includes(s) ||
+        (item?.resched_to || "").toLowerCase().includes(s) ||
         (item?.status || "").toLowerCase().includes(s)
       );
     }) || [];
@@ -67,10 +55,9 @@ function AdminBookingReschedLog() {
   );
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  // FORMAT TABLE DATA
+  // FORMAT DATA FOR DISPLAY
   const formattedData = currentData.map((item) => ({
     ...item,
-    email: item.user_id === 12 ? "No Email Provided" : item.email,
     room_name: item.room?.room_name || "N/A",
     extras:
       item.extras && item.extras.length > 0
@@ -89,11 +76,120 @@ function AdminBookingReschedLog() {
     })}`,
   }));
 
-  //
+  // VIEW DETAILS HANDLER
   const viewDetails = (item) => {
     setShowForm("view_details");
     setViewDetailsId(item);
   };
+
+  // -------------------------------
+  // PDF EXPORT FUNCTION
+  // -------------------------------
+  const downloadReschedPDF = () => {
+    const doc = new jsPDF("portrait", "mm", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const now = new Date();
+
+    // Filter data based on created_at month
+    const monthlyData = filteredData.filter((item) => {
+      if (!item.created_at) return false;
+      const createdDate = new Date(item.created_at);
+      return (
+        createdDate.getMonth() === now.getMonth() &&
+        createdDate.getFullYear() === now.getFullYear()
+      );
+    });
+
+    if (monthlyData.length === 0) {
+      alert("No rescheduled bookings found for this month.");
+      return;
+    }
+
+    const monthName = now.toLocaleString("default", { month: "long" });
+    const year = now.getFullYear();
+
+    // Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text(
+      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      pageWidth / 2,
+      12,
+      { align: "center" }
+    );
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Monbon, Irosin, Sorsogon", pageWidth / 2, 18, {
+      align: "center",
+    });
+
+    doc.setLineWidth(0.5);
+    doc.line(14, 22, pageWidth - 14, 22);
+
+    // Updated title for rescheduled bookings
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text("Rescheduled Room Bookings Report", pageWidth / 2, 30, {
+      align: "center",
+    });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text(`${monthName} ${year}`, pageWidth / 2, 36, { align: "center" });
+
+    // Format numbers
+    const formatNum = (num) =>
+      Number(num).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+    const tableColumn = [
+      "ID",
+      "Fullname",
+      "Phone",
+      "Prev Room",
+      "New Room",
+      "Sched Date",
+      "Resched To",
+      "Sched Total",
+      "Sched Paid",
+      "Resched Total",
+      "Resched Paid",
+      "Refund/Charge",
+      "Created At",
+    ];
+
+    const tableRows = monthlyData.map((item) => [
+      item.id,
+      item.fullname,
+      item.phone,
+      item.prev_room,
+      item.new_room,
+      item.sched_date,
+      item.resched_to,
+      formatNum(item.sched_total_price),
+      formatNum(item.sched_paid_payment),
+      formatNum(item.resched_total_price),
+      formatNum(item.resched_paid_payment),
+      formatNum(item.refund_charge),
+      item.created_at,
+    ]);
+
+    autoTable(doc, {
+      startY: 42,
+      head: [tableColumn],
+      body: tableRows,
+      theme: "grid",
+      styles: { fontSize: 7, cellPadding: 2 },
+      headStyles: { fillColor: [40, 40, 40], textColor: 255, halign: "center" },
+      tableWidth: "auto",
+    });
+
+    doc.save(`Rescheduled_Bookings_${monthName}_${year}.pdf`);
+  };
+
   return (
     <>
       {toast && (
@@ -106,7 +202,7 @@ function AdminBookingReschedLog() {
 
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
-          Recheduled Booking
+          Rescheduled Booking
         </h1>
 
         {loading && <p className="text-blue-500 text-sm">Loading...</p>}
@@ -122,6 +218,13 @@ function AdminBookingReschedLog() {
           </span>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={downloadReschedPDF}
+              title="Download PDF for Current Month"
+              className="bg-green-600 text-white px-3 py-1 rounded text-xs whitespace-nowrap flex items-center gap-1"
+            >
+              <icons.MdOutlineFileDownload /> PDF
+            </button>
             <SearchInput
               placeholder="Search..."
               value={searchTerm}
@@ -153,9 +256,10 @@ function AdminBookingReschedLog() {
           />
         )}
       </div>
+
       {showForm === "view_details" && (
         <ViewReschedDetails
-          data={viewDetailsId} // pass clicked row object
+          data={viewDetailsId}
           onClose={() => setShowForm(null)}
         />
       )}

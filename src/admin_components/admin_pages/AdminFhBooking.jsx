@@ -12,7 +12,9 @@ import { fhbooking } from "../../constant/tableColumns";
 import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import Toaster from "../../components/molecules/Toaster";
 import DeclineModal from "../admin_molecules/DeclineModal";
-
+import { icons } from "../../constant/icon";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 function AdminFhBooking() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
@@ -95,6 +97,113 @@ function AdminFhBooking() {
   }));
 
   console.log("DATA  : ", data);
+
+  // -------------------------------------------
+  // 📌 PDF EXPORT FOR APPROVED BOOKINGS
+  // -------------------------------------------
+  const downloadDeclinedPDF = () => {
+    const doc = new jsPDF("portrait", "mm", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    const now = new Date();
+    const currentMonthName = now.toLocaleString("default", { month: "long" });
+    const currentYear = now.getFullYear();
+
+    // Resort Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text(
+      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      pageWidth / 2,
+      10,
+      {
+        align: "center",
+      }
+    );
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text("Monbon, Irosin, Sorsogon", pageWidth / 2, 15, {
+      align: "center",
+    });
+
+    doc.setLineWidth(0.4);
+    doc.line(14, 19, pageWidth - 14, 19);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("Pending Function Hall Booking Records", pageWidth / 2, 26, {
+      align: "center",
+    });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 31, {
+      align: "center",
+    });
+
+    // Filter by START DATE (monthly)
+    const monthlyData = filteredData.filter((item) => {
+      const bookingDate = new Date(item.date);
+      return (
+        bookingDate.getMonth() === now.getMonth() &&
+        bookingDate.getFullYear() === currentYear
+      );
+    });
+
+    if (monthlyData.length === 0) {
+      alert("No pending bookings found for this month.");
+      return;
+    }
+
+    const tableColumn = [
+      "Booking ID",
+      "Guest Name",
+      "Phone",
+      "Reserved Date",
+      "Price",
+      "Paid",
+      "Facility",
+      "Created At",
+      "Status",
+    ];
+
+    const formatNum = (num) =>
+      Number(num).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+    const tableRows = monthlyData.map((item) => [
+      item.id,
+      item.fullname,
+      item.phone,
+      item.date,
+      formatNum(item.price),
+      formatNum(item.paid),
+      item.name,
+      item.bookedDate,
+      item.status,
+    ]);
+
+    autoTable(doc, {
+      startY: 36,
+      head: [tableColumn],
+      body: tableRows,
+      theme: "grid",
+      styles: { fontSize: 7, cellPadding: 1.8 },
+      headStyles: {
+        fillColor: [30, 30, 30],
+        textColor: 255,
+        halign: "center",
+      },
+      tableWidth: "auto",
+    });
+
+    doc.save(`Pending_Bookings_${currentMonthName}_${currentYear}.pdf`);
+  };
+
+  // -------------------------------------------
   return (
     <>
       {toast && (
@@ -107,7 +216,7 @@ function AdminFhBooking() {
 
       <div className="scroll-smooth">
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
-          Function Hall Booking Record
+          Pending Function Hall Booking
         </h1>
 
         {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
@@ -123,12 +232,21 @@ function AdminFhBooking() {
             Showing {filteredData.length} Booking
           </span>
 
-          <SearchInput
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            disabled={loading}
-          />
+          <div className="flex flex-row items-center gap-2">
+            <button
+              onClick={downloadDeclinedPDF}
+              title="Download PDF for Current Month"
+              className="bg-green-600 text-white px-3 py-1 rounded text-xs whitespace-nowrap flex items-center gap-1"
+            >
+              <icons.MdOutlineFileDownload /> PDF
+            </button>
+            <SearchInput
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              disabled={loading}
+            />
+          </div>
         </div>
 
         {/* TABLE */}
@@ -169,7 +287,7 @@ function AdminFhBooking() {
           onCancel={() => setApproveItem(null)}
           label="Yes, Approve"
           label2="approve this booking"
-          label3="Are you sure you want to approve this booking?"
+          label3="This booking will be moved and marked as Approved."
           onConfirm={() =>
             setInactive({ id: approveItem.id, action: "set_approve" })
           }

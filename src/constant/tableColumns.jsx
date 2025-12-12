@@ -161,7 +161,7 @@ export const availableCottageColumns = [
 //booking
 export const bookingPending = [
   { title: "ID", key: "booking_id" },
-  { title: "Name", key: "fullname" },
+  { title: "Guest", key: "fullname" },
   { title: "Phone", key: "phone" },
   { title: "Room Name", key: "room_name" },
   { title: "Check-In", key: "start_date" },
@@ -274,6 +274,8 @@ export const bookingRescheduled = [
 ];
 
 export const bookingRescheduledFh = [
+  { title: "Booking ID", key: "rescheduled_booking_id" },
+
   { title: "Full Name", key: "fullname" },
   { title: "Phone", key: "phone" },
   { title: "Previous Facility", key: "prev_facility" },
@@ -291,8 +293,6 @@ export const bookingRescheduledFh = [
   { title: "Paid (Rescheduled)", key: "resched_paid_payment" },
 
   { title: "Refund / Charge", key: "refund_charge" },
-
-  { title: "Rescheduled Booking ID", key: "rescheduled_booking_id" },
 
   { title: "Created At", key: "created_at" },
 ];

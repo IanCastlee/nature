@@ -12,7 +12,9 @@ import { useLocation } from "react-router-dom";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import Toaster from "../../components/molecules/Toaster";
 import useSetInactive from "../../hooks/useSetInactive";
-
+import { icons } from "../../constant/icon";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 function AdminBookingFhNotAttended() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
@@ -102,6 +104,114 @@ function AdminBookingFhNotAttended() {
       });
     }
   );
+
+  // -------------------------------------------
+  // 📌 PDF EXPORT FOR ARRIVED FUNCTION HALL BOOKINGS
+  // -------------------------------------------
+  const downloadDeclinedPDF = () => {
+    const doc = new jsPDF("portrait", "mm", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    const now = new Date();
+    const currentMonthName = now.toLocaleString("default", { month: "long" });
+    const currentYear = now.getFullYear();
+
+    // Resort Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text(
+      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      pageWidth / 2,
+      10,
+      {
+        align: "center",
+      }
+    );
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text("Monbon, Irosin, Sorsogon", pageWidth / 2, 15, {
+      align: "center",
+    });
+
+    doc.setLineWidth(0.4);
+    doc.line(14, 19, pageWidth - 14, 19);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("Not Attended Function Hall Booking Records", pageWidth / 2, 26, {
+      align: "center",
+    });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 31, {
+      align: "center",
+    });
+
+    // Filter by START DATE (monthly)
+    const monthlyData = filteredData.filter((item) => {
+      const bookingDate = new Date(item.date);
+      return (
+        bookingDate.getMonth() === now.getMonth() &&
+        bookingDate.getFullYear() === currentYear
+      );
+    });
+
+    if (monthlyData.length === 0) {
+      alert("No not attended bookings found for this month.");
+      return;
+    }
+
+    const tableColumn = [
+      "Booking ID",
+      "Guest Name",
+      "Phone",
+      "Reserved Date",
+      "Price",
+      "Paid",
+      "Facility",
+      "Created At",
+      "Status",
+    ];
+
+    const formatNum = (num) =>
+      Number(num).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+    const tableRows = monthlyData.map((item) => [
+      item.id,
+      item.fullname,
+      item.phone,
+      item.date,
+      formatNum(item.price),
+      formatNum(item.paid),
+      item.name,
+      item.bookedDate,
+      item.status,
+    ]);
+
+    autoTable(doc, {
+      startY: 36,
+      head: [tableColumn],
+      body: tableRows,
+      theme: "grid",
+      styles: { fontSize: 7, cellPadding: 1.8 },
+      headStyles: {
+        fillColor: [30, 30, 30],
+        textColor: 255,
+        halign: "center",
+      },
+      tableWidth: "auto",
+    });
+
+    doc.save(`Not_Attended_Bookings_${currentMonthName}_${currentYear}.pdf`);
+  };
+
+  // -------------------------------------------
+
   return (
     <>
       {toast && (
@@ -130,6 +240,13 @@ function AdminBookingFhNotAttended() {
           </span>
 
           <div className="flex flex-row items-center gap-2">
+            <button
+              onClick={downloadDeclinedPDF}
+              title="Download PDF for Current Month"
+              className="bg-green-600 text-white px-3 py-1 rounded text-xs whitespace-nowrap flex items-center gap-1"
+            >
+              <icons.MdOutlineFileDownload /> PDF
+            </button>
             <SearchInput
               placeholder="Search..."
               value={searchTerm}

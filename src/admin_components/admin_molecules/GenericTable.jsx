@@ -1,3 +1,5 @@
+import React from "react";
+
 function GenericTable({
   columns,
   data,
@@ -6,14 +8,16 @@ function GenericTable({
   noDataComponent,
 }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto font-sans">
+      {" "}
+      {/* Global font applied here */}
       <table className="min-w-full border-collapse border border-gray-300">
         <thead>
           <tr className="dark:bg-gray-900 bg-white">
             {columns.map((col, index) => (
               <th
                 key={index}
-                className={`p-2 dark:text-gray-100 text-left font-medium text-xs border dark:border-gray-700 border-gray-300 ${
+                className={`p-2 dark:text-gray-100 text-left font-semibold text-[10px] border dark:border-gray-700 border-gray-300 ${
                   col.className || ""
                 }`}
                 style={
@@ -40,7 +44,7 @@ function GenericTable({
                 {columns.map((col, colIndex) => (
                   <td
                     key={colIndex}
-                    className={`p-2 border text-xs dark:border-gray-700 dark:text-gray-100 border-gray-300 ${
+                    className={`px-2 border text-[10px] dark:border-gray-700 dark:text-gray-100 border-gray-300 ${
                       col.className || ""
                     } ${
                       ["price", "paid", "half_price"].includes(col.key)

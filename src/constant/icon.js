@@ -66,10 +66,13 @@ import { FaFacebookMessenger } from "react-icons/fa6";
 import { IoMailSharp } from "react-icons/io5";
 import { MdLocalPhone } from "react-icons/md";
 
+import { MdOutlineFileDownload } from "react-icons/md";
+
 export const icons = {
   FaPhoneAlt,
   IoIosCloseCircleOutline,
   RiShakeHandsLine,
+  MdOutlineFileDownload,
   IoMailSharp,
   MdLocalPhone,
   FaFacebookMessenger,

@@ -12,17 +12,17 @@ import { useLocation } from "react-router-dom";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import Toaster from "../../components/molecules/Toaster";
 import useSetInactive from "../../hooks/useSetInactive";
+import { icons } from "../../constant/icon";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 function AdminFhBookingArrived() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
   const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
-
-  // 🔥 APPROVAL STATES
   const [approveItem, setApproveItem] = useState(null);
   const [approveAction, setApproveAction] = useState("");
-
   const [toast, setToast] = useState(null);
 
   const location = useLocation();
@@ -32,83 +32,167 @@ function AdminFhBookingArrived() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  //==============//
-  //  DATA FETCH  //
-  //==============//
-
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-fhbooking.php?status=arrived`
   );
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  //=================//
-  // FILTERING //
-  //=================//
-
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
-
-      const search = searchTerm.toLowerCase();
-
+      const s = searchTerm.toLowerCase();
       return (
-        (item?.fullname || "").toLowerCase().includes(search) ||
-        (item?.lastname || "").toLowerCase().includes(search) ||
-        (item?.room_name || "").toLowerCase().includes(search) ||
-        (item?.start_date || "").toLowerCase().includes(search) ||
-        (item?.end_date || "").toLowerCase().includes(search) ||
-        (item?.nights?.toString() || "").includes(search) ||
-        (item?.status || "").toLowerCase().includes(search)
+        (item.fullname || "").toLowerCase().includes(s) ||
+        (item.facility_type || "").toLowerCase().includes(s) ||
+        (item.date || "").toLowerCase().includes(s) ||
+        (item.start_time || "").toLowerCase().includes(s) ||
+        (item.status || "").toLowerCase().includes(s)
       );
     }) || [];
 
-  const indexOfLastData = currentPage * itemsPerPage;
-  const indexOfFirstData = indexOfLastData - itemsPerPage;
-  const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
+  const indexOfLast = currentPage * itemsPerPage;
+  const currentData = filteredData.slice(
+    indexOfLast - itemsPerPage,
+    indexOfLast
+  );
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-  //==========================//
-  //  VIEW FH DETAILS //
-  //==========================//
 
   const viewFHDetails = (item) => {
     setShowForm("view fh-hall");
     setViewFHDetailsId(item);
   };
 
+  // Formatted display values
   const formattedData = currentData.map((item) => ({
     ...item,
-
     paid: `₱${Number(item.paid).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
     })}`,
     price: `₱${Number(item.price).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
     })}`,
     half_price: `₱${Number(item.price / 2).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
     })}`,
   }));
 
-  // SET BACK TO APPROVED
+  // Move back to approved
   const { setInactive, loading: approveLoading } = useSetInactive(
     "/booking/fh-booking.php",
     () => {
       refetch();
       setApproveItem(null);
       setApproveAction("");
-      setToast({
-        message: "Booking moved back to approved",
-        type: "success",
-      });
+      setToast({ message: "Booking moved back to approved", type: "success" });
     }
   );
+
+  // -------------------------------------------
+  // 📌 PDF EXPORT FOR ARRIVED FUNCTION HALL BOOKINGS
+  // -------------------------------------------
+  const downloadDeclinedPDF = () => {
+    const doc = new jsPDF("portrait", "mm", "a4");
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    const now = new Date();
+    const currentMonthName = now.toLocaleString("default", { month: "long" });
+    const currentYear = now.getFullYear();
+
+    // Resort Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text(
+      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      pageWidth / 2,
+      10,
+      {
+        align: "center",
+      }
+    );
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text("Monbon, Irosin, Sorsogon", pageWidth / 2, 15, {
+      align: "center",
+    });
+
+    doc.setLineWidth(0.4);
+    doc.line(14, 19, pageWidth - 14, 19);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("Arrived Function Hall Booking Records", pageWidth / 2, 26, {
+      align: "center",
+    });
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 31, {
+      align: "center",
+    });
+
+    // Filter by START DATE (monthly)
+    const monthlyData = filteredData.filter((item) => {
+      const bookingDate = new Date(item.date);
+      return (
+        bookingDate.getMonth() === now.getMonth() &&
+        bookingDate.getFullYear() === currentYear
+      );
+    });
+
+    if (monthlyData.length === 0) {
+      alert("No arrived bookings found for this month.");
+      return;
+    }
+
+    const tableColumn = [
+      "Booking ID",
+      "Guest Name",
+      "Phone",
+      "Reserved Date",
+      "Price",
+      "Paid",
+      "Facility",
+      "Created At",
+      "Status",
+    ];
+
+    const formatNum = (num) =>
+      Number(num).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+    const tableRows = monthlyData.map((item) => [
+      item.id,
+      item.fullname,
+      item.phone,
+      item.date,
+      formatNum(item.price),
+      formatNum(item.paid),
+      item.name,
+      item.bookedDate,
+      item.status,
+    ]);
+
+    autoTable(doc, {
+      startY: 36,
+      head: [tableColumn],
+      body: tableRows,
+      theme: "grid",
+      styles: { fontSize: 7, cellPadding: 1.8 },
+      headStyles: {
+        fillColor: [30, 30, 30],
+        textColor: 255,
+        halign: "center",
+      },
+      tableWidth: "auto",
+    });
+
+    doc.save(`Arrived_Bookings_${currentMonthName}_${currentYear}.pdf`);
+  };
+
+  // -------------------------------------------
+
   return (
     <>
       {toast && (
@@ -119,9 +203,9 @@ function AdminFhBookingArrived() {
         />
       )}
 
-      <div className="scroll-smooth">
+      <div>
         <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
-          Booking History
+          Arrived Function Hall Booking
         </h1>
 
         {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
@@ -131,12 +215,20 @@ function AdminFhBookingArrived() {
           </p>
         )}
 
-        <div className="w-full flex flex-row justify-between items-center mb-2">
-          <span className="dark:text-gray-100 text-xs font-medium">
-            Showing {filteredData.length} Booking
+        <div className="w-full flex justify-between items-center mb-2">
+          <span className="text-xs text-gray-600 dark:text-gray-100">
+            Showing {filteredData.length} bookings
           </span>
 
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={downloadDeclinedPDF}
+              title="Download PDF for Current Month"
+              className="bg-green-600 text-white px-3 py-1 rounded text-xs whitespace-nowrap flex items-center gap-1"
+            >
+              <icons.MdOutlineFileDownload /> PDF
+            </button>
+
             <SearchInput
               placeholder="Search..."
               value={searchTerm}
@@ -157,7 +249,6 @@ function AdminFhBookingArrived() {
                 isNotAvailablePage,
                 item,
                 setShowForm,
-
                 onSetBackToApproved: (item) => {
                   setApproveItem(item);
                   setApproveAction("set_backtoapproved");
@@ -171,29 +262,26 @@ function AdminFhBookingArrived() {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={handlePageChange}
+            onPageChange={setCurrentPage}
           />
         )}
       </div>
 
-      {/* 🔥 CONFIRMATION MODAL */}
+      {/* Confirmation Modal */}
       {approveItem?.id && (
         <DeleteModal
           item={approveItem}
-          name={approveItem?.firstname}
+          name={approveItem?.fullname}
           loading={approveLoading}
           onCancel={() => {
             setApproveItem(null);
             setApproveAction("");
           }}
-          label="Yes, Back to Approved"
-          label2="approved"
+          label="Yes, Move Back to Approved"
+          label2="back_approved"
           label3="Are you sure you want to move this booking back to approved?"
           onConfirm={() =>
-            setInactive({
-              id: approveItem?.id,
-              action: approveAction,
-            })
+            setInactive({ id: approveItem?.id, action: approveAction })
           }
         />
       )}

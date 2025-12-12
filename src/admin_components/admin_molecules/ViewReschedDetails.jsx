@@ -18,25 +18,27 @@ function ViewReschedDetails({ data, onClose }) {
       ></div>
 
       {/* Modal */}
-      <div className="fixed inset-0 flex items-center justify-center z-50 p-6">
-        <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-2xl w-full max-w-3xl relative text-sm">
+      <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+        <div className="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-2xl w-full max-w-3xl relative text-xs">
+          {" "}
+          {/* text-xs for smaller font */}
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-lg"
+            className="absolute top-2.5 right-2.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-base"
           >
             ✕
           </button>
-
           {/* Header */}
-          <h2 className="text-2xl font-bold mb-6 dark:text-gray-100 border-b pb-3">
+          <h2 className="text-lg font-bold mb-2 dark:text-gray-100 border-b pb-1">
+            {" "}
+            {/* smaller heading */}
             Rescheduled Booking Details
           </h2>
-
           {/* Details */}
-          <div className="space-y-4 text-gray-700 dark:text-gray-200 text-sm">
+          <div className="space-y-2 text-gray-700 dark:text-gray-200">
             {/* Name & Phone */}
-            <div className="flex justify-between space-x-6 bg-gray-100 dark:bg-gray-800 p-3 rounded">
+            <div className="flex justify-between space-x-3 bg-gray-100 dark:bg-gray-800 p-1.5 rounded">
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
                   Full Name:
@@ -52,7 +54,7 @@ function ViewReschedDetails({ data, onClose }) {
             </div>
 
             {/* Room Info */}
-            <div className="flex justify-between space-x-6 bg-gray-50 dark:bg-gray-700 p-3 rounded">
+            <div className="flex justify-between space-x-3 bg-gray-50 dark:bg-gray-700 p-1.5 rounded">
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
                   Previous Room:
@@ -68,7 +70,7 @@ function ViewReschedDetails({ data, onClose }) {
             </div>
 
             {/* Stay Dates */}
-            <div className="flex justify-between space-x-6 bg-gray-100 dark:bg-gray-800 p-3 rounded">
+            <div className="flex justify-between space-x-3 bg-gray-100 dark:bg-gray-800 p-1.5 rounded">
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
                   Original Stay:
@@ -84,7 +86,7 @@ function ViewReschedDetails({ data, onClose }) {
             </div>
 
             {/* Prices */}
-            <div className="flex justify-between space-x-6 bg-gray-50 dark:bg-gray-700 p-3 rounded">
+            <div className="flex justify-between space-x-3 bg-gray-50 dark:bg-gray-700 p-1.5 rounded">
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
                   Original Price:
@@ -104,7 +106,7 @@ function ViewReschedDetails({ data, onClose }) {
             </div>
 
             {/* Payments */}
-            <div className="flex justify-between space-x-6 bg-gray-100 dark:bg-gray-800 p-3 rounded">
+            <div className="flex justify-between space-x-3 bg-gray-100 dark:bg-gray-800 p-1.5 rounded">
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
                   Paid (Original):
@@ -124,7 +126,7 @@ function ViewReschedDetails({ data, onClose }) {
             </div>
 
             {/* Refund / Charge */}
-            <div className="flex justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded">
+            <div className="flex justify-between bg-gray-50 dark:bg-gray-700 p-1.5 rounded">
               <span className="font-semibold text-gray-600 dark:text-gray-300">
                 Refund / Charge:
               </span>
@@ -134,7 +136,7 @@ function ViewReschedDetails({ data, onClose }) {
             </div>
 
             {/* Created At */}
-            <div className="flex justify-between bg-gray-100 dark:bg-gray-800 p-3 rounded">
+            <div className="flex justify-between bg-gray-100 dark:bg-gray-800 p-1.5 rounded">
               <span className="font-semibold text-gray-600 dark:text-gray-300">
                 Created At:
               </span>
