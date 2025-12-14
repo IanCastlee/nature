@@ -6,17 +6,17 @@ function useFormSubmit(url, onSuccess) {
   const [error, setError] = useState(null);
 
   const submit = async (formData, options = {}) => {
-    // ✅ add options
+    //  add options
     try {
       setLoading(true);
       setError(null);
 
-      const res = await axiosInstance.post(url, formData, options); // ✅ pass options
+      const res = await axiosInstance.post(url, formData, options);
 
       if (res.data.success) {
         onSuccess?.(res.data);
       } else {
-        setError(res.data);
+        setError(res);
         console.log("⚠️ Form submission returned error state:", res.data);
       }
     } catch (err) {

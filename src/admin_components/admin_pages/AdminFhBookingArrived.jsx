@@ -7,7 +7,6 @@ import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
 import { renderActionsFhBookingArrived } from "../admin_molecules/RenderActions";
 import { fhbookingHistory } from "../../constant/tableColumns";
-import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import { useLocation } from "react-router-dom";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import Toaster from "../../components/molecules/Toaster";
@@ -15,6 +14,7 @@ import useSetInactive from "../../hooks/useSetInactive";
 import { icons } from "../../constant/icon";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import ViewFhBookingDetails from "../admin_molecules/ViewFhBookingDetails";
 
 function AdminFhBookingArrived() {
   const showForm = useForm((state) => state.showForm);
@@ -57,7 +57,7 @@ function AdminFhBookingArrived() {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const viewFHDetails = (item) => {
-    setShowForm("view fh-hall");
+    setShowForm("view_fh_hall");
     setViewFHDetailsId(item);
   };
 
@@ -193,6 +193,7 @@ function AdminFhBookingArrived() {
 
   // -------------------------------------------
 
+  console.log(" viewFHDetailsId:", viewFHDetailsId);
   return (
     <>
       {toast && (
@@ -253,6 +254,7 @@ function AdminFhBookingArrived() {
                   setApproveItem(item);
                   setApproveAction("set_backtoapproved");
                 },
+                onViewDetails: () => viewFHDetails(item),
               })
             }
           />
@@ -286,7 +288,13 @@ function AdminFhBookingArrived() {
         />
       )}
 
-      {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
+      {showForm === "view_fh_hall" && (
+        <ViewFhBookingDetails
+          booking={viewFHDetailsId}
+          status="arrived"
+          onClose={() => showForm(null)}
+        />
+      )}
     </>
   );
 }

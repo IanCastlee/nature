@@ -1,5 +1,5 @@
 import React from "react";
-
+import { icons } from "../../constant/icon";
 function ViewReschedDetails({ data, onClose }) {
   if (!data) return null;
 
@@ -20,21 +20,22 @@ function ViewReschedDetails({ data, onClose }) {
       {/* Modal */}
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
         <div className="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-2xl w-full max-w-3xl relative text-xs">
-          {" "}
-          {/* text-xs for smaller font */}
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-2.5 right-2.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 text-base"
-          >
-            ✕
-          </button>
-          {/* Header */}
-          <h2 className="text-lg font-bold mb-2 dark:text-gray-100 border-b pb-1">
-            {" "}
-            {/* smaller heading */}
-            Rescheduled Booking Details
-          </h2>
+          <div className="w-full flex flex-row justify-between items-center mb-4 border-b pb-1">
+            {/* text-xs for smaller font */}
+
+            {/* Header */}
+            <h2 className="text-lg font-bold mb-2 dark:text-gray-100 ">
+              {" "}
+              {/* smaller heading */}
+              Rescheduled Booking Details
+            </h2>
+
+            <icons.MdOutlineClose
+              onClick={onClose}
+              className="cursor-pointer text-2xl text-gray-800 dark:text-gray-50 hover:text-red-500"
+            />
+          </div>
+
           {/* Details */}
           <div className="space-y-2 text-gray-700 dark:text-gray-200">
             {/* Name & Phone */}

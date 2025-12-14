@@ -165,6 +165,11 @@ function Header({ isHome }) {
                   path: "/contacts",
                   isLink: true,
                 },
+                {
+                  label: "FAQ",
+                  path: "/faq",
+                  isLink: true,
+                },
               ].map((item) => (
                 <li key={item.label} className="relative group">
                   <Link
@@ -198,7 +203,7 @@ function Header({ isHome }) {
           </nav>
 
           {/* Mobile Hamburger Icon */}
-          <div className="flex flex-row gap-4 items-center md:hidden ml-auto pr-4">
+          <div className="flex flex-row gap-4 items-center md:hidden ml-auto">
             {user && (
               <li>
                 <div
@@ -226,8 +231,8 @@ function Header({ isHome }) {
       mobileMenuOpen
         ? "bg-red-500 text-white"
         : scrolled
-        ? "bg-white text-black shadow-md"
-        : "bg-gray-700 text-white"
+        ? "dark:bg-gray-900 dark:text-white bg-white text-black shadow-md"
+        : "dark:bg-gray-900 dark:text-white"
     }        // Default (top of page)
   `}
             >

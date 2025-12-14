@@ -14,9 +14,11 @@ import DeleteModal from "../../components/molecules/DeleteModal";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { icons } from "../../constant/icon";
+import ViewDetails from "../admin_molecules/ViewDetails";
 function AdminBookingNotAttended() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
+  const [viewDetailsId, setViewDetailsId] = useState(null);
 
   const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
   const [toast, setToast] = useState(null);
@@ -96,9 +98,9 @@ function AdminBookingNotAttended() {
   );
 
   // -------------------------------------------
-  // 📌 PDF EXPORT FOR DECLINED BOOKINGS
+  // 📌 PDF EXPORT FOR DECLINED BOOKINGS / NOT ATTENDED
   // -------------------------------------------
-  const downloadDeclinedPDF = () => {
+  const downloadNotAttendedPDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
 
@@ -113,9 +115,7 @@ function AdminBookingNotAttended() {
       "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
       pageWidth / 2,
       10,
-      {
-        align: "center",
-      }
+      { align: "center" }
     );
 
     doc.setFont("helvetica", "normal");
@@ -160,7 +160,7 @@ function AdminBookingNotAttended() {
       "Check-In Date",
       "Check-Out Date",
       "Night(s)",
-      "Extras",
+      "Extras Total",
       "Price",
       "Paid",
       "Room",
@@ -174,20 +174,34 @@ function AdminBookingNotAttended() {
         maximumFractionDigits: 2,
       });
 
-    const tableRows = monthlyData.map((item) => [
-      item.booking_id,
-      item.fullname,
-      item.phone,
-      item.start_date,
-      item.end_date,
-      item.nights,
-      item.extras?.length > 0 ? "Yes" : "None",
-      formatNum(item.price),
-      formatNum(item.paid),
-      item.room?.room_name || "N/A",
-      item.room?.price || "N/A",
-      item.status,
-    ]);
+    const tableRows = monthlyData.map((item) => {
+      // Calculate total extras × nights
+      let extrasTotal = 0;
+      if (Array.isArray(item.extras) && item.extras.length > 0) {
+        extrasTotal = item.extras.reduce((sum, extra) => {
+          const priceNum =
+            parseFloat(extra.price?.toString().replace(/[^0-9.-]+/g, "")) || 0;
+          const quantity = Number(extra.quantity) || 1;
+          return sum + priceNum * quantity;
+        }, 0);
+        extrasTotal = extrasTotal * (Number(item.nights) || 1);
+      }
+
+      return [
+        item.booking_id,
+        item.fullname,
+        item.phone,
+        item.start_date,
+        item.end_date,
+        item.nights,
+        formatNum(extrasTotal),
+        formatNum(item.price),
+        formatNum(item.paid),
+        item.room?.room_name || "N/A",
+        item.room?.price || "N/A",
+        item.status,
+      ];
+    });
 
     autoTable(doc, {
       startY: 36,
@@ -207,6 +221,14 @@ function AdminBookingNotAttended() {
   };
 
   // -------------------------------------------
+
+  //=====================//
+  //  view  details  //
+  //=====================//
+  const viewDetails = (item) => {
+    setShowForm("view_details");
+    setViewDetailsId(item);
+  };
 
   return (
     <>
@@ -237,7 +259,7 @@ function AdminBookingNotAttended() {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={downloadDeclinedPDF}
+              onClick={downloadNotAttendedPDF}
               className="bg-green-600 text-white px-3 py-1 rounded text-xs whitespace-nowrap flex items-center gap-1"
             >
               <icons.MdOutlineFileDownload /> PDF
@@ -266,6 +288,7 @@ function AdminBookingNotAttended() {
                   setApproveItem(item);
                   setApproveAction("set_backtoapproved");
                 },
+                onSetViewDetails: (item) => viewDetails(item),
               })
             }
           />
@@ -301,7 +324,9 @@ function AdminBookingNotAttended() {
         />
       )}
 
-      {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
+      {showForm === "view_details" && (
+        <ViewDetails active="not_attended" data={viewDetailsId} />
+      )}
     </>
   );
 }

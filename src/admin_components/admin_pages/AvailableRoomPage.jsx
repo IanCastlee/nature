@@ -86,8 +86,6 @@ function AvailableRoomPage() {
     `/admin/room-inclusion.php?room_id_get=${otherRoomDetailForm.room_id}`
   );
 
-  console.log("ROOM ID : ", otherRoomDetailForm.room_id);
-
   //fetch  extrasData
   const {
     data: extrasData,
@@ -149,16 +147,17 @@ function AvailableRoomPage() {
     loading: formLoading,
     error: formError,
   } = useFormSubmit("/admin/room.php", () => {
-    window.location.reload();
+    //window.location.reload();
 
     refetch();
     setShowForm(null);
-    clealAddModalField();
+    // clealAddModalField();
 
-    setPreviews([]);
+    // setPreviews([]);
     setForm((prev) => ({ ...prev, images: [] }));
   });
 
+  console.log(formError);
   //amenity
   const {
     submit: submitAmenity,
@@ -192,8 +191,6 @@ function AvailableRoomPage() {
   //=================//
   //  HANDLE SUBMIT //
   //===============//
-
-  console.log("SBNDJSDBJS: ", form);
 
   //rooms
   const handleSubmit = (e) => {

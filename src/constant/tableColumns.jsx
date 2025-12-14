@@ -358,7 +358,7 @@ export const fhbooking = [
 
   { title: "Total Amount", key: "price" },
   // { title: "Paid", key: "paid" },
-  { title: "Balance to Pay", key: "half_price" },
+  { title: "Required Payment", key: "half_price" },
   {
     title: "Status",
     key: "status",
@@ -535,5 +535,44 @@ export const termsAndConditionsColumn = [
     key: "last_update",
     width: "150px",
     className: "text-center",
+  },
+];
+
+// terms and faqs column
+export const faqsColumn = [
+  {
+    title: "Question (EN)",
+    key: "question_en",
+    width: "220px",
+    className: "truncate font-medium",
+  },
+  {
+    title: "Answer (EN)",
+    key: "answer_en",
+    className: "whitespace-pre-line break-words max-w-[500px]",
+  },
+  {
+    title: "Created At",
+    key: "created_at",
+  },
+];
+
+//terms column
+export const termsColumn = [
+  {
+    title: "Title (EN)",
+    key: "title_en",
+  },
+  {
+    title: "Title (TL)",
+    key: "title_tl",
+  },
+  {
+    title: "Content (EN)",
+    key: "content_en",
+  },
+  {
+    title: "Content (TL)",
+    key: "content_tl",
   },
 ];

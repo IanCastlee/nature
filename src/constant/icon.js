@@ -40,6 +40,7 @@ import { BsArrowRight } from "react-icons/bs";
 import { IoEyeOutline } from "react-icons/io5";
 import { IoEyeOffOutline } from "react-icons/io5";
 import { FiUpload } from "react-icons/fi";
+import { GiDuration } from "react-icons/gi";
 
 //admin sidebar
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -59,6 +60,7 @@ import { VscMegaphone } from "react-icons/vsc";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { RiShakeHandsLine } from "react-icons/ri";
 import { IoIosCloseCircleOutline } from "react-icons/io";
+import { TbBookmarkQuestion } from "react-icons/tb";
 
 import { IoMdNotifications } from "react-icons/io";
 import { IoIosInformationCircleOutline } from "react-icons/io";
@@ -70,12 +72,14 @@ import { MdOutlineFileDownload } from "react-icons/md";
 
 export const icons = {
   FaPhoneAlt,
+  TbBookmarkQuestion,
   IoIosCloseCircleOutline,
   RiShakeHandsLine,
   MdOutlineFileDownload,
   IoMailSharp,
   MdLocalPhone,
   FaFacebookMessenger,
+  GiDuration,
   IoIosInformationCircleOutline,
   IoMdNotifications,
   IoMdCheckmarkCircleOutline,

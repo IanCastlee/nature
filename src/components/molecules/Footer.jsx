@@ -3,114 +3,122 @@ import { images } from "../../constant/image";
 import { icons } from "../../constant/icon";
 import { Link } from "react-router-dom";
 import useGetData from "../../hooks/useGetData";
+
 function Footer() {
   const currentYear = new Date().getFullYear();
 
-  // fetch fh data
-  const { data, loading, refetch, error } = useGetData(
-    `/admin/admin_setting.php`
-  );
+  // fetch data
+  const { data } = useGetData(`/admin/admin_setting.php`);
 
   return (
-    <footer className="w-full bg-slate-50 dark:bg-gray-950 border-t-[1px] dark:border-gray-900">
-      <div className="flex flex-row lg:flex-row justify-between  px-2 md:px-4 lg:px-[100px] py-6 flex-wrap">
-        <div className="h-[200px] lg:h-auto max-w-[60%] lg:max-w-[100%]">
+    <footer className="w-full bg-slate-50 dark:bg-gray-950 border-t dark:border-gray-900">
+      <div className="flex flex-col lg:flex-row justify-between px-4 md:px-6 lg:px-20 py-8 gap-8">
+        {/* Logo */}
+        <div className="flex-shrink-0 w-full lg:w-[220px] flex justify-center lg:justify-start">
           <img
             src={images.logo}
             alt="Nature Hot Spring Logo"
-            className=" w-[100%] lg:w-[220px] h-[100%] lg:h-[220px] object-contain mb-0 lg:-mb-14"
+            className="w-[150px] lg:w-[220px] object-contain"
           />
         </div>
 
-        <div className="flex flex-col gap-2 max-w-[100%] mb-6 lg:mb-0">
-          <h3 className="text-sm dark:text-white font-semibold mb-2">
-            CONTACTS
-          </h3>
+        {/* Contacts */}
+        <div className="flex flex-col gap-3">
+          <h3 className="text-sm dark:text-white font-semibold">CONTACTS</h3>
+          <a
+            href={data?.fb || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="dark:text-white text-sm flex items-center gap-3 hover:text-blue-400 transition"
+          >
+            <icons.FaFacebookMessenger className="text-blue-400 text-2xl border rounded-full border-blue-400 p-1" />
+            Nature Hot Spring Page
+          </a>
 
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
-            <icons.IoIosMail className="text-blue-400 text-2xl border rounded-full border-blue-400 p-[2px]" />
-            {data?.email}
+          <Link className="dark:text-white text-sm flex items-center gap-3">
+            <icons.FaPhoneAlt className="text-blue-400 text-2xl border rounded-full border-blue-400 p-1" />
+            Smart: {data?.smart_no || "0917-XXXXXXX"}
           </Link>
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
-            <icons.FaPhoneAlt className="text-blue-400 text-2xl border rounded-full border-blue-400 p-[2px]" />
-            Smart : {data?.smart_no}
+          <Link className="dark:text-white text-sm flex items-center gap-3">
+            <icons.FaPhoneAlt className="text-blue-400 text-2xl border rounded-full border-blue-400 p-1" />
+            Globe: {data?.globe_no || "0922-XXXXXXX"}
           </Link>
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
-            <icons.FaPhoneAlt className="text-blue-400 text-2xl border rounded-full border-blue-400 p-[2px]" />
-            Globe : {data?.globe_no}
+          <Link className="dark:text-white text-sm flex items-center gap-3">
+            <icons.IoIosMail className="text-blue-400 text-2xl border rounded-full border-blue-400 p-1" />
+            {data?.email || "info@example.com"}
           </Link>
         </div>
 
-        <div className="flex flex-col gap-2 max-w-[100%] mb-6 lg:mb-0">
-          <h3 className="text-sm dark:text-white font-semibold mb-2">
-            QUICK LINKS
-          </h3>
-
+        {/* Quick Links */}
+        <div className="flex flex-col gap-3">
+          <h3 className="text-sm dark:text-white font-semibold">QUICK LINKS</h3>
           <Link
             to="/"
-            className="dark:text-white text-sm flex flex-row items-center gap-3"
+            className="dark:text-white text-sm hover:text-blue-400 transition"
           >
             Home
           </Link>
           <Link
             to="/about"
-            className="dark:text-white text-sm flex flex-row items-center gap-3"
+            className="dark:text-white text-sm hover:text-blue-400 transition"
           >
             About
           </Link>
           <Link
             to="/contact"
-            className="dark:text-white text-sm flex flex-row items-center gap-3"
+            className="dark:text-white text-sm hover:text-blue-400 transition"
           >
             Contact
           </Link>
-          {/* Add Terms and Conditions link */}
           <Link
             to="/terms"
-            className="dark:text-white text-sm flex flex-row items-center gap-3"
+            className="dark:text-white text-sm hover:text-blue-400 transition"
           >
             Terms & Conditions
           </Link>
         </div>
 
-        <div className="flex flex-col gap-2 max-w-[100%] mb-6 lg:mb-0">
-          <h3 className="text-sm dark:text-white font-semibold mb-2">
-            WHAT WE OFFER
+        {/* What We Offer */}
+        <div className="flex flex-col gap-3">
+          <h3 className="text-sm dark:text-white font-semibold">
+            WE ALSO HAVE
           </h3>
-
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
-            Comfortable Accommodations
-          </Link>
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
-            Natural Hot Springs
-          </Link>
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
-            Water Biking
-          </Link>
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
-            Biking Around the Lagoon
-          </Link>
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
-            Fish Feeding at the Lagoon
-          </Link>
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
-            Personalized Service
-          </Link>
+          {[
+            "Water Biking",
+            "Biking Around the Lagoon",
+            "Fish Feeding at the Lagoon",
+            "Personalized Service",
+          ].map((item, index) => (
+            <span key={index} className="dark:text-white text-sm">
+              {item}
+            </span>
+          ))}
         </div>
 
-        <div className="flex flex-col gap-2 max-w-[100%] mb-6 lg:mb-0">
-          <h3 className="text-sm dark:text-white font-semibold mb-2">
-            ADDRESS
-          </h3>
-
-          <Link className="dark:text-white text-sm flex flex-row items-center gap-3">
-            <icons.MdLocationPin className="text-blue-400 text-2xl border rounded-full border-blue-400 p-[2px]" />
-            Purok 1 ,Monbon, Irosin, Sorsogon, Philippines
-          </Link>
+        {/* Address & Map */}
+        <div className="flex flex-col gap-3 w-full lg:w-[300px]">
+          <h3 className="text-sm dark:text-white font-semibold">ADDRESS</h3>
+          <div className="flex items-center gap-3 dark:text-white text-sm">
+            <icons.MdLocationPin className="text-blue-400 text-2xl border rounded-full border-blue-400 p-1" />
+            Purok 1, Monbon, Irosin, Sorsogon, Philippines
+          </div>
+          <div className="w-full h-[200px] lg:h-[170px] mt-2">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d26179.83965467092!2d123.99829559379175!3d12.73582097005117!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33a0c5a07d35032d%3A0x7b7a9ba5a4dbc734!2sNature%20Spring%20Resort%20%26%20Inn!5e0!3m2!1sen!2sph!4v1765699378697!5m2!1sen!2sph"
+              width="100%"
+              height="170"
+              style={{ border: 0, borderRadius: "10px" }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Location Map"
+            />
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-row justify-center items-center py-4 mt-10 bg-white dark:bg-black">
+      {/* Bottom */}
+      <div className="flex flex-col lg:flex-row justify-center items-center py-4 mt-6 bg-white dark:bg-black text-center">
         <span className="dark:text-white text-sm">
           © {currentYear}{" "}
           <span className="text-blue-400">Nature Hot Spring</span>. All rights

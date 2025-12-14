@@ -20,7 +20,7 @@ if ($method === "GET") {
 
     $baseSql = "
         SELECT 
-            rb.booking_id, rb.user_id, rb.facility_id, rb.fullname, rb.phone, rb.start_date, rb.end_date,
+            rb.booking_id, rb.user_id, rb.facility_id, rb.fullname, rb.phone, rb.start_date, rb.end_date,  rb.bookedDate,
             rb.nights, rb.status, rb.price AS booking_price, rb.paid AS booking_paid,
 
             u.firstname, u.lastname, u.email,
@@ -88,6 +88,7 @@ if ($method === "GET") {
                 'facility_id' => $row['facility_id'],
                 'start_date' => $row['start_date'],
                 'end_date' => $row['end_date'],
+                'bookedDate' => $row['bookedDate'],
                 'nights' => $row['nights'],
                 'status' => $row['status'],
                 'price' => $row['booking_price'],

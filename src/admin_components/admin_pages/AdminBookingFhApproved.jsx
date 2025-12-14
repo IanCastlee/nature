@@ -16,13 +16,14 @@ import ReSchedBookingFh from "../admin_molecules/ReschedBookingFh";
 import { icons } from "../../constant/icon";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import ViewFhBookingDetails from "../admin_molecules/ViewFhBookingDetails";
 function AdminBookingFhApproved() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
   const [viewFHDetailsId, setViewFHDetailsId] = useState(null);
 
-  // 🔥 APPROVAL STATES
+  //  APPROVAL STATES
   const [approveItem, setApproveItem] = useState(null);
   const [approveAction, setApproveAction] = useState("");
   const [reschedItem, setReschedItem] = useState(null);
@@ -323,7 +324,7 @@ function AdminBookingFhApproved() {
         )}
       </div>
 
-      {/* 🔥 CONFIRMATION MODAL */}
+      {/*  CONFIRMATION MODAL */}
       {approveItem?.id && (
         <DeleteModal
           item={approveItem}
@@ -368,18 +369,13 @@ function AdminBookingFhApproved() {
         />
       )}
 
-      {/* 🔥 VIEW FUNCTION HALL DETAILS */}
+      {/*  VIEW FUNCTION HALL DETAILS */}
       {showForm === "view fh-hall" && viewFHDetailsId && (
-        <ViewFHDetails booking={viewFHDetailsId} />
+        <ViewFhBookingDetails booking={viewFHDetailsId} status="approved" />
       )}
 
-      {/* 🔥 RESCHED MODAL */}
-      {showResched && reschedItem && (
-        <ReSchedBookingFh
-          booking={reschedItem}
-          onClose={() => setShowResched(false)}
-        />
-      )}
+      {/*  RESCHED MODAL */}
+      {showResched && reschedItem && <ReSchedBookingFh booking={reschedItem} />}
     </>
   );
 }

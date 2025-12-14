@@ -128,7 +128,7 @@ function AdminBookingHistory() {
   // -------------------------------------------
   // 📌 PDF EXPORT FOR APPROVED BOOKINGS
   // -------------------------------------------
-  const downloadDeclinedPDF = () => {
+  const downloadApprovedPDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
 
@@ -143,9 +143,7 @@ function AdminBookingHistory() {
       "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
       pageWidth / 2,
       10,
-      {
-        align: "center",
-      }
+      { align: "center" }
     );
 
     doc.setFont("helvetica", "normal");
@@ -190,7 +188,7 @@ function AdminBookingHistory() {
       "Check-In Date",
       "Check-Out Date",
       "Night(s)",
-      "Extras",
+      "Extras Total",
       "Price",
       "Paid",
       "Room",
@@ -204,20 +202,35 @@ function AdminBookingHistory() {
         maximumFractionDigits: 2,
       });
 
-    const tableRows = monthlyData.map((item) => [
-      item.booking_id,
-      item.fullname,
-      item.phone,
-      item.start_date,
-      item.end_date,
-      item.nights,
-      item.extras?.length > 0 ? "Yes" : "None",
-      formatNum(item.price),
-      formatNum(item.paid),
-      item.room?.room_name || "N/A",
-      item.room?.price || "N/A",
-      item.status,
-    ]);
+    const tableRows = monthlyData.map((item) => {
+      // Calculate total extras price × nights
+      let extrasTotal = 0;
+      if (Array.isArray(item.extras) && item.extras.length > 0) {
+        extrasTotal = item.extras.reduce((sum, extra) => {
+          const priceNum =
+            parseFloat(extra.price?.toString().replace(/[^0-9.-]+/g, "")) || 0;
+          const quantity = Number(extra.quantity) || 1;
+          return sum + priceNum * quantity;
+        }, 0);
+
+        extrasTotal = extrasTotal * (Number(item.nights) || 1);
+      }
+
+      return [
+        item.booking_id,
+        item.fullname,
+        item.phone,
+        item.start_date,
+        item.end_date,
+        item.nights,
+        formatNum(extrasTotal),
+        formatNum(item.price),
+        formatNum(item.paid),
+        item.room?.room_name || "N/A",
+        item.room?.price || "N/A",
+        item.status,
+      ];
+    });
 
     autoTable(doc, {
       startY: 36,
@@ -266,7 +279,7 @@ function AdminBookingHistory() {
 
           <div className="flex flex-row items-center gap-2">
             <button
-              onClick={downloadDeclinedPDF}
+              onClick={downloadApprovedPDF}
               title="Download PDF for Current Month"
               className="bg-green-600 text-white px-3 py-1 rounded text-xs whitespace-nowrap flex items-center gap-1"
             >
@@ -366,7 +379,9 @@ function AdminBookingHistory() {
         />
       )}
 
-      {showForm === "view_details" && <ViewDetails id={viewDetailsId} />}
+      {showForm === "view_details" && (
+        <ViewDetails data={viewDetailsId} active="approved" />
+      )}
 
       {showResched && reschedItem && (
         <ReSchedBooking

@@ -202,14 +202,14 @@ function AdminTermsAndConditions() {
       {deleteItem?.id && (
         <DeleteModal
           item={deleteItem}
-          name={deleteItem?.title}
+          name={deleteItem?.question_en}
           loading={inactiveLoading}
           onCancel={() => setDeleteItem(null)}
           label="Yes, Delete"
-          label2="not-active"
+          label2="Cancel"
           label3="This will permanently delete this record."
           onConfirm={() =>
-            setInactive({ id: deleteItem?.id, action: "set_inactive" })
+            setInactive({ id: deleteItem?.id, action: "delete" })
           }
         />
       )}

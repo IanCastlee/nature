@@ -315,7 +315,7 @@ export const renderActionsBookingHistory = ({
 export const renderActionsBookingHistoryLog = ({
   item,
   onSetBackToApproved,
-  onSetViewCottageDetails,
+  onSetViewDetails,
 }) => {
   return (
     <div className="flex flex-row gap-2 items-center justify-end">
@@ -327,7 +327,7 @@ export const renderActionsBookingHistoryLog = ({
         <icons.TbRefresh />
       </button>
       <button
-        onClick={() => onSetViewCottageDetails(item.cottage_id)}
+        onClick={() => onSetViewDetails(item)}
         className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
         title="View Room Details"
       >
@@ -481,15 +481,8 @@ export const renderActionsFhBookingApproved = ({
 //render action fh booking
 export const renderActionsFhBookingArrived = ({
   item,
-  showForm,
-  onSetInactive,
-  setApproveAction,
   onSetBackToApproved,
-  onSetPending,
-  onSetViewCottageDetails,
-  onSetApprove,
-  onSetDeClined,
-  isNotAvailablePage,
+  onViewDetails,
 }) => {
   return (
     <div className="flex items-center justify-end gap-2">
@@ -502,7 +495,7 @@ export const renderActionsFhBookingArrived = ({
       </button>
 
       <button
-        onClick={() => onSetViewCottageDetails(item.cottage_id)}
+        onClick={() => onViewDetails(item)}
         className="bg-green-600 text-white w-[27px] h-[27px] rounded-sm flex justify-center items-center"
         title="View Room Details"
       >

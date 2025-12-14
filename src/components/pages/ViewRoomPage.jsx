@@ -79,6 +79,7 @@ function ViewRoomPage() {
     extras,
     photo_sphere,
     status,
+    time_in_out,
   } = roomDetails;
 
   const parsedAmenities =
@@ -197,8 +198,12 @@ function ViewRoomPage() {
             </span>
 
             <span className="inline-flex items-center text-lg dark:text-gray-100 text-gray-700">
-              <icons.IoIosTimer className="mr-1 text-blue-400 dark:text-blue-400" />{" "}
+              <icons.GiDuration className="mr-1 text-blue-400 dark:text-blue-400" />{" "}
               {duration} hrs
+            </span>
+            <span className="inline-flex items-center text-lg dark:text-gray-100 text-gray-700">
+              <icons.IoIosTimer className="mr-1 text-blue-400 dark:text-blue-400" />{" "}
+              {time_in_out}
             </span>
           </div>
         </section>

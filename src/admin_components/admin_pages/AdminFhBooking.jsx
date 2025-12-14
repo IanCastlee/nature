@@ -9,12 +9,12 @@ import { renderActionsFhBooking } from "../admin_molecules/RenderActions";
 import useSetInactive from "../../hooks/useSetInactive";
 import DeleteModal from "../../components/molecules/DeleteModal";
 import { fhbooking } from "../../constant/tableColumns";
-import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import Toaster from "../../components/molecules/Toaster";
 import DeclineModal from "../admin_molecules/DeclineModal";
 import { icons } from "../../constant/icon";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import ViewFhBookingDetails from "../admin_molecules/ViewFhBookingDetails";
 function AdminFhBooking() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
@@ -32,6 +32,8 @@ function AdminFhBooking() {
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-fhbooking.php?status=pending`
   );
+
+  console.log("DATA : ", viewFHDetailsData);
 
   // PAGINATION
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
@@ -95,8 +97,6 @@ function AdminFhBooking() {
       maximumFractionDigits: 2,
     })}`,
   }));
-
-  console.log("DATA  : ", data);
 
   // -------------------------------------------
   // 📌 PDF EXPORT FOR APPROVED BOOKINGS
@@ -316,7 +316,7 @@ function AdminFhBooking() {
 
       {/* VIEW DETAILS MODAL */}
       {showForm === "view_fh_hall" && viewFHDetailsData && (
-        <ViewFHDetails booking={viewFHDetailsData} />
+        <ViewFhBookingDetails booking={viewFHDetailsData} />
       )}
     </>
   );

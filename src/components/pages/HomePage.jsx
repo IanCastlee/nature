@@ -22,6 +22,7 @@ const RoomCategoryCard = lazy(() => import("../molecules/RoomCategoryCard"));
 const CattageCard = lazy(() => import("../molecules/CattageCard"));
 const FunctionHallCard = lazy(() => import("../molecules/FunctionHallCard"));
 const WhyChooseUs = lazy(() => import("../organisms/WhyChooseUs"));
+const FAQ = lazy(() => import("./FAQ"));
 
 const imageKeys = ["hero1", "hero1_m", "hero2", "hero2_m", "hero3", "hero3_m"];
 
@@ -305,6 +306,16 @@ function HomePage() {
               />
             </div>
           )}
+
+          <Suspense
+            fallback={
+              <div className="fixed bottom-4 right-10 text-white">
+                Loading...
+              </div>
+            }
+          >
+            <FAQ />
+          </Suspense>
         </section>
       </main>
 

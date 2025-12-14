@@ -100,9 +100,7 @@ function AdminBookingDeclined() {
       "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
       pageWidth / 2,
       10,
-      {
-        align: "center",
-      }
+      { align: "center" }
     );
 
     doc.setFont("helvetica", "normal");
@@ -147,7 +145,7 @@ function AdminBookingDeclined() {
       "Check-In Date",
       "Check-Out Date",
       "Night(s)",
-      "Extras",
+      "Extras Total",
       "Price",
       "Paid",
       "Room",
@@ -161,20 +159,34 @@ function AdminBookingDeclined() {
         maximumFractionDigits: 2,
       });
 
-    const tableRows = monthlyData.map((item) => [
-      item.booking_id,
-      item.fullname,
-      item.phone,
-      item.start_date,
-      item.end_date,
-      item.nights,
-      item.extras?.length > 0 ? "Yes" : "None",
-      formatNum(item.price),
-      formatNum(item.paid),
-      item.room?.room_name || "N/A",
-      item.room?.price || "N/A",
-      item.status,
-    ]);
+    const tableRows = monthlyData.map((item) => {
+      // Calculate total extras × nights
+      let extrasTotal = 0;
+      if (Array.isArray(item.extras) && item.extras.length > 0) {
+        extrasTotal = item.extras.reduce((sum, extra) => {
+          const priceNum =
+            parseFloat(extra.price?.toString().replace(/[^0-9.-]+/g, "")) || 0;
+          const quantity = Number(extra.quantity) || 1;
+          return sum + priceNum * quantity;
+        }, 0);
+        extrasTotal = extrasTotal * (Number(item.nights) || 1);
+      }
+
+      return [
+        item.booking_id,
+        item.fullname,
+        item.phone,
+        item.start_date,
+        item.end_date,
+        item.nights,
+        formatNum(extrasTotal),
+        formatNum(item.price),
+        formatNum(item.paid),
+        item.room?.room_name || "N/A",
+        item.room?.price || "N/A",
+        item.status,
+      ];
+    });
 
     autoTable(doc, {
       startY: 36,
@@ -263,7 +275,9 @@ function AdminBookingDeclined() {
         )}
       </div>
 
-      {showForm === "view_details" && <ViewDetails id={viewDetailsId} />}
+      {showForm === "view_details" && (
+        <ViewDetails data={viewDetailsId} action="declined" />
+      )}
     </>
   );
 }

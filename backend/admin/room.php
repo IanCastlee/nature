@@ -223,6 +223,7 @@ if ($method === "POST") {
     $price = $_POST['price'] ?? '';
     $capacity = $_POST['capacity'] ?? '';
     $duration = $_POST['duration'] ?? '';
+    $time_in_out = $_POST['time_in_out'] ?? '';
     $description = $_POST['description'] ?? '';
 
     // PhotoSphere
@@ -241,9 +242,9 @@ if ($method === "POST") {
     if ($action === "create") {
 
         $stmt = $conn->prepare("INSERT INTO rooms 
-            (category_id, room_name, price, capacity, duration, description, photo_sphere, status, last_maintenance)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'active', CURDATE())");
-        $stmt->bind_param("isdiiss", $category, $room_name, $price, $capacity, $duration, $description, $filename_PS);
+            (category_id, room_name, price, capacity, duration, time_in_out, description, photo_sphere, status, last_maintenance)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', CURDATE())");
+        $stmt->bind_param("isdiisss", $category, $room_name, $price, $capacity, $duration, $time_in_out, $description, $filename_PS);
 
         if ($stmt->execute()) {
             $newRoomId = $stmt->insert_id;
@@ -274,14 +275,14 @@ if ($method === "POST") {
 
         if ($filename_PS) {
             $stmt = $conn->prepare("UPDATE rooms 
-                SET category_id=?, room_name=?, price=?, capacity=?, duration=?, description=?, photo_sphere=? 
+                SET category_id=?, room_name=?, price=?, capacity=?, duration=?, time_in_out=?, description=?, photo_sphere=? 
                 WHERE room_id=?");
-            $stmt->bind_param("isdiissi", $category, $room_name, $price, $capacity, $duration, $description, $filename_PS, $id);
+            $stmt->bind_param("isdiisssi", $category, $room_name, $price, $capacity, $duration, $time_in_out, $description, $filename_PS, $id);
         } else {
             $stmt = $conn->prepare("UPDATE rooms 
-                SET category_id=?, room_name=?, price=?, capacity=?, duration=?, description=? 
+                SET category_id=?, room_name=?, price=?, capacity=?, duration=?, time_in_out=?,  description=? 
                 WHERE room_id=?");
-            $stmt->bind_param("isdiisi", $category, $room_name, $price, $capacity, $duration, $description, $id);
+            $stmt->bind_param("isdiissi", $category, $room_name, $price, $capacity, $duration,$time_in_out, $description, $id);
         }
 
         if ($stmt->execute()) {

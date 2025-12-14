@@ -12,6 +12,7 @@ import { renderActionsFhBookingDeclined } from "../admin_molecules/RenderActions
 import { icons } from "../../constant/icon";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import ViewFhBookingDetails from "../admin_molecules/ViewFhBookingDetails";
 
 function AdminBookingFhDeclined() {
   const showForm = useForm((state) => state.showForm);
@@ -210,7 +211,7 @@ function AdminBookingFhDeclined() {
       </div>
 
       {showForm === "view_fhall" && (
-        <ViewFHDetails booking={viewFHDetailsData} />
+        <ViewFhBookingDetails booking={viewFHDetailsData} status="declined" />
       )}
     </>
   );

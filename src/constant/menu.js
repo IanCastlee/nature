@@ -66,7 +66,7 @@ export const menuItems = [
         to: "/admin/fhbooking-declined",
       },
       {
-        name: "Rescheduled Booking Log",
+        name: "Rescheduled Booking",
         to: "/admin/rescheduled-fh-log",
       },
     ],
@@ -146,12 +146,11 @@ export const menuItems = [
     to: "/admin/terms",
     icon: icons.RiShakeHandsLine,
   },
-
-  // {
-  //   name: "Why Choose Us",
-  //   to: "/admin/why-choose-us",
-  //   icon: icons.GoImage,
-  // },
+  {
+    name: "FAQs",
+    to: "/admin/faqs",
+    icon: icons.TbBookmarkQuestion,
+  },
   {
     name: "Settings",
     to: "/admin/setting",

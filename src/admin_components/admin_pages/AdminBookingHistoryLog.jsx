@@ -14,6 +14,7 @@ import DeleteModal from "../../components/molecules/DeleteModal";
 import { icons } from "../../constant/icon";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import ViewDetails from "../admin_molecules/ViewDetails";
 
 function AdminBookingHistoryLog() {
   const showForm = useForm((state) => state.showForm);
@@ -28,10 +29,11 @@ function AdminBookingHistoryLog() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  const [viewDetailsId, setViewDetailsId] = useState(null);
+
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-booking.php?status=arrived`
   );
-  console.log("DATA : ", data);
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -61,16 +63,40 @@ function AdminBookingHistoryLog() {
     setViewFHDetailsId(item);
   };
 
-  // Format table for display
+  // // Format table for display
+  // const formattedData = currentData.map((item) => ({
+  //   ...item,
+  //   extras: item.extras && item.extras.length > 0 ? "Yes" : "None",
+  //   room_name: item.room?.room_name || "N/A",
+  //   paid: `₱${Number(item.paid).toLocaleString("en-PH", {
+  //     minimumFractionDigits: 2,
+  //   })}`,
+  //   price: `₱${Number(item.price).toLocaleString("en-PH", {
+  //     minimumFractionDigits: 2,
+  //   })}`,
+  // }));
+
   const formattedData = currentData.map((item) => ({
     ...item,
-    extras: item.extras && item.extras.length > 0 ? "Yes" : "None",
+    email: item.user_id === 12 ? "No Email Provided" : item.email,
     room_name: item.room?.room_name || "N/A",
+    extras:
+      item.extras && item.extras.length > 0
+        ? item.extras
+            .map((extra) => `${extra.name} (x${extra.quantity})`)
+            .join(", ")
+        : "None",
     paid: `₱${Number(item.paid).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     })}`,
     price: `₱${Number(item.price).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    half_price: `₱${Number(item.price / 2).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     })}`,
   }));
 
@@ -95,7 +121,7 @@ function AdminBookingHistoryLog() {
 
     // Resort Name - Smaller + Bold + Center
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(12); // smaller
+    doc.setFontSize(12);
     doc.text(
       "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
       pageWidth / 2,
@@ -116,7 +142,7 @@ function AdminBookingHistoryLog() {
 
     // Booking Log Title - Smaller Bold
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(13); // smaller
+    doc.setFontSize(13);
     doc.text("Arrived Room Booking Records", pageWidth / 2, 26, {
       align: "center",
     });
@@ -149,7 +175,7 @@ function AdminBookingHistoryLog() {
       "Check-In Date",
       "Check-Out Date",
       "Night(s)",
-      "Extras",
+      "Extras Total",
       "Price",
       "Paid",
       "Room",
@@ -157,34 +183,48 @@ function AdminBookingHistoryLog() {
       "Status",
     ];
 
-    // format numerical values
+    // Format numerical values
     const formatNum = (num) =>
       Number(num).toLocaleString("en-PH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       });
 
-    const tableRows = monthlyData.map((item) => [
-      item.booking_id,
-      item.fullname,
-      item.phone,
-      item.start_date,
-      item.end_date,
-      item.nights,
-      item.extras && item.extras.length > 0 ? "Yes" : "None",
-      formatNum(item.price),
-      formatNum(item.paid),
-      item.room?.room_name || "N/A",
-      item.room?.price || "N/A",
-      item.status.charAt(0).toUpperCase() + item.status.slice(1),
-    ]);
+    const tableRows = monthlyData.map((item) => {
+      // Calculate total extras × nights
+      let extrasTotal = 0;
+      if (Array.isArray(item.extras) && item.extras.length > 0) {
+        extrasTotal = item.extras.reduce((sum, extra) => {
+          const priceNum =
+            parseFloat(extra.price?.toString().replace(/[^0-9.-]+/g, "")) || 0;
+          const quantity = Number(extra.quantity) || 1;
+          return sum + priceNum * quantity;
+        }, 0);
+        extrasTotal = extrasTotal * (Number(item.nights) || 1);
+      }
+
+      return [
+        item.booking_id,
+        item.fullname,
+        item.phone,
+        item.start_date,
+        item.end_date,
+        item.nights,
+        formatNum(extrasTotal),
+        formatNum(item.price),
+        formatNum(item.paid),
+        item.room?.room_name || "N/A",
+        item.room?.price || "N/A",
+        item.status.charAt(0).toUpperCase() + item.status.slice(1),
+      ];
+    });
 
     autoTable(doc, {
-      startY: 36, // adjusted for smaller header
+      startY: 36,
       head: [tableColumn],
       body: tableRows,
       theme: "grid",
-      styles: { fontSize: 7, cellPadding: 1.8 }, // SMALL TABLE TEXT
+      styles: { fontSize: 7, cellPadding: 1.8 },
       headStyles: {
         fillColor: [40, 40, 40],
         textColor: 255,
@@ -194,6 +234,14 @@ function AdminBookingHistoryLog() {
     });
 
     doc.save(`Booking_History_${currentMonthName}_${currentYear}.pdf`);
+  };
+
+  //=====================//
+  //  view  details  //
+  //=====================//
+  const viewDetails = (item) => {
+    setShowForm("view_details");
+    setViewDetailsId(item);
   };
 
   return (
@@ -254,6 +302,7 @@ function AdminBookingHistoryLog() {
                   setApproveItem(item);
                   setApproveAction("set_backtoapproved");
                 },
+                onSetViewDetails: (item) => viewDetails(item),
               })
             }
           />
@@ -286,7 +335,9 @@ function AdminBookingHistoryLog() {
         />
       )}
 
-      {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
+      {showForm === "view_details" && (
+        <ViewDetails active="arrived" data={viewDetailsId} />
+      )}
     </>
   );
 }

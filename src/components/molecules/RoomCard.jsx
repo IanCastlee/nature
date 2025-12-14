@@ -163,8 +163,12 @@ function RoomCard({ rooms }) {
                 </span>
 
                 <span className="inline-flex items-center text-sm dark:text-gray-100 text-gray-700">
-                  <icons.IoIosTimer className="mr-1 text-blue-600" />
+                  <icons.GiDuration className="mr-1 text-blue-600" />
                   Duration: {item?.duration || "N/A"} hrs
+                </span>
+                <span className="inline-flex items-center text-sm dark:text-gray-100 text-gray-700">
+                  <icons.IoIosTimer className="mr-1 text-blue-600" />
+                  Time In/Out: {item?.time_in_out}
                 </span>
               </div>
 
@@ -194,9 +198,7 @@ function RoomCard({ rooms }) {
                     </div>
                   </>
                 ) : (
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    No Extras Available
-                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400"></p>
                 )}
               </div>
 

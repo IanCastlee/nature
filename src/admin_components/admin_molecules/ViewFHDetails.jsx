@@ -1,137 +1,84 @@
 import { icons } from "../../constant/icon";
+import useGetData from "../../hooks/useGetData";
 import { useForm } from "../../store/useRoomStore";
+import { uploadUrl } from "../../utils/fileURL";
 import { motion } from "framer-motion";
 
-function ViewFHDetails({ booking }) {
+function ViewFHDetails({ fhId }) {
   const setShowForm = useForm((state) => state.setShowForm);
 
-  // Map of labels and keys to display dynamically
-  const bookingFields = [
-    { label: "Guest Name", key: "fullname" },
-    { label: "Phone", key: "phone" },
-    { label: "Function Hall", key: "name" },
-    { label: "Booked Date", key: "bookedDate" },
-    { label: "Event Date", key: "date" },
-    { label: "Start Time", key: "start_time" },
-    { label: "Total Price", key: "price", isCurrency: true },
-    { label: "Required Payment", key: "half_price", isCurrency: true },
-    { label: "Paid", key: "paid", isCurrency: true },
-    { label: "Status", key: "status", isStatus: true },
-  ];
+  const {
+    data: functionHallDetails,
+    loading,
+    error,
+  } = useGetData(`/admin/functionhall.php?id=${fhId}`);
 
-  // Format as PHP currency safely
-  const formatCurrency = (value) => {
-    if (!value) return "₱0.00";
+  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (error)
+    return (
+      <p className="text-center text-red-500">Error loading room details.</p>
+    );
+  if (!functionHallDetails) return null;
 
-    // Remove any non-digit/decimal characters (like ₱ or ,)
-    const numberValue = parseFloat(value.toString().replace(/[^0-9.-]+/g, ""));
-    if (isNaN(numberValue)) return "₱0.00";
-
-    return `₱${numberValue.toLocaleString("en-PH", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  };
+  const { image, name, price, capacity, duration, description, category } =
+    functionHallDetails;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-center items-center bg-black/40 backdrop-blur-sm">
+    <div className="w-full h-screen bg-black/10 flex justify-center items-center  fixed inset-0 z-50">
       <motion.div
-        initial={{ opacity: 0, scale: 0.97 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.25 }}
-        className="w-[70%] max-h-[92%] bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-y-auto p-6"
+        initial={{ opacity: 0, y: -5 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="w-[70%] max-h-[90%] bg-white dark:bg-gray-900 rounded-lg p-4 shadow-lg overflow-y-auto"
       >
-        {/* HEADER */}
-        <div className="flex justify-between items-center mb-6 pb-2 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 tracking-wide">
-            Function Hall Booking Details
-          </h2>
+        <div className="w-full flex flex-row justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-50">
+            Funtion Hall Details
+          </h3>
 
           <icons.MdOutlineClose
             onClick={() => setShowForm(null)}
-            className="cursor-pointer text-2xl text-gray-700 dark:text-gray-300 hover:text-red-500 transition"
+            className="cursor-pointer text-2xl text-gray-800 dark:text-gray-50 hover:text-red-500"
           />
         </div>
 
-        {/* BOOKING DETAILS */}
-        <div className="pt-6">
-          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3 tracking-wide">
-            Booking Information
-          </h3>
+        <div className="w-full flex flex-row gap-4 mb-4">
+          <img
+            src={`${uploadUrl.uploadurl}/function_hall/${image}`}
+            alt={name}
+            className="w-[30%] rounded object-cover border"
+          />
 
-          <div className="grid grid-cols-2 gap-y-2 text-sm">
-            {bookingFields.map((field) => {
-              if (booking[field.key] == null) return null; // Skip if field is missing
-
-              let value = booking[field.key];
-
-              // Format currency
-              if (field.isCurrency) {
-                value = formatCurrency(value);
-              }
-
-              // Highlight status
-              if (field.isStatus) {
-                value = (
-                  <span
-                    className={`font-medium ${
-                      value === "declined"
-                        ? "text-red-500"
-                        : value === "approved"
-                        ? "text-green-500"
-                        : "text-yellow-500"
-                    }`}
-                  >
-                    {value}
-                  </span>
-                );
-              }
-
-              return (
-                <Detail key={field.key} label={field.label} value={value} />
-              );
-            })}
-          </div>
-
-          {/* Decline Note (only if exists) */}
-          {booking.booking_note_fh && (
-            <div className="mt-4">
-              <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                Decline Reason:
-              </p>
-              <p className="text-sm text-red-500 mt-1 leading-relaxed">
-                {booking.booking_note_fh}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* DESCRIPTION */}
-        {booking.description && (
-          <div className="border-t border-gray-200 dark:border-gray-700 mt-10 pt-6">
-            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 tracking-wide">
-              Description
-            </h3>
-
-            <p className="text-sm text-gray-700 dark:text-gray-300 mt-2 leading-relaxed">
-              {booking.description || "-"}
+          <div className="w-[70%] text-sm text-gray-700 flex flex-col gap-2">
+            <p className="dark:text-white">
+              <strong>Funtion Hall:</strong> {name}
+            </p>
+            <p className="dark:text-white">
+              <strong>Category:</strong> {category}
+            </p>
+            <p className="dark:text-white">
+              <strong>Price:</strong> ₱{parseFloat(price).toLocaleString()}
+            </p>
+            <p className="dark:text-white">
+              <strong>Capacity:</strong> {capacity}{" "}
+              {capacity > 1 ? "people" : "person"}
+            </p>
+            <p className="dark:text-white">
+              <strong>Duration:</strong> {duration} hours
             </p>
           </div>
-        )}
+        </div>
+
+        <div className="w-full border-t dark:border-gray-700 border-gray-200 mt-10 pt-4">
+          <h3 className="dark:text-white text-gray-700 text-sm font-semibold">
+            * Description
+          </h3>
+          <p className="dark:text-white text-gray-800 text-sm mt-2">
+            {description}
+          </p>
+        </div>
       </motion.div>
     </div>
-  );
-}
-
-// Helper Component for clean label/value alignment
-function Detail({ label, value }) {
-  return (
-    <p className="flex text-sm leading-relaxed">
-      <span className="font-semibold w-36 text-gray-800 dark:text-gray-100">
-        {label}:
-      </span>
-      <span className="text-gray-700 dark:text-gray-300 flex-1">{value}</span>
-    </p>
   );
 }
 

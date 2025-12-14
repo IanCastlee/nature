@@ -267,6 +267,7 @@ function BookWithoutSigningIn() {
     });
 
     setExtraQty(1);
+    setSelectedExtraId("");
   };
 
   const getNumberOfNights = () => {
@@ -514,8 +515,8 @@ function BookWithoutSigningIn() {
             </div>
 
             {extras && (
-              <div className="w-full flex justify-center lg:mt-6 mt-0">
-                <div className="w-full lg:w-[60%] bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md p-4">
+              <div className="w-full flex justify-center lg:mt-6 mt-0 lg:px-4">
+                <div className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-md p-4">
                   {/* Label */}
                   <h3 className="font-semibold mb-4 text-gray-800 dark:text-gray-100 text-sm">
                     Add Extras
@@ -525,6 +526,7 @@ function BookWithoutSigningIn() {
                     {/* Dropdown */}
                     <div className="flex-1">
                       <CustomDropDownn
+                        label="."
                         options={extrasData}
                         value={selectedExtraId}
                         onChange={(selectedId) =>

@@ -15,6 +15,7 @@ import useSetInactive from "../../hooks/useSetInactive";
 import { icons } from "../../constant/icon";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import ViewFhBookingDetails from "../admin_molecules/ViewFhBookingDetails";
 function AdminBookingFhNotAttended() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
@@ -211,7 +212,10 @@ function AdminBookingFhNotAttended() {
   };
 
   // -------------------------------------------
-
+  const viewFHDetails = (item) => {
+    setShowForm("view_fh_hall");
+    setViewFHDetailsId(item);
+  };
   return (
     <>
       {toast && (
@@ -272,6 +276,7 @@ function AdminBookingFhNotAttended() {
                   setApproveItem(item);
                   setApproveAction("set_backtoapproved");
                 },
+                onViewDetails: () => viewFHDetails(item),
               })
             }
           />
@@ -308,7 +313,9 @@ function AdminBookingFhNotAttended() {
         />
       )}
 
-      {showForm === "view fh-hall" && <ViewFHDetails fhId={viewFHDetailsId} />}
+      {showForm === "view_fh_hall" && (
+        <ViewFhBookingDetails booking={viewFHDetailsId} />
+      )}
     </>
   );
 }

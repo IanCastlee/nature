@@ -169,7 +169,7 @@ if ($method === "POST") {
         if ($stmt->execute()) {
             echo json_encode([
                 "success" => true,
-                "message" => "✅ Function Hall updated successfully."
+                "message" => " Function Hall updated successfully."
             ]);
         } else {
             echo json_encode([

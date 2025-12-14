@@ -67,6 +67,9 @@ import AdminBookingNotAttended from "./admin_components/admin_pages/AdminBooking
 import AdminBookingFhNotAttended from "./admin_components/admin_pages/AdminBookingFhNotAttended";
 import AdminBookingReschedLog from "./admin_components/admin_pages/AdminBookingReschedLog";
 import AdminBookingReschedLogFh from "./admin_components/admin_pages/AdminBookingReschedLogFh";
+import FAQ from "./components/pages/FAQ";
+import AdminFAQs from "./admin_components/admin_pages/AdminFAQs";
+import AdminTerms from "./admin_components/admin_pages/AdminTerms";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -142,6 +145,7 @@ const UserLayout = () => {
 
         <Route path="/tester" element={<Tester />} />
         <Route path="/reserve/:roomId" element={<BookWithoutSigningIn />} />
+        <Route path="/faq" element={<FAQ />} />
       </Routes>
       {!shouldHideLayout && <Footer />}
     </>
@@ -235,8 +239,10 @@ const AdminLayout = () => {
             element={<AdminBookingReschedLogFh />}
           />
 
-          <Route path="/terms" element={<AdminTermsAndConditions />} />
+          <Route path="/terms" element={<AdminTerms />} />
+          {/* <Route path="/terms" element={<AdminTermsAndConditions />} /> */}
           <Route path="/why-choose-us" element={<AdminWhyChooseUs />} />
+          <Route path="/faqs" element={<AdminFAQs />} />
         </Routes>
       </main>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import { icons } from "../../constant/icon";
 import {
@@ -28,34 +28,95 @@ ChartJS.register(
 
 const Dashboard = () => {
   const [selectedYear, setSelectedYear] = useState("2025");
+  const [chartData, setChartData] = useState({
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
+    datasets: [
+      {
+        label: "Paid Bookings",
+        data: Array(12).fill(0),
+        borderColor: "rgb(75, 192, 192)",
+        backgroundColor: "rgba(75, 192, 192, 0.2)",
+        tension: 0.3,
+      },
+    ],
+  });
+
   const [showCurrentOccupants, setShowCurrentOccupants] = useState(false);
   const [showSetting, setShowSetting] = useState(false);
-  // Fetch data count
+
+  // Fetch general counts
   const { data, loading, refetch, error } = useGetData(`/admin/counts.php`);
+
+  // Fetch bookings per month using the reusable hook
+  const {
+    data: chartInfo,
+    loading: chartLoading,
+    refetch: refetchChart,
+  } = useGetData(`/admin/get-bookings-per-month.php?year=${selectedYear}`);
+
+  // Update chart data whenever chartInfo changes
+  useEffect(() => {
+    if (chartInfo && chartInfo.monthlyPaid) {
+      setChartData({
+        labels: [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ],
+        datasets: [
+          {
+            label: "Paid Bookings",
+            data: chartInfo.monthlyPaid,
+            borderColor: "rgb(75, 192, 192)",
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            tension: 0.3,
+          },
+        ],
+      });
+    }
+  }, [chartInfo]);
 
   const stats = [
     {
-      title: "Room  Booking",
+      title: "Room Booking",
       value: data ? data.pendingRoomBookings : "-",
-      //  percent: data ? `+${data.pendingRoomBookings}%` : "-",
       color: "green",
     },
     {
-      title: "Function Hall  Booking",
+      title: "Function Hall Booking",
       value: data ? data.functionHallBookings : "-",
-      // percent: data ? `+${data.functionHallBookings}%` : "-",
       color: "red",
     },
     {
-      title: "Not Verified Users",
-      value: data ? data.notVerifiedUsers : "-",
-      // percent: data ? `+${data.notVerifiedUsers}%` : "-",
+      title: "Most Booked Room",
+      value: data ? data.mostBookedRooms.join(", ") : "-",
       color: "blue",
     },
     {
-      title: "Verified Users",
-      value: data ? data.verifiedUsers : "-",
-      // percent: data ? `+${data.verifiedUsers}%` : "-",
+      title: "Most Booked Function Hall",
+      value: data ? data.mostBookedHalls.join(", ") : "-",
       color: "yellow",
     },
   ];
@@ -110,40 +171,6 @@ const Dashboard = () => {
     },
   ];
 
-  // Dummy bookings grouped by year
-  const bookingsByYear = {
-    2023: [20, 30, 40, 50, 35, 60, 45, 55, 65, 70, 80, 90],
-    2024: [25, 35, 30, 60, 50, 75, 60, 70, 80, 90, 100, 110],
-    2025: [45, 60, 40, 80, 75, 90, 85, 95, 100, 110, 120, 130],
-  };
-
-  const chartData = {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
-    datasets: [
-      {
-        label: `Bookings in ${selectedYear}`,
-        data: bookingsByYear[selectedYear],
-        borderColor: "#4CAF50",
-        backgroundColor: "rgba(76, 175, 80, 0.2)",
-        fill: true,
-        tension: 0.4,
-      },
-    ],
-  };
-
   const options = {
     responsive: true,
     plugins: {
@@ -152,11 +179,7 @@ const Dashboard = () => {
     },
   };
 
-  const handleClose = () => {
-    console.log("first");
-    setShowCurrentOccupants(false);
-    console.log("DFJDJNFJDFNN : ", showCurrentOccupants);
-  };
+  console.log("chartInfo:", chartInfo);
 
   return (
     <>
@@ -165,15 +188,12 @@ const Dashboard = () => {
           <h1 className="text-lg font-bold mb-4 dark:text-white text-black">
             Dashboard Overview
           </h1>
-
           <div className="flex flex-row items-center gap-2">
             <Button
               onClick={() => setShowCurrentOccupants(true)}
-              className="flex flex-row items-center h-[35px] bg-gray-700 hover:bg-gray-800
-             text-white text-xs font-medium px-3 rounded-md transition-colors"
+              className="flex flex-row items-center h-[35px] bg-gray-700 hover:bg-gray-800 text-white text-xs font-medium px-3 rounded-md transition-colors"
               label={<>Current Occupants</>}
             />
-
             <icons.IoSettingsOutline
               className="text-2xl cursor-pointer dark:text-white text-black"
               onClick={() => setShowSetting(true)}
@@ -186,17 +206,27 @@ const Dashboard = () => {
           {stats.map((item, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-gray-900 p-4 rounded-md shadow-md flex flex-col justify-between"
+              className="bg-white dark:bg-gray-900 p-4 rounded-md shadow-md flex flex-col justify-between border-l-4"
+              style={{ borderLeftColor: item.color }}
             >
               <h2 className="text-sm text-gray-600 dark:text-gray-200 font-medium">
                 {item.title}
               </h2>
-              <p className={`text-2xl font-bold text-${item.color}-500`}>
-                {item.value}
-              </p>
-              <span className={`text-sm text-${item.color}-400`}>
-                {item.percent}
-              </span>
+              {Array.isArray(item.value) ? (
+                <div
+                  className={`flex flex-col mt-1 text-sm font-semibold text-${item.color}-500 space-y-1`}
+                >
+                  {item.value.map((val, idx) => (
+                    <span key={idx}>{val}</span>
+                  ))}
+                </div>
+              ) : (
+                <p
+                  className={`text-sm font-semibold text-${item.color}-500 mt-1`}
+                >
+                  {item.value}
+                </p>
+              )}
             </div>
           ))}
         </div>
@@ -247,17 +277,23 @@ const Dashboard = () => {
             <option value="2023">2023</option>
             <option value="2024">2024</option>
             <option value="2025">2025</option>
+            <option value="2026">2026</option>
           </select>
         </div>
 
         {/* Graph */}
         <div className="bg-white dark:bg-gray-900 p-6 rounded-md shadow-md">
-          <Line data={chartData} options={options} />
+          {chartLoading ? (
+            <p>Loading chart...</p>
+          ) : (
+            <Line data={chartData} options={options} />
+          )}
         </div>
       </div>
 
-      {showCurrentOccupants && <CurrentOccupants close={handleClose} />}
-
+      {showCurrentOccupants && (
+        <CurrentOccupants close={() => setShowCurrentOccupants(false)} />
+      )}
       {showSetting && <AdminSetting />}
     </>
   );
