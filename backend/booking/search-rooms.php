@@ -5,14 +5,14 @@ include("../dbConn.php");
 $checkIn = $_GET['checkIn'];
 $checkOut = $_GET['checkOut'];
 $guests = (int)$_GET['guests'];
-$categoryId = (int)$_GET['categoryId'];
+// $categoryId = (int)$_GET['categoryId'];
 
 // Query to get rooms that match capacity & category, and are active (available)
 $sql = "
 SELECT r.*
 FROM rooms r
-WHERE r.category_id = ?
-  AND r.capacity >= ?
+WHERE 
+   r.capacity >= ?
   AND r.status = 'active'
   AND r.room_id NOT IN (
     SELECT rb.facility_id
@@ -29,7 +29,7 @@ if (!$stmt) {
 }
 
 // Bind parameters: categoryId, guests, checkIn, checkOut
-$stmt->bind_param("iiss", $categoryId, $guests, $checkIn, $checkOut);
+$stmt->bind_param("iss", $guests, $checkIn, $checkOut);
 
 $stmt->execute();
 $result = $stmt->get_result();
@@ -47,7 +47,7 @@ echo json_encode([
         'checkIn' => $checkIn,
         'checkOut' => $checkOut,
         'guests' => $guests,
-        'categoryId' => $categoryId
+       
     ]
 ]);
 ?>

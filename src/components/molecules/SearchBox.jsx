@@ -16,17 +16,27 @@ function SearchBox() {
     checkIn: "",
     checkOut: "",
     guests: "",
-    categoryId: "",
   });
 
+  // Handle input changes
   const handleChange = (key, value) => {
-    setSearchData((prev) => ({ ...prev, [key]: value }));
+    if (key === "checkIn") {
+      // Reset check-out when check-in changes
+      setSearchData((prev) => ({
+        ...prev,
+        checkIn: value,
+        checkOut: "",
+      }));
+    } else {
+      setSearchData((prev) => ({ ...prev, [key]: value }));
+    }
   };
 
+  // Handle search button click
   const handleSearch = () => {
-    const { checkIn, checkOut, guests, categoryId } = searchData;
+    const { checkIn, checkOut, guests } = searchData;
 
-    if (!checkIn || !checkOut || !guests || !categoryId) {
+    if (!checkIn || !checkOut || !guests) {
       setToast({
         message: "Please fill all fields before searching.",
         type: "error",
@@ -41,19 +51,28 @@ function SearchBox() {
 
     setTimeout(() => {
       navigate(
-        `/search-result?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&categoryId=${categoryId}`
+        `/search-result?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`
       );
     }, 1000);
   };
 
+  // Get today's date and tomorrow's date for min check-in
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDate = tomorrow.toISOString().split("T")[0];
 
+  // Helper to get the next day after a date string
+  const getNextDay = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    date.setDate(date.getDate() + 1);
+    return date.toISOString().split("T")[0];
+  };
+
   return (
     <>
-      {/*  Toast Notification */}
+      {/* Toast Notification */}
       {toast && (
         <Toaster
           message={toast.message}
@@ -66,12 +85,12 @@ function SearchBox() {
         <div
           className="backdrop-blur-md border border-gray-300 dark:border-gray-600 rounded-md shadow-lg
           p-4 sm:p-5 flex flex-col md:flex-row gap-3 md:items-end w-full
-          max-w-full sm:max-w-4xl md:max-w-5xl lg:max-w-[80%] xl:max-w-6xl 2xl:max-w-[75%]
+          max-w-full sm:max-w-4xl md:max-w-5xl lg:max-w-[60%]
           bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
         >
-          {/* Dates (stack on mobile) */}
-          <div className="flex flex-row gap-1">
-            {/* Check-in date */}
+          {/* Dates */}
+          <div className="flex lg:flex-row md:flex-row flex-col gap-1">
+            {/* Check-In */}
             <div className="flex-1">
               <label className="text-xs block mb-1">Check-In</label>
               <input
@@ -83,15 +102,16 @@ function SearchBox() {
               />
             </div>
 
-            {/* Check-out date */}
+            {/* Check-Out */}
             <div className="flex-1">
               <label className="text-xs block mb-1">Check-Out</label>
               <input
                 type="date"
                 value={searchData.checkOut}
                 onChange={(e) => handleChange("checkOut", e.target.value)}
-                min={minDate}
-                className="w-full bg-transparent border border-gray-400 dark:border-gray-600 rounded-lg px-4 py-2 outline-none text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                min={getNextDay(searchData.checkIn) || minDate}
+                disabled={!searchData.checkIn}
+                className="w-full bg-transparent border border-gray-400 dark:border-gray-600 rounded-lg px-4 py-2 outline-none text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -113,19 +133,6 @@ function SearchBox() {
                 </option>
               ))}
             </select>
-          </div>
-
-          {/* Category dropdown */}
-          <div className="w-full sm:w-auto flex-1">
-            <label className="text-xs block mb-1">Room Category</label>
-            <CustomDropDownn
-              top={true}
-              options={data}
-              value={searchData.categoryId}
-              onChange={(value) => handleChange("categoryId", value)}
-              valueKey="category_id"
-              labelKey="category"
-            />
           </div>
 
           {/* Search Button */}

@@ -227,14 +227,16 @@ function Header({ isHome }) {
             <div
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className={`flex items-center justify-center w-10 h-10 rounded-md cursor-pointer transition-all
-    ${
-      mobileMenuOpen
-        ? "bg-red-500 text-white"
-        : scrolled
-        ? "dark:bg-gray-900 dark:text-white bg-white text-black shadow-md"
-        : "dark:bg-gray-900 dark:text-white"
-    }        // Default (top of page)
-  `}
+        ${
+          mobileMenuOpen
+            ? "bg-red-500 text-white"
+            : isHome && !scrolled
+            ? "bg-transparent text-white" // home & not scrolled: transparent bg, white text
+            : scrolled
+            ? "dark:bg-gray-900 dark:text-white bg-white text-black shadow-md"
+            : "dark:bg-gray-900 dark:text-white"
+        }
+      `}
             >
               {mobileMenuOpen ? (
                 <icons.MdOutlineClose className="text-2xl" />
@@ -321,12 +323,13 @@ function Header({ isHome }) {
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.25 }}
-                        className="pl-4 mt-2 flex flex-col gap-2 overflow-hidden border-l dark:border-gray-700"
+                        className="pl-2 mt-2 flex flex-col gap-2 overflow-hidden"
                       >
                         {/* ROOM CATEGORIES */}
-                        <li>
+                        <li className="w-full border-l-2 border-blue-500 dark:border-blue-400 pl-3">
+                          {/* Dropdown Button */}
                           <button
-                            className="w-full flex items-center justify-between py-1 hover:underline"
+                            className="w-full flex items-center justify-between py-2 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition font-medium"
                             onClick={() => setMobileRoomsOpen(!mobileRoomsOpen)}
                           >
                             Room Categories
@@ -337,6 +340,7 @@ function Header({ isHome }) {
                             )}
                           </button>
 
+                          {/* Dropdown Items */}
                           <AnimatePresence>
                             {mobileRoomsOpen && (
                               <motion.ul
@@ -344,7 +348,7 @@ function Header({ isHome }) {
                                 animate={{ height: "auto", opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
                                 transition={{ duration: 0.25 }}
-                                className="pl-4 mt-1 flex flex-col gap-1 overflow-hidden"
+                                className="mt-2 flex flex-col gap-2 pl-4 overflow-hidden"
                               >
                                 {data?.map((item) => (
                                   <li
@@ -357,7 +361,7 @@ function Header({ isHome }) {
                                       setMobileOfferOpen(false);
                                       setMobileRoomsOpen(false);
                                     }}
-                                    className="cursor-pointer text-sm py-1 hover:underline"
+                                    className="cursor-pointer text-sm py-2 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                                   >
                                     {item.category}
                                   </li>
@@ -368,26 +372,30 @@ function Header({ isHome }) {
                         </li>
 
                         {/* OTHER OFFERS */}
-                        <li
-                          className="cursor-pointer py-1 hover:underline"
-                          onClick={() => {
-                            navigate("/cottages");
-                            setMobileMenuOpen(false);
-                            setMobileOfferOpen(false);
-                          }}
-                        >
-                          Cottages
-                        </li>
+                        <li className="border-l-2 border-transparent pl-3">
+                          <ul className="flex flex-col gap-2 mt-2">
+                            <li
+                              className="cursor-pointer py-2 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm"
+                              onClick={() => {
+                                navigate("/cottages");
+                                setMobileMenuOpen(false);
+                                setMobileOfferOpen(false);
+                              }}
+                            >
+                              Cottages
+                            </li>
 
-                        <li
-                          className="cursor-pointer py-1 hover:underline"
-                          onClick={() => {
-                            navigate("/function-halls");
-                            setMobileMenuOpen(false);
-                            setMobileOfferOpen(false);
-                          }}
-                        >
-                          Function Hall
+                            <li
+                              className="cursor-pointer py-2 px-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm"
+                              onClick={() => {
+                                navigate("/function-halls");
+                                setMobileMenuOpen(false);
+                                setMobileOfferOpen(false);
+                              }}
+                            >
+                              Function Hall
+                            </li>
+                          </ul>
                         </li>
                       </motion.ul>
                     )}

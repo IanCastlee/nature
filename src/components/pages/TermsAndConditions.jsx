@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import useGetData from "../../hooks/useGetData";
-
+import { Link } from "react-router-dom";
+import { icons } from "../../constant/icon";
 function TermsAndConditions() {
   const { data, loading } = useGetData("/admin/terms.php");
   const [terms, setTerms] = useState([]);
   const [language, setLanguage] = useState("en"); // "en" or "tl"
+
+  const { data: dataSetting } = useGetData(`/admin/admin_setting.php`);
 
   useEffect(() => {
     if (Array.isArray(data)) {
@@ -26,8 +29,8 @@ function TermsAndConditions() {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-20 mt-[70px]">
       <div className="w-full mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 lg:p-8">
         {/* Header + Language Selector */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-          <h1 className="lg:text-2xl md:ext-2xl sm:text-lg font-bold text-gray-900 dark:text-white text-center sm:text-left flex-1">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4">
+          <h1 className="lg:text-3xl md:text-2xl text-2xl font-bold text-gray-900 dark:text-white text-center sm:text-left flex-1">
             Terms and Conditions
           </h1>
 
@@ -87,6 +90,33 @@ function TermsAndConditions() {
             No terms and conditions available at the moment.
           </p>
         )}
+
+        <div className="flex flex-row flex-wrap gap-3 p-3 border dark:border-gray-700  rounded-md bg-white/10 dark:bg-gray-800/20">
+          <a
+            href={dataSetting?.fb || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 text-sm flex items-center gap-2 hover:text-blue-400 transition"
+          >
+            <icons.FaFacebookMessenger className="text-blue-400 text-2xl border border-blue-400 rounded-full p-1" />
+            Nature Hot Spring Page
+          </a>
+
+          <Link className="dark:text-white text-sm flex items-center gap-2">
+            <icons.FaPhoneAlt className="text-blue-400 text-2xl border border-blue-400 rounded-full p-1" />
+            Smart: {dataSetting?.smart_no || "0917-XXXXXXX"}
+          </Link>
+
+          <Link className="dark:text-white text-sm flex items-center gap-2">
+            <icons.FaPhoneAlt className="text-blue-400 text-2xl border border-blue-400 rounded-full p-1" />
+            Globe: {dataSetting?.globe_no || "0922-XXXXXXX"}
+          </Link>
+
+          <Link className="dark:text-white text-sm flex items-center gap-2">
+            <icons.IoIosMail className="text-blue-400 text-2xl border border-blue-400 rounded-full p-1" />
+            {dataSetting?.email || "info@example.com"}
+          </Link>
+        </div>
       </div>
     </div>
   );

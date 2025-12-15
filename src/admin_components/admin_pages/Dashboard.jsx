@@ -14,7 +14,6 @@ import {
 import useGetData from "../../hooks/useGetData";
 import Button from "../admin_atoms/Button";
 import CurrentOccupants from "./CurrentOccupants";
-import AdminSetting from "./AdminSetting";
 
 ChartJS.register(
   LineElement,
@@ -194,10 +193,6 @@ const Dashboard = () => {
               className="flex flex-row items-center h-[35px] bg-gray-700 hover:bg-gray-800 text-white text-xs font-medium px-3 rounded-md transition-colors"
               label={<>Current Occupants</>}
             />
-            <icons.IoSettingsOutline
-              className="text-2xl cursor-pointer dark:text-white text-black"
-              onClick={() => setShowSetting(true)}
-            />
           </div>
         </div>
 
@@ -278,6 +273,15 @@ const Dashboard = () => {
             <option value="2024">2024</option>
             <option value="2025">2025</option>
             <option value="2026">2026</option>
+            <option value="2026">2027</option>
+            <option value="2026">2028</option>
+            <option value="2026">2029</option>
+            <option value="2026">2030</option>
+            <option value="2026">2031</option>
+            <option value="2026">2032</option>
+            <option value="2026">2033</option>
+            <option value="2026">2034</option>
+            <option value="2026">2035</option>
           </select>
         </div>
 
@@ -294,7 +298,6 @@ const Dashboard = () => {
       {showCurrentOccupants && (
         <CurrentOccupants close={() => setShowCurrentOccupants(false)} />
       )}
-      {showSetting && <AdminSetting />}
     </>
   );
 };
