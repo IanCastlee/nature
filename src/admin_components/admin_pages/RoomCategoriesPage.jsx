@@ -237,8 +237,7 @@ function RoomCategoriesPage() {
           onCancel={() => setDeleteItem(null)}
           label="Yes, Set as not active"
           label2="not-active"
-          label3=" This will make this category unavailable, but not delete it
-            permanently."
+          label3="This action will mark the category as unavailable without deleting it permanently."
           onConfirm={() =>
             setInactive({
               id: deleteItem?.category_id,
@@ -256,8 +255,7 @@ function RoomCategoriesPage() {
           onCancel={() => setDeleteItem(null)}
           label="Yes, Set as not active"
           label2="not-active"
-          label3=" This will make this cottage unavailable, but not delete it
-            permanently."
+          label3="This action will mark the category as unavailable without deleting it permanently."
           onConfirm={() => {
             setInactive({
               id: deleteItem?.cottage_id,

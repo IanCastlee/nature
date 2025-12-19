@@ -34,12 +34,19 @@ function ViewRoomDetails({ roomId }) {
     extras,
   } = roomDetails;
 
-  const parsedAmenities = amenities?.split(",") || [];
-  const parsedInclusions = inclusion?.split(",") || [];
-  const parsedExtras = extras?.split(",") || [];
+  // Filter out empty or whitespace-only entries
+  const parsedAmenities = (amenities?.split(",") || []).filter(
+    (a) => a.trim() !== ""
+  );
+  const parsedInclusions = (inclusion?.split(",") || []).filter(
+    (i) => i.trim() !== ""
+  );
+  const parsedExtras = (extras?.split(",") || []).filter(
+    (e) => e.trim() !== ""
+  );
 
   return (
-    <div className="w-full h-screen bg-black/10 flex justify-center items-center  fixed inset-0 z-50">
+    <div className="w-full h-screen bg-black/10 flex justify-center items-center fixed inset-0 z-50">
       <motion.div
         initial={{ opacity: 0, y: -5 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -89,65 +96,53 @@ function ViewRoomDetails({ roomId }) {
         </div>
 
         <div className="w-full flex flex-row gap-x-8 mt-6">
-          <ul className="flex-1">
-            <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50">
-              Amenities
-            </h3>
-            {parsedAmenities.length ? (
-              parsedAmenities.map((amenity, idx) => (
+          {parsedAmenities.length > 0 && (
+            <ul className="flex-1">
+              <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50">
+                Amenities
+              </h3>
+              {parsedAmenities.map((amenity, idx) => (
                 <li
                   key={idx}
                   className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
                 >
                   {amenity.trim()}
                 </li>
-              ))
-            ) : (
-              <li className="text-sm text-gray-500 italic">
-                No amenities listed.
-              </li>
-            )}
-          </ul>
+              ))}
+            </ul>
+          )}
 
-          <ul className="flex-1">
-            <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50">
-              Room Inclusions
-            </h3>
-            {parsedInclusions.length ? (
-              parsedInclusions.map((inclusion, idx) => (
+          {parsedInclusions.length > 0 && (
+            <ul className="flex-1">
+              <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50">
+                Room Inclusions
+              </h3>
+              {parsedInclusions.map((inclusion, idx) => (
                 <li
                   key={idx}
                   className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
                 >
                   {inclusion.trim()}
                 </li>
-              ))
-            ) : (
-              <li className="text-sm text-gray-500 italic">
-                No inclusions listed.
-              </li>
-            )}
-          </ul>
+              ))}
+            </ul>
+          )}
 
-          <ul className="flex-1">
-            <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50">
-              Room Extras
-            </h3>
-            {parsedExtras.length ? (
-              parsedExtras.map((extras, idx) => (
+          {parsedExtras.length > 0 && (
+            <ul className="flex-1">
+              <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50">
+                Room Extras
+              </h3>
+              {parsedExtras.map((extra, idx) => (
                 <li
                   key={idx}
                   className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
                 >
-                  {extras.trim()}
+                  {extra.trim()}
                 </li>
-              ))
-            ) : (
-              <li className="text-sm text-gray-500 italic">
-                No extras listed.
-              </li>
-            )}
-          </ul>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="w-full border-t dark:border-gray-700 border-gray-200 mt-10 pt-4">

@@ -204,7 +204,7 @@ function AdminAnnouncementPage() {
           onCancel={() => setDeleteItem(null)}
           label="Yes, Set as not active"
           label2="not-active"
-          label3="This will hide this announcement but not delete it permanently."
+          label3="This action will mark the announcement as not-active without deleting it permanently."
           onConfirm={() =>
             setInactive({
               id: deleteItem?.id,

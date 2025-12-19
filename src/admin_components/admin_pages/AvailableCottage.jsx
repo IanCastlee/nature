@@ -286,8 +286,7 @@ function AvailableCottage() {
           onCancel={() => setDeleteItem(null)}
           label="Yes, Set as not active"
           label2="not-active"
-          label3=" This will make this cottage unavailable, but not delete it
-            permanently."
+          label3="This action will mark this cottage as unavailable without permanently deleting it."
           onConfirm={() => {
             setInactive({
               id: deleteItem?.cottage_id,

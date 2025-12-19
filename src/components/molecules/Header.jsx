@@ -6,7 +6,7 @@ import useThemeStore from "../../store/themeStore";
 import useAuthStore from "../../store/authStore";
 import useGetData from "../../hooks/useGetData";
 import Notification from "../organisms/Notification";
-import { useForm } from "../../store/useRoomStore";
+import { useAnnouncementStore, useForm } from "../../store/useRoomStore";
 import Announcement from "../pages/Announcement";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -22,6 +22,22 @@ function Header({ isHome }) {
   const [mobileRoomsOpen, setMobileRoomsOpen] = useState(false);
   const { darkMode, toggleDarkMode } = useThemeStore();
   const [showDropdown, setShowDropdown] = useState(false);
+  const announcementCount = useAnnouncementStore(
+    (state) => state.announcementCount
+  );
+  const setAnnouncementCount = useAnnouncementStore(
+    (state) => state.setAnnouncementCount
+  );
+
+  const { data: announcementData } = useGetData(
+    `/admin/announcement.php?status=active`
+  );
+
+  useEffect(() => {
+    if (!announcementData) return;
+
+    setAnnouncementCount(announcementData.length);
+  }, [announcementData]);
 
   // Fetch data
   const { data, loading, refetch, error } = useGetData(
@@ -58,7 +74,7 @@ function Header({ isHome }) {
               alt="Logo"
               className={`transition-all duration-300 ${
                 scrolled ? "h-[55px]" : isHome ? "h-[150px]" : "h-[55px]"
-              } cursor-pointer absolute top-2 left-0`}
+              } cursor-pointer absolute top-2 left-[-10px]`}
             />
           )}
 
@@ -157,8 +173,8 @@ function Header({ isHome }) {
               {[
                 {
                   label: "Announcement",
-                  isLink: false, // important: it's not a Link
-                  action: () => setShowForm("announcement"), // onClick handler
+                  isLink: false,
+                  action: () => setShowForm("announcement"),
                 },
                 {
                   label: "Contacts",
@@ -187,6 +203,13 @@ function Header({ isHome }) {
                   >
                     {item.label}
                   </Link>
+
+                  {/*  Notification Badge */}
+                  {item.label === "Announcement" && announcementCount > 0 && (
+                    <span className="absolute -top-1 -right-2 h-3 w-3 rounded-full bg-red-500 flex items-center justify-center text-[8px] text-white">
+                      {announcementCount}
+                    </span>
+                  )}
                 </li>
               ))}
 
@@ -416,9 +439,18 @@ function Header({ isHome }) {
                         setMobileMenuOpen(false);
                         setMobileOfferOpen(false);
                       }}
-                      className="block py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                      className="relative flex items-center justify-between py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                     >
-                      {item.label}
+                      {/* Text */}
+                      <span>{item.label}</span>
+
+                      {/*  Announcement Badge */}
+                      {item.label === "Announcement" &&
+                        announcementCount > 0 && (
+                          <span className="ml-2  bg-red-500 text-white text-xs px-2 py-[1px] rounded-full">
+                            {announcementCount}
+                          </span>
+                        )}
                     </div>
                   </li>
                 ))}

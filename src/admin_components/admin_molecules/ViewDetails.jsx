@@ -3,34 +3,52 @@ import { motion } from "framer-motion";
 
 function ViewDetails({ active, data }) {
   const setShowForm = useForm((state) => state.setShowForm);
-  console.log("FDATA : ", data);
+
   if (!data) return null;
 
   const info = data;
 
-  // Normalize extras
-  const extras = info.extras
-    ? Array.isArray(info.extras)
-      ? info.extras
-      : [{ name: info.extras, quantity: 1, price: "" }]
-    : [];
+  /* =============================
+      FIXED EXTRAS NORMALIZATION
+     ============================= */
+  const extras = (() => {
+    const e = info.extras;
+
+    // Treat NO extras properly
+    if (
+      !e ||
+      e === "None" ||
+      e === "none" ||
+      e === "" ||
+      e === "[]" ||
+      e === null
+    ) {
+      return [];
+    }
+
+    // Already a valid array
+    if (Array.isArray(e)) return e;
+
+    // Single extra text
+    return [{ name: e, quantity: 1, price: "" }];
+  })();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/80">
       <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.25 }}
-        className="w-full max-w-3xl bg-white rounded-xl shadow-xl overflow-hidden"
+        className="w-full max-w-3xl bg-white dark:bg-gray-900 rounded-xl shadow-xl overflow-hidden"
       >
         {/* ===== HEADER ===== */}
-        <div className="flex items-start justify-between px-6 py-5 border-b">
+        <div className="flex items-start justify-between px-6 py-5 border-b border-gray-200 dark:border-gray-700">
           <div>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
               Booking Details
             </h2>
-            <p className="text-sm text-gray-500">
-              Function Hall Reservation Information
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Room Reservation Information
             </p>
           </div>
 
@@ -38,10 +56,10 @@ function ViewDetails({ active, data }) {
             className={`px-4 py-1 rounded-full text-xs font-semibold uppercase tracking-wide
               ${
                 info.status === "approved"
-                  ? "bg-green-100 text-green-700"
+                  ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                   : info.status === "pending"
-                  ? "bg-yellow-100 text-yellow-700"
-                  : "bg-red-100 text-red-700"
+                  ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
+                  : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
               }
             `}
           >
@@ -99,8 +117,8 @@ function ViewDetails({ active, data }) {
           {/* DECLINE NOTE */}
           {info.status === "declined" && info.note && (
             <Section title="Decline Reason">
-              <div className="col-span-2 bg-red-50 border border-red-200 p-4 rounded-md">
-                <p className="text-sm text-red-700 whitespace-pre-line">
+              <div className="col-span-2 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 p-4 rounded-md">
+                <p className="text-sm text-red-700 dark:text-red-300 whitespace-pre-line">
                   {info.note}
                 </p>
               </div>
@@ -110,11 +128,11 @@ function ViewDetails({ active, data }) {
           {/* EXTRAS */}
           <Section title="Extras">
             {extras.length === 0 ? (
-              <p className="text-sm text-gray-500 col-span-2">
-                No extras selected.
+              <p className="text-sm text-gray-500 dark:text-gray-400 col-span-2">
+                No extras.
               </p>
             ) : (
-              <ul className="col-span-2 space-y-1 text-sm text-gray-700">
+              <ul className="col-span-2 space-y-1 text-sm text-gray-700 dark:text-gray-300">
                 {extras.map((x, i) => (
                   <li key={i}>
                     {x.quantity ? `${x.quantity} × ` : ""}
@@ -127,10 +145,10 @@ function ViewDetails({ active, data }) {
         </div>
 
         {/* ===== FOOTER ===== */}
-        <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50">
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <button
             onClick={() => setShowForm(null)}
-            className="px-5 py-2 text-sm font-medium border rounded-md text-gray-700 bg-white hover:bg-gray-100"
+            className="px-5 py-2 text-sm font-medium border rounded-md text-gray-700 bg-white hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700"
           >
             Close
           </button>
@@ -144,8 +162,10 @@ function ViewDetails({ active, data }) {
 
 function Section({ title, children }) {
   return (
-    <div className="border rounded-lg p-4 bg-gray-50">
-      <h4 className="text-sm font-semibold text-gray-800 mb-3">{title}</h4>
+    <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+      <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3">
+        {title}
+      </h4>
       <div className="grid grid-cols-2 gap-y-3 gap-x-6">{children}</div>
     </div>
   );
@@ -154,26 +174,32 @@ function Section({ title, children }) {
 function Info({ label, value }) {
   return (
     <div>
-      <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
-      <p className="text-sm font-medium text-gray-800">{value ?? "-"}</p>
+      <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+        {label}
+      </p>
+      <p className="text-sm font-medium text-gray-800 dark:text-gray-100">
+        {value ?? "-"}
+      </p>
     </div>
   );
 }
 
 function HighlightInfo({ label, value, type }) {
   const styles = {
-    checkin: "bg-green-50 border-green-400 text-green-800",
-    checkout: "bg-blue-50 border-blue-400 text-blue-800",
+    checkin:
+      "bg-green-50 border-green-400 text-green-800 dark:bg-green-900 dark:border-green-600 dark:text-green-300",
+    checkout:
+      "bg-blue-50 border-blue-400 text-blue-800 dark:bg-blue-900 dark:border-blue-600 dark:text-blue-300",
   };
 
   return (
     <div
       className={`col-span-1 rounded-md border-l-4 p-3 ${styles[type] || ""}`}
     >
-      <p className="text-xs uppercase tracking-wide font-semibold opacity-70">
+      <p className="text-xs uppercase tracking-wide font-semibold opacity-70 dark:text-gray-300">
         {label}
       </p>
-      <p className="text-sm font-bold">{value ?? "-"}</p>
+      <p className="text-sm font-bold dark:text-gray-100">{value ?? "-"}</p>
     </div>
   );
 }

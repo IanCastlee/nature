@@ -191,27 +191,32 @@ function ViewRoomPage() {
             </div>
           </div>
 
-          <div className=" flex flex-flex-row flex-wrap justify-start gap-5">
-            <span className="inline-flex items-center text-lg dark:text-gray-100 text-gray-700 ">
-              <icons.LuUsers className="mr-1 text-blue-400 dark:text-blue-400" />{" "}
+          <div className="flex flex-wrap justify-start gap-5">
+            {/* Capacity */}
+            <span className="inline-flex items-center text-xs lg:text-lg dark:text-gray-100 text-gray-700">
+              <icons.LuUsers className="mr-1 text-blue-400 dark:text-blue-400 text-xs lg:text-base" />
               {capacity} Person
             </span>
 
-            <span className="inline-flex items-center text-lg dark:text-gray-100 text-gray-700">
-              <icons.GiDuration className="mr-1 text-blue-400 dark:text-blue-400" />{" "}
+            {/* Duration */}
+            <span className="inline-flex items-center text-xs lg:text-lg dark:text-gray-100 text-gray-700">
+              <icons.GiDuration className="mr-1 text-blue-400 dark:text-blue-400 text-xs lg:text-base" />
               {duration} hrs
             </span>
-            <span className="inline-flex items-center text-lg dark:text-gray-100 text-gray-700">
-              <icons.IoIosTimer className="mr-1 text-blue-400 dark:text-blue-400" />{" "}
+
+            {/* Time In/Out */}
+            <span className="inline-flex items-center text-xs lg:text-lg dark:text-gray-100 text-gray-700">
+              <icons.IoIosTimer className="mr-1 text-blue-400 dark:text-blue-400 text-xs lg:text-base" />
               {time_in_out}
             </span>
           </div>
         </section>
         <section className="w-full px-2 md:px-2 lg:px-[130px] mt-4">
           <div className="w-full flex flex-col lg:flex-row gap-8 mt-6">
+            {/* Amenities */}
             {parsedAmenities.filter((a) => a && a.trim() !== "").length > 0 && (
               <ul className="flex-1">
-                <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">
+                <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-xs lg:text-lg">
                   Amenities
                 </h3>
                 {parsedAmenities
@@ -219,7 +224,7 @@ function ViewRoomPage() {
                   .map((amenity, idx) => (
                     <li
                       key={idx}
-                      className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
+                      className="text-[10px] lg:text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
                     >
                       {amenity}
                     </li>
@@ -227,10 +232,11 @@ function ViewRoomPage() {
               </ul>
             )}
 
+            {/* Inclusions */}
             {parsedInclusions.filter((i) => i && i.trim() !== "").length >
               0 && (
               <ul className="flex-1">
-                <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">
+                <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-xs lg:text-lg">
                   Room Inclusions
                 </h3>
                 {parsedInclusions
@@ -238,7 +244,7 @@ function ViewRoomPage() {
                   .map((inclusion, idx) => (
                     <li
                       key={idx}
-                      className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
+                      className="text-[10px] lg:text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
                     >
                       {inclusion}
                     </li>
@@ -246,9 +252,10 @@ function ViewRoomPage() {
               </ul>
             )}
 
+            {/* Extras */}
             {parsedExtras.filter((e) => e && e.trim() !== "").length > 0 && (
               <ul className="flex-1">
-                <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-lg">
+                <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-xs lg:text-lg">
                   Room Extras
                 </h3>
                 {parsedExtras
@@ -256,7 +263,7 @@ function ViewRoomPage() {
                   .map((extra, idx) => (
                     <li
                       key={idx}
-                      className="text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
+                      className="text-[10px] lg:text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
                     >
                       {extra}
                     </li>
@@ -266,12 +273,16 @@ function ViewRoomPage() {
           </div>
         </section>
 
+        {/* Description */}
         <section className="w-full flex flex-col px-2 md:px-2 lg:px-[130px] mt-4">
           <div className="w-full border-t dark:border-gray-800 mt-4 pt-4">
-            <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50">
+            <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-xs lg:text-lg">
               * Description
             </h3>
-            <p className="dark:text-white text-lg">{description}</p>
+
+            <p className="dark:text-white text-xs lg:text-lg leading-relaxed">
+              {description}
+            </p>
           </div>
         </section>
       </main>

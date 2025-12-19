@@ -284,8 +284,7 @@ function AvailableFunctionHall() {
           onCancel={() => setDeleteItem(null)}
           label="Yes, Set as not active"
           label2="not-active"
-          label3=" This will make this funtion hall unavailable, but not delete it
-            permanently."
+          label3=" This action will mark this function hall as unavailable without permanently deleting it."
           onConfirm={() => {
             setInactive({
               id: deleteItem?.fh_id,

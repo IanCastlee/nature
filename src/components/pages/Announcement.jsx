@@ -1,13 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { icons } from "../../constant/icon";
 import { motion } from "framer-motion";
 import useGetData from "../../hooks/useGetData";
+import { useAnnouncementStore } from "../../store/useRoomStore";
 
 function Announcement({ close }) {
   // fetch active announcements
   const { data, loading, error } = useGetData(
     `/admin/announcement.php?status=active`
   );
+
+  const setAnnouncementCount = useAnnouncementStore(
+    (state) => state.setAnnouncementCount
+  );
+
+  // ⭐ Update announcement count whenever data loads
+  useEffect(() => {
+    if (data) {
+      setAnnouncementCount(data.length);
+    }
+  }, [data, setAnnouncementCount]);
 
   return (
     <div className="w-full h-screen bg-black/50 fixed top-0 left-0 z-50 flex justify-center items-center">
