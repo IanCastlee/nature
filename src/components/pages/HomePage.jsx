@@ -28,13 +28,11 @@ const imageKeys = ["hero1", "hero1_m", "hero2", "hero2_m", "hero3", "hero3_m"];
 
 function HomePage() {
   const navigate = useNavigate();
-  const [showChatBox, setShowChatBox] = React.useState(false);
 
   //==============//
   //  DATA FETCH  //
   //==============//
 
-  // fetch fh data
   const {
     data: dataFh,
     loading: loadingFh,
@@ -42,23 +40,17 @@ function HomePage() {
     error: errorFh,
   } = useGetData(`/admin/functionhall.php?status=active`);
 
-  // Get token from sessionStorage
   const authStorage = sessionStorage.getItem("auth-storage");
-
   const parsedStorage = JSON.parse(authStorage);
   const token = parsedStorage?.state?.token;
 
-  // Pass token in Axios headers
   const { data, loading, refetch, error } = useGetData(
     "/admin/room-category.php",
     {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     }
   );
 
-  // fetch cottage data
   const {
     data: dataCottage,
     loading: loadingCottage,
@@ -66,7 +58,6 @@ function HomePage() {
     error: errorCottage,
   } = useGetData(`/admin/cottage.php?status=active`);
 
-  // Preload images
   useEffect(() => {
     imageKeys.forEach((key) => {
       const img = new Image();
@@ -74,14 +65,17 @@ function HomePage() {
     });
   }, []);
 
-  // fetch fh data
   const {
     data: heroData,
     loading: loadingHero,
     refetch: refetchHero,
     error: errorHero,
   } = useGetData(`/admin/admin_setting.php`);
+
   const heroImages = heroData?.hero_images || [];
+
+  // Only enable loop if there are at least 2 slides
+  const swiperLoop = heroImages.length > 1;
 
   return (
     <>
@@ -91,9 +85,9 @@ function HomePage() {
             modules={[Autoplay, EffectFade]}
             effect="fade"
             autoplay={{ delay: 4000, disableOnInteraction: false }}
-            loop={true}
+            loop={swiperLoop}
             speed={1000}
-            className="w-full h-screen" // important for full-height slider
+            className="w-full h-screen"
           >
             {loadingHero && (
               <div className="flex items-center justify-center h-screen">
@@ -141,6 +135,15 @@ function HomePage() {
                       rooms — perfect for families, couples, and solo travelers
                       seeking rest and rejuvenation.
                     </p>
+
+                    <div className="w-full flex flex-row lg:justify-start justify-end items-start lg:px-0 px-4 lg:mb-0 mb-4">
+                      <a
+                        href="#room-categories"
+                        className="bg-blue-600 hover:bg-blue-700 text-white text-sm lg:mt-4 mt-2 p-2 rounded-md inline-block"
+                      >
+                        Show Rooms
+                      </a>
+                    </div>
                   </figcaption>
                 </SwiperSlide>
               ))}
@@ -168,13 +171,11 @@ function HomePage() {
           <WhyChooseUs />
         </Suspense>
 
-        <section className="w-full dark:bg-black mt-10">
+        {/* Room Categories Section */}
+        <section id="room-categories" className="w-full dark:bg-black mt-10">
           <div className="flex flex-col justify-center items-center">
             <SubtTitle title="OUR ROOMS" />
-            <Title
-              title=" 
-              CHOOSE THE TYPE THAT SUITS YOU"
-            />
+            <Title title="CHOOSE THE TYPE THAT SUITS YOU" />
           </div>
 
           <div className="w-full flex flex-row flex-wrap px-2 md:px-2 lg:px-[130px] justify-center gap-2">
@@ -210,6 +211,7 @@ function HomePage() {
           </div>
         </section>
 
+        {/* Function Halls Section */}
         <section className="w-full flex flex-col dark:bg-black mt-24">
           <div className="flex flex-col justify-center items-center">
             <div className="flex flex-row justify-center items-center gap-2">
@@ -218,7 +220,7 @@ function HomePage() {
             <Title title="SPACIOUS AND STYLISH FUNCTION HALLS FOR YOU" />
           </div>
 
-          <div className="w-full flex flex-row flex-wrap  px-2  md:px-2 lg:px-[130px] justify-center gap-2">
+          <div className="w-full flex flex-row flex-wrap px-2 md:px-2 lg:px-[130px] justify-center gap-2">
             {loadingFh && (
               <div className="text-sm text-blue-600 mt-4">
                 Loading function halls...
@@ -230,6 +232,7 @@ function HomePage() {
                 {errorFh.message || "Something went wrong."}
               </div>
             )}
+
             {dataFh &&
               dataFh.slice(0, 2).map((item, index) => (
                 <Suspense
@@ -259,6 +262,7 @@ function HomePage() {
           )}
         </section>
 
+        {/* Cottages Section */}
         <section className="w-full flex flex-col dark:bg-black mt-28">
           <div className="flex flex-col justify-center items-center">
             <div className="flex flex-row justify-center items-center gap-2">
@@ -267,7 +271,7 @@ function HomePage() {
             <Title title="FIND THE PERFECT COTTAGE FOR YOUR STAY" />
           </div>
 
-          <div className="w-full flex flex-row flex-wrap md:flex-nowrap lg:flex-nowrap px-2  md:px-2 lg:px-[130px] justify-center gap-2">
+          <div className="w-full flex flex-row flex-wrap md:flex-nowrap lg:flex-nowrap px-2 md:px-2 lg:px-[130px] justify-center gap-2">
             {loadingCottage && (
               <div className="text-sm text-blue-600 mt-4">
                 Loading cottages...

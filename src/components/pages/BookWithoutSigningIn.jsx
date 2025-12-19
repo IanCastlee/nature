@@ -182,10 +182,35 @@ function BookWithoutSigningIn() {
   });
 
   const handleSubmitBooking = async () => {
-    if (isSubmitting) return; // prevent multiple clicks
-    setIsSubmitting(true); // disable button immediately
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     try {
+      // Validation with toast messages instead of alert
+      if (!form.firstname?.trim()) {
+        setToast({ message: "Please enter your first name.", type: "error" });
+        setIsSubmitting(false);
+        return;
+      }
+      if (!form.lastname?.trim()) {
+        setToast({ message: "Please enter your last name.", type: "error" });
+        setIsSubmitting(false);
+        return;
+      }
+      if (!form.phone?.trim()) {
+        setToast({ message: "Please enter your phone number.", type: "error" });
+        setIsSubmitting(false);
+        return;
+      }
+      if (!form.terms) {
+        setToast({
+          message: "You must accept the terms and conditions.",
+          type: "error",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const nights = getNumberOfNights();
 
       const extrasTotal = addedExtras.reduce(
@@ -193,7 +218,7 @@ function BookWithoutSigningIn() {
         0
       );
 
-      //  REMEMBER ME — Save or Remove Local Storage
+      // REMEMBER ME — Save or Remove Local Storage
       if (form.remember) {
         localStorage.setItem("firstname", form.firstname);
         localStorage.setItem("lastname", form.lastname);
@@ -204,11 +229,6 @@ function BookWithoutSigningIn() {
         localStorage.removeItem("lastname");
         localStorage.removeItem("phone");
         localStorage.removeItem("remember_info");
-      }
-
-      if (!form.terms) {
-        setIsSubmitting(false); // re-enable if terms not checked
-        return;
       }
 
       const payload = {
@@ -231,12 +251,14 @@ function BookWithoutSigningIn() {
         total_price: nights * Number(price) + extrasTotal,
       };
 
-      // Await if submit returns a promise
       await submit(payload);
     } catch (error) {
-      console.error(error);
+      setToast({
+        message: error.message || "Failed to submit booking",
+        type: "error",
+      });
     } finally {
-      setIsSubmitting(false); // always re-enable after submission
+      setIsSubmitting(false);
     }
   };
 
@@ -764,7 +786,6 @@ function BookWithoutSigningIn() {
                       value={form.firstname}
                       onChange={handleChange}
                       className="w-full text-sm"
-                      required
                     />
                     <Input
                       label="Lastname"
@@ -772,7 +793,6 @@ function BookWithoutSigningIn() {
                       value={form.lastname}
                       onChange={handleChange}
                       className="w-full text-sm"
-                      required
                     />
                   </div>
 
@@ -782,7 +802,6 @@ function BookWithoutSigningIn() {
                     value={form.phone}
                     onChange={handleChange}
                     className="w-full mb-3 text-sm"
-                    required
                   />
 
                   {/* REMEMBER ME */}

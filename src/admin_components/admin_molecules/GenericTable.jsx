@@ -8,7 +8,7 @@ function GenericTable({
   noDataComponent,
 }) {
   return (
-    <div className="overflow-x-auto font-sans">
+    <div className="overflow-x-auto font-sans bg-white dark:bg-gray-800 rounded-lg shadow-md">
       {" "}
       {/* Global font applied here */}
       <table className="min-w-full border-collapse border border-gray-300">
@@ -17,7 +17,7 @@ function GenericTable({
             {columns.map((col, index) => (
               <th
                 key={index}
-                className={`p-2 dark:text-gray-100 text-left font-semibold text-[10px] border dark:border-gray-700 border-gray-300 ${
+                className={`px-2 py-3 dark:text-gray-100 text-left font-semibold text-[10px] border dark:border-gray-700 border-gray-300 ${
                   col.className || ""
                 }`}
                 style={

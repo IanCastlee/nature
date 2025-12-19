@@ -78,7 +78,7 @@ function RoomCategoriesPage() {
     text-xs 
     px-3 py-1.5 rounded-md inline-block
     bg-white text-black
-    dark:bg-gray-800 dark:text-white
+    dark:bg-black dark:text-white
   "
             >
               Business Hours: <br /> 8:00 AM – 5:00 PM (Every Day)

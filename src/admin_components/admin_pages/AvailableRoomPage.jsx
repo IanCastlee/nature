@@ -47,7 +47,6 @@ function AvailableRoomPage() {
     price: "",
     capacity: "",
     duration: "",
-    duration: "",
     time_in_out: "",
     description: "",
     images: [],
@@ -543,7 +542,7 @@ function AvailableRoomPage() {
           onCancel={() => setDeleteItem(null)}
           label="Yes, Set as Unavailable"
           label2="unavailable"
-          label3="This will mark this room as unavailable, but it will not be deleted permanently."
+          label3="This action will mark the room as unavailable without permanently deleting it."
           onConfirm={() => {
             setInactive({
               id: deleteItem?.room_id,

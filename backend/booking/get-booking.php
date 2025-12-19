@@ -20,7 +20,7 @@ if ($method === "GET") {
 
     $baseSql = "
         SELECT 
-            rb.booking_id, rb.user_id, rb.facility_id, rb.fullname, rb.phone, rb.start_date, rb.end_date,  rb.bookedDate,
+            rb.booking_id, rb.user_id, rb.facility_id, rb.fullname, rb.phone, rb.start_date, rb.end_date,  rb.bookedDate, rb.updated_at,
             rb.nights, rb.status, rb.price AS booking_price, rb.paid AS booking_paid,
 
             u.firstname, u.lastname, u.email,
@@ -66,7 +66,9 @@ if ($method === "GET") {
         $baseSql .= " WHERE " . implode(" AND ", $conditions);
     }
 
-    $baseSql .= " ORDER BY rb.booking_id DESC";
+    // $baseSql .= " ORDER BY rb.booking_id DESC";
+    $baseSql .= " ORDER BY rb.updated_at DESC";
+
 
     $stmt = $conn->prepare($baseSql);
     if (!empty($params)) {

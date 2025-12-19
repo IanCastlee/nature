@@ -32,9 +32,10 @@ if ($method === "GET") {
             resched_paid_payment, 
             refund_charge, 
             rescheduled_booking_id,
-            created_at
+            created_at,
+            updated_at
         FROM resched_log_fh
-        ORDER BY created_at DESC
+        ORDER BY updated_at DESC
     ");
     
     if ($stmt->execute()) {

@@ -82,7 +82,7 @@ if ($method === "POST") {
     $description = $_POST['description'] ?? '';
 
     $uploadDir = "../uploads/function_hall/";
-    $uploadDir_PS = "../uploads/photoSphere/";
+    $uploadDir_PS = "../uploads/photosphere/";
     $filename = null;
     $filename_PS = null;
 

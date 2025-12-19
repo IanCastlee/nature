@@ -178,7 +178,17 @@ const Dashboard = () => {
     },
   };
 
-  console.log("chartInfo:", chartInfo);
+  const {
+    data: yearlyData,
+    loading: yearlyLoading,
+    refetch: refetchYearly,
+  } = useGetData(`/admin/get-years.php`);
+
+  useEffect(() => {
+    if (yearlyData?.length) {
+      setSelectedYear(yearlyData[0]);
+    }
+  }, [yearlyData]);
 
   return (
     <>
@@ -269,19 +279,14 @@ const Dashboard = () => {
             onChange={(e) => setSelectedYear(e.target.value)}
             className="border dark:bg-gray-900 dark:border-gray-500 dark:text-gray-200 rounded px-2 py-1 text-xs"
           >
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-            <option value="2026">2027</option>
-            <option value="2026">2028</option>
-            <option value="2026">2029</option>
-            <option value="2026">2030</option>
-            <option value="2026">2031</option>
-            <option value="2026">2032</option>
-            <option value="2026">2033</option>
-            <option value="2026">2034</option>
-            <option value="2026">2035</option>
+            {yearlyLoading && <option>Loading...</option>}
+
+            {!yearlyLoading &&
+              yearlyData?.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -290,7 +295,19 @@ const Dashboard = () => {
           {chartLoading ? (
             <p>Loading chart...</p>
           ) : (
-            <Line data={chartData} options={options} />
+            <>
+              <Line data={chartData} options={options} />
+
+              {/* Yearly Income */}
+              <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  Yearly Income ({selectedYear})
+                </span>
+                <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                  ₱{Number(chartInfo?.totalPaid || 0).toLocaleString()}
+                </span>
+              </div>
+            </>
           )}
         </div>
       </div>

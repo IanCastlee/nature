@@ -387,6 +387,7 @@ function AdminBookingHistory() {
         <ReSchedBooking
           booking={reschedItem}
           onClose={() => setShowResched(false)}
+          refetchBooking={refetch}
         />
       )}
     </>

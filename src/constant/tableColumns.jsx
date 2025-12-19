@@ -160,7 +160,7 @@ export const availableCottageColumns = [
 
 //booking
 export const bookingPending = [
-  { title: "ID", key: "booking_id" },
+  { title: "No.", key: "booking_id" },
   { title: "Guest", key: "fullname" },
   { title: "Phone", key: "phone" },
   { title: "Room Name", key: "room_name" },
@@ -179,8 +179,8 @@ export const bookingPending = [
 ];
 
 export const bookingApproved = [
-  { title: "ID", key: "booking_id" },
-  { title: "Name", key: "fullname" },
+  { title: "No.", key: "booking_id" },
+  { title: "Guest", key: "fullname" },
   { title: "Phone", key: "phone" },
   { title: "Room Name", key: "room_name" },
   { title: "Check-In", key: "start_date" },
@@ -199,9 +199,9 @@ export const bookingApproved = [
 ];
 
 export const bookingHistory = [
-  { title: "ID", key: "booking_id" },
+  { title: "No.", key: "booking_id" },
 
-  { title: "Name", key: "fullname" },
+  { title: "Guest", key: "fullname" },
   { title: "Phone", key: "phone" },
   { title: "Room Name", key: "room_name" },
   { title: "Check-In", key: "start_date" },
@@ -220,9 +220,9 @@ export const bookingHistory = [
 ];
 
 export const bookingDeclined = [
-  { title: "ID", key: "booking_id" },
+  { title: "No.", key: "booking_id" },
 
-  { title: "Name", key: "fullname" },
+  { title: "Guest", key: "fullname" },
   { title: "Phone", key: "phone" },
   { title: "Room Name", key: "room_name" },
   { title: "Check-In", key: "start_date" },
@@ -240,9 +240,9 @@ export const bookingDeclined = [
 ];
 
 export const booking = [
-  { title: "ID", key: "booking_id" },
+  { title: "No.", key: "booking_id" },
 
-  { title: "Name", key: "fullname" },
+  { title: "Guest", key: "fullname" },
   { title: "Email", key: "email" },
   { title: "Room Name", key: "room_name" },
   { title: "Check-In", key: "start_date" },
@@ -258,23 +258,40 @@ export const booking = [
   { title: "Status", key: "status" },
 ];
 
+// export const bookingRescheduled = [
+//   { title: "No.", key: "rescheduled_booking_id" },
+//   { title: "Guest", key: "fullname" },
+//   { title: "Phone", key: "phone" },
+//   { title: "Previous Room", key: "prev_room" },
+//   { title: "New Room", key: "new_room" },
+//   { title: "Original Stay", key: "sched_date" }, // start & end of previous booking
+//   { title: "Rescheduled Stay", key: "resched_to" }, // start & end of new booking
+//   { title: "Original Price", key: "sched_total_price" },
+//   { title: "Rescheduled Price", key: "resched_total_price" },
+//   { title: "Paid (Original)", key: "sched_paid_payment" },
+//   { title: "Paid (Rescheduled)", key: "resched_paid_payment" },
+//   { title: "Refund / Charge", key: "refund_charge" },
+//   { title: "Created At", key: "created_at" },
+// ];
+
 export const bookingRescheduled = [
-  { title: "Full Name", key: "fullname" },
-  { title: "Phone", key: "phone" },
+  { title: "No.", key: "rescheduled_booking_id" },
+  { title: "Guest Name", key: "fullname" },
+  { title: "Phone Number", key: "phone" },
   { title: "Previous Room", key: "prev_room" },
   { title: "New Room", key: "new_room" },
-  { title: "Original Stay", key: "sched_date" }, // start & end of previous booking
-  { title: "Rescheduled Stay", key: "resched_to" }, // start & end of new booking
-  { title: "Original Price", key: "sched_total_price" },
-  { title: "Rescheduled Price", key: "resched_total_price" },
-  { title: "Paid (Original)", key: "sched_paid_payment" },
-  { title: "Paid (Rescheduled)", key: "resched_paid_payment" },
-  { title: "Refund / Charge", key: "refund_charge" },
-  { title: "Created At", key: "created_at" },
+  { title: "Original Stay Dates", key: "sched_date" }, // start & end of previous booking
+  { title: "Rescheduled Stay Dates", key: "resched_to" }, // start & end of new booking
+  { title: "Original Total Price", key: "sched_total_price" },
+  { title: "Rescheduled Total Price", key: "resched_total_price" },
+  { title: "Paid (Original Booking)", key: "sched_paid_payment" },
+  { title: "Paid (Rescheduled Booking)", key: "resched_paid_payment" },
+  { title: "Refund / Additional Charge", key: "refund_charge" },
+  { title: "Date Rescheduled", key: "created_at" },
 ];
 
 export const bookingRescheduledFh = [
-  { title: "Booking ID", key: "rescheduled_booking_id" },
+  { title: "No.", key: "rescheduled_booking_id" },
 
   { title: "Full Name", key: "fullname" },
   { title: "Phone", key: "phone" },
@@ -332,7 +349,11 @@ export const users = [
 //function hall booking
 export const fhbooking = [
   {
-    title: "Fullname",
+    title: "No.",
+    key: "id",
+  },
+  {
+    title: "Guest",
     key: "fullname",
   },
   {
@@ -368,7 +389,11 @@ export const fhbooking = [
 //function hall approved booking
 export const fhbookingApproved = [
   {
-    title: "Fullname",
+    title: "No.",
+    key: "id",
+  },
+  {
+    title: "Guest",
     key: "fullname",
   },
   {
@@ -400,7 +425,11 @@ export const fhbookingApproved = [
 //function hall declined booking
 export const fhbookingDeclined = [
   {
-    title: "Fullname",
+    title: "No.",
+    key: "id",
+  },
+  {
+    title: "Guest",
     key: "fullname",
   },
   {
@@ -431,7 +460,11 @@ export const fhbookingDeclined = [
 //function hall declined booking
 export const fhbookingHistory = [
   {
-    title: "Fullname",
+    title: "No.",
+    key: "id",
+  },
+  {
+    title: "Guest",
     key: "fullname",
   },
   {

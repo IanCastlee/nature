@@ -3,6 +3,7 @@ import useGetData from "../../hooks/useGetData";
 import useFormSubmit from "../../hooks/useFormSubmit";
 import { uploadUrl } from "../../utils/fileURL";
 import axiosInstance from "../../utils/axiosInstance";
+import Input from "../../components/atoms/Input";
 
 // Simple Toaster component
 function Toaster({ message, type = "success", onClose, duration = 3000 }) {
@@ -96,195 +97,154 @@ function AdminSetting() {
     );
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-gray-800">
-        Admin Settings
-      </h1>
-
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6 bg-white p-6 rounded-lg shadow-md"
-      >
-        {/* Email */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-10">
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+            Admin Settings
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Manage website content and contact information
+          </p>
         </div>
 
-        {/* Globe No */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">
-            Globe No
-          </label>
-          <input
-            type="text"
-            name="globe_no"
-            value={formData.globe_no}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-
-        {/* Smart No */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">
-            Smart No
-          </label>
-          <input
-            type="text"
-            name="smart_no"
-            value={formData.smart_no}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-
-        {/* Social Links */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">
-            Facebook
-          </label>
-          <input
-            type="text"
-            name="fb"
-            value={formData.fb}
-            onChange={handleChange}
-            placeholder="Facebook URL (optional)"
-            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-          <label className="block text-gray-700 font-medium mb-2 mt-2">
-            Instagram
-          </label>
-          <input
-            type="text"
-            name="ig"
-            value={formData.ig}
-            onChange={handleChange}
-            placeholder="Instagram URL (optional)"
-            className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-
-        {/* Logo */}
-        {/* <div>
-          <label className="block text-gray-700 font-medium mb-2">Logo</label>
-          <input
-            type="file"
-            name="logo"
-            onChange={handleChange}
-            className="block mb-2"
-          />
-          {data.logo && (
-            <img
-              src={`${uploadUrl.uploadurl}/logo/${data.logo}`}
-              alt="logo"
-              className="w-32 h-auto rounded border"
-            />
-          )}
-        </div> */}
-
-        {/* Hero Images */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">
-            Hero Images (max 5)
-          </label>
-          <input
-            type="file"
-            name="heroImages"
-            multiple
-            onChange={handleChange}
-            className="block mb-2"
-          />
-          <div className="flex flex-wrap gap-4">
-            {existingHeroImages.map((img) => (
-              <div key={img.id} className="relative w-24 h-24">
-                <img
-                  src={`${uploadUrl.uploadurl}/hero/${img.image}`}
-                  alt="hero"
-                  className="w-full h-full object-cover rounded border"
-                />
-                <button
-                  type="button"
-                  onClick={async () => {
-                    if (window.confirm("Delete this image?")) {
-                      try {
-                        const form = new FormData();
-                        form.append("delete_hero_id", img.id);
-
-                        const res = await axiosInstance.post(
-                          "/admin/admin_setting.php",
-                          form
-                        );
-
-                        if (res.data.success) {
-                          setExistingHeroImages((prev) =>
-                            prev.filter((i) => i.id !== img.id)
-                          );
-                          setToast({
-                            message: "Hero image deleted!",
-                            type: "success",
-                          });
-                        } else {
-                          setToast({
-                            message:
-                              res.data.message || "Failed to delete image",
-                            type: "error",
-                          });
-                        }
-                      } catch {
-                        setToast({
-                          message: "Something went wrong while deleting.",
-                          type: "error",
-                        });
-                      }
-                    }
-                  }}
-                  className="absolute top-0 right-0 bg-red-600 text-white text-xs px-1 py-0.5 rounded"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-
-            {heroImages.map((file, i) => (
-              <div
-                key={i}
-                className="w-24 h-24 flex items-center justify-center text-sm text-gray-700 border rounded bg-gray-100"
-              >
-                {file.name}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Submit */}
-        <button
-          type="submit"
-          disabled={formLoading}
-          className={`w-full py-2 px-4 rounded text-white font-semibold ${
-            formLoading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
-          }`}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg divide-y divide-gray-200 dark:divide-gray-700"
         >
-          {formLoading ? "Saving..." : "Save Settings"}
-        </button>
+          {/* CONTACT INFO */}
+          <section className="p-6">
+            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+              Contact Information
+            </h2>
 
-        {formError && <p className="text-red-500 mt-2">{formError.message}</p>}
-      </form>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <Input
+                label="Email"
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+              <Input
+                label="Globe Number"
+                name="globe_no"
+                value={formData.globe_no}
+                onChange={handleChange}
+              />
+              <Input
+                label="Smart Number"
+                name="smart_no"
+                value={formData.smart_no}
+                onChange={handleChange}
+              />
+            </div>
+          </section>
 
-      {/* Toast */}
-      {toast && (
-        <Toaster
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+          {/* SOCIAL LINKS */}
+          <section className="p-6">
+            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+              Social Media
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <Input
+                label="Facebook URL"
+                name="fb"
+                value={formData.fb}
+                onChange={handleChange}
+                placeholder="https://facebook.com/..."
+              />
+              <Input
+                label="Instagram URL"
+                name="ig"
+                value={formData.ig}
+                onChange={handleChange}
+                placeholder="https://instagram.com/..."
+              />
+            </div>
+          </section>
+
+          {/* HERO IMAGES */}
+          <section className="p-6">
+            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+              Hero Images
+            </h2>
+
+            <input
+              type="file"
+              name="heroImages"
+              multiple
+              onChange={handleChange}
+              className="block w-full text-sm text-gray-600
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-md file:border-0
+              file:bg-blue-50 file:text-blue-700
+              hover:file:bg-blue-100"
+            />
+
+            <div className="mt-4 grid grid-cols-3 sm:grid-cols-5 gap-4">
+              {existingHeroImages.map((img) => (
+                <div
+                  key={img.id}
+                  className="relative group rounded-lg overflow-hidden shadow"
+                >
+                  <img
+                    src={`${uploadUrl.uploadurl}/hero/${img.image}`}
+                    alt="hero"
+                    className="w-full h-24 object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!window.confirm("Delete this image?")) return;
+                      const form = new FormData();
+                      form.append("delete_hero_id", img.id);
+                      const res = await axiosInstance.post(
+                        "/admin/admin_setting.php",
+                        form
+                      );
+                      if (res.data.success) {
+                        setExistingHeroImages((prev) =>
+                          prev.filter((i) => i.id !== img.id)
+                        );
+                        setToast({ message: "Image deleted", type: "success" });
+                      }
+                    }}
+                    className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* SUBMIT */}
+          <section className="p-6 bg-gray-50 dark:bg-gray-700 rounded-b-xl">
+            <button
+              type="submit"
+              disabled={formLoading}
+              className="w-full md:w-auto px-6 py-2 rounded-md text-white font-medium bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+            >
+              {formLoading ? "Saving..." : "Save Changes"}
+            </button>
+            {formError && (
+              <p className="text-red-500 text-sm mt-2">{formError.message}</p>
+            )}
+          </section>
+        </form>
+
+        {/* TOAST */}
+        {toast && (
+          <Toaster
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
+        )}
+      </div>
     </div>
   );
 }

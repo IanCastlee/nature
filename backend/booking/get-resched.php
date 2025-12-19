@@ -16,10 +16,10 @@ if ($method === "GET") {
     // ===============================
     $stmt = $conn->prepare("
         SELECT id, fullname, phone, prev_room, new_room, sched_date, resched_to, 
-               sched_total_price, resched_total_price, sched_paid_payment, resched_paid_payment, 
-               refund_charge, created_at
+               sched_total_price, resched_total_price, sched_paid_payment, resched_paid_payment, rescheduled_booking_id,
+               refund_charge, created_at, updated_at
         FROM resched_log
-        ORDER BY created_at DESC
+        ORDER BY updated_at DESC
     ");
     
     if ($stmt->execute()) {

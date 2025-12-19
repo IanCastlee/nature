@@ -2,39 +2,49 @@
 include("../header.php");
 include("../dbConn.php");
 
-// Get year from query param
-$year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
+// Check if year is provided
+$hasYear = isset($_GET['year']) && is_numeric($_GET['year']);
+$year = $hasYear ? intval($_GET['year']) : null;
 
-// Initialize monthly counts array (1-12)
+// Initialize monthly counts array (1–12)
 $monthlyPaidCounts = array_fill(1, 12, 0);
 $totalPaid = 0;
 
-// Fetch paid bookings for the year
-$sql = "SELECT start_date, paid FROM room_booking 
-        WHERE YEAR(start_date) = ? AND paid > 0";
+// Base SQL
+$sql = "SELECT start_date, paid FROM room_booking WHERE paid > 0";
+
+// Add year filter ONLY if provided
+if ($hasYear) {
+    $sql .= " AND YEAR(start_date) = ?";
+}
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $year);
+
+// Bind year if needed
+if ($hasYear) {
+    $stmt->bind_param("i", $year);
+}
+
 $stmt->execute();
 $result = $stmt->get_result();
 
 while ($row = $result->fetch_assoc()) {
-    $month = (int)date('n', strtotime($row['start_date'])); // 1-12
-    $monthlyPaidCounts[$month] += $row['paid']; // sum paid per month
+    $month = (int) date('n', strtotime($row['start_date']));
+    $monthlyPaidCounts[$month] += $row['paid'];
     $totalPaid += $row['paid'];
 }
 
-// Convert monthly array to 0-indexed for JS chart
+// Convert to 0-indexed array for JS chart
 $monthlyPaidCountsIndexed = [];
 for ($i = 1; $i <= 12; $i++) {
     $monthlyPaidCountsIndexed[] = $monthlyPaidCounts[$i];
 }
 
-// Return JSON in a way compatible with useGetData
+// Response
 echo json_encode([
     'success' => true,
     'data' => [
-        'year' => $year,
+        'year' => $hasYear ? $year : 'ALL',
         'totalPaid' => $totalPaid,
         'monthlyPaid' => $monthlyPaidCountsIndexed
     ]

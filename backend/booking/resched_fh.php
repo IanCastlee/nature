@@ -10,14 +10,16 @@ if ($_SERVER['REQUEST_METHOD'] !== "POST") {
     exit;
 }
 
+// Accept JSON
 if (isset($_SERVER["CONTENT_TYPE"]) && strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
     $input = json_decode(file_get_contents("php://input"), true);
     $_POST = $input;
 }
 
-$booking_id = $_POST["booking_id"] ?? null;
-$status     = $_POST["status"] ?? null;
-$difference = $_POST["difference"] ?? 0;
+$booking_id       = $_POST["booking_id"] ?? null;
+$prev_booking_id  = $_POST["prev_booking_id"] ?? null; // 🔥 NEW
+$status           = $_POST["status"] ?? null;
+$difference       = $_POST["difference"] ?? 0;
 
 if (!$booking_id || !$status) {
     http_response_code(400);
@@ -27,12 +29,13 @@ if (!$booking_id || !$status) {
 
 $response = [];
 
-// =====================================
-// UPDATE BOOKING STATUS
-// =====================================
+/*==============================================
+ UPDATE CURRENT BOOKING
+===============================================*/
+
 switch ($status) {
 
-    case "resched":
+    case "resched": // OLD booking
         $stmt = $conn->prepare("
             UPDATE other_facilities_booking
             SET status = 'resched',
@@ -42,7 +45,7 @@ switch ($status) {
         $stmt->bind_param("di", $difference, $booking_id);
         break;
 
-    case "rescheduled":
+    case "rescheduled": // NEW booking
         $stmt = $conn->prepare("
             UPDATE other_facilities_booking
             SET status = 'rescheduled',
@@ -70,98 +73,104 @@ if (!$stmt->execute()) {
 
 $response["success"] = true;
 
-// =====================================
-// STATUS: resched (NO LOG)
-// =====================================
+// If OLD booking updated → finish
 if ($status === "resched") {
     echo json_encode([
         "success" => true,
-        "message" => "Booking marked as rescheduled."
+        "message" => "Previous booking updated."
     ]);
     exit;
 }
 
-// =====================================
-// STATUS: rescheduled → INSERT LOG
-// =====================================
+/*==============================================
+ INSERT LOG (for NEW booking only)
+===============================================*/
 
-// Get previous booking: THIS TIME, GET THE *PAIR*, NOT LAST ENTRY
-$prev_stmt = $conn->prepare("
-    SELECT ofb.*, fh.name AS facility_name
-    FROM other_facilities_booking ofb
-    JOIN function_hall fh ON fh.fh_id = ofb.facility_id
-    WHERE ofb.status = 'resched'
-      AND ofb.id < ?
-    ORDER BY ofb.id DESC
-    LIMIT 1
-");
-$prev_stmt->bind_param("i", $booking_id);
-$prev_stmt->execute();
-$prev_booking = $prev_stmt->get_result()->fetch_assoc();
+if ($status === "rescheduled") {
 
-// Get the new booking
-$new_stmt = $conn->prepare("
-    SELECT ofb.*, fh.name AS facility_name
-    FROM other_facilities_booking ofb
-    JOIN function_hall fh ON fh.fh_id = ofb.facility_id
-    WHERE ofb.id = ?
-");
-$new_stmt->bind_param("i", $booking_id);
-$new_stmt->execute();
-$new_booking = $new_stmt->get_result()->fetch_assoc();
+    if (!$prev_booking_id) {
+        echo json_encode(["success" => false, "error" => "Missing prev_booking_id"]);
+        exit;
+    }
 
-if ($prev_booking && $new_booking) {
+    // Fetch OLD booking using prev_booking_id
+    $prev_stmt = $conn->prepare("
+        SELECT ofb.*, fh.name AS facility_name
+        FROM other_facilities_booking ofb
+        JOIN function_hall fh ON fh.fh_id = ofb.facility_id
+        WHERE ofb.id = ?
+        LIMIT 1
+    ");
+    $prev_stmt->bind_param("i", $prev_booking_id);
+    $prev_stmt->execute();
+    $prev_booking = $prev_stmt->get_result()->fetch_assoc();
 
+    // Fetch NEW booking
+    $new_stmt = $conn->prepare("
+        SELECT ofb.*, fh.name AS facility_name
+        FROM other_facilities_booking ofb
+        JOIN function_hall fh ON fh.fh_id = ofb.facility_id
+        WHERE ofb.id = ?
+        LIMIT 1
+    ");
+    $new_stmt->bind_param("i", $booking_id);
+    $new_stmt->execute();
+    $new_booking = $new_stmt->get_result()->fetch_assoc();
+
+    if (!$prev_booking || !$new_booking) {
+        echo json_encode(["success" => false, "error" => "Record lookup failed."]);
+        exit;
+    }
+
+    // Insert into log
     $insert_stmt = $conn->prepare("
         INSERT INTO resched_log_fh
-        (fullname, phone, prev_facility, new_facility, sched_date, resched_date, 
-         sched_time, resched_time, sched_total_price, resched_total_price, 
-         sched_paid_payment, resched_paid_payment, refund_charge, 
+        (fullname, phone, prev_facility, new_facility, sched_date, resched_date,
+         sched_time, resched_time, sched_total_price, resched_total_price,
+         sched_paid_payment, resched_paid_payment, refund_charge,
          rescheduled_booking_id, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
     ");
 
-    $fullname  = $new_booking['fullname'];
-    $phone     = $new_booking['phone'];
-    $prev_fac  = $prev_booking['facility_name'];
-    $new_fac   = $new_booking['facility_name'];
+    $fullname   = $new_booking['fullname'];
+    $phone      = $new_booking['phone'];
 
-    $sched_date    = $prev_booking['date'];
-    $resched_date  = $new_booking['date'];
+    $prev_fac   = $prev_booking['facility_name'];
+    $new_fac    = $new_booking['facility_name'];
 
-    $sched_time    = $prev_booking['start_time'] . " to " . $prev_booking['end_time'];
-    $resched_time  = $new_booking['start_time'] . " to " . $new_booking['end_time'];
+    $sched_date   = $prev_booking['date'];
+    $resched_date = $new_booking['date'];
 
-    $sched_total_price    = $prev_booking['price'];
-    $resched_total_price  = $new_booking['price'];
+    $sched_time   = $prev_booking['start_time'] . " to " . $prev_booking['end_time'];
+    $resched_time = $new_booking['start_time'] . " to " . $new_booking['end_time'];
+
+    $sched_total_price   = $prev_booking['price'];
+    $resched_total_price = $new_booking['price'];
 
     $sched_paid_payment   = $prev_booking['paid'];
     $resched_paid_payment = $new_booking['paid'];
 
-    $refund_charge        = $prev_booking['refund_charge']; // CORRECT VALUE AT THAT TIME
-    $rescheduled_id       = $new_booking['id'];
+    $refund_charge = $prev_booking['refund_charge'];
+    $rescheduled_id = $new_booking['id'];
 
     $insert_stmt->bind_param(
         "ssssssssdddddi",
-        $fullname, $phone, $prev_fac, $new_fac, $sched_date, $resched_date,
-        $sched_time, $resched_time, $sched_total_price, $resched_total_price,
-        $sched_paid_payment, $resched_paid_payment, $refund_charge, $rescheduled_id
+        $fullname, $phone, $prev_fac, $new_fac,
+        $sched_date, $resched_date, $sched_time, $resched_time,
+        $sched_total_price, $resched_total_price,
+        $sched_paid_payment, $resched_paid_payment,
+        $refund_charge, $rescheduled_id
     );
 
     if ($insert_stmt->execute()) {
-        $response["log_created"] = true;
-        $response["message"] = "Booking rescheduled successfully!";
+        echo json_encode(["success" => true, "message" => "Reschedule log created."]);
     } else {
-        $response["log_created"] = false;
-        $response["error"] = $insert_stmt->error;
+        echo json_encode(["success" => false, "error" => $insert_stmt->error]);
     }
 
-} else {
-    $response["log_created"] = false;
-    $response["error"] = "Previous or new booking not found.";
+    exit;
 }
 
 echo json_encode($response);
 exit;
-
 ?>

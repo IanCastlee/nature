@@ -8,8 +8,8 @@ import GenericTable from "../admin_molecules/GenericTable";
 import { fhbooking } from "../../constant/tableColumns";
 import useSetInactive from "../../hooks/useSetInactive";
 import Toaster from "../../components/molecules/Toaster";
-
-function ReSchedBookingFh({ booking, onClose }) {
+import { icons } from "../../constant/icon";
+function ReSchedBookingFh({ booking, refetchApproved }) {
   const setShowForm = useForm((state) => state.setShowForm);
   const [toast, setToast] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,7 +30,8 @@ function ReSchedBookingFh({ booking, onClose }) {
       setToast({ message: "Booking updated successfully!", type: "success" });
       setShowComputationModal(false);
       refetch();
-      onClose();
+      refetchApproved();
+      setShowForm(null);
     }
   );
 
@@ -80,37 +81,39 @@ function ReSchedBookingFh({ booking, onClose }) {
     const newHalf = toNumber(newBooking.half_price);
     const difference = prevPaid - newHalf;
 
-    const prevBookingForm = {
-      booking_id: booking.id,
-      status: "resched",
-      difference,
-      prevRoom: booking.name,
-    };
-
-    const newBookingForm = {
-      booking_id: newBooking.id,
-      status: "rescheduled",
-      difference,
-      newRoom: newBooking.name,
-    };
-
     try {
-      await setInactive(prevBookingForm);
-      await setInactive(newBookingForm);
+      // OLD booking
+      await setInactive({
+        booking_id: booking.id,
+        status: "resched",
+        difference,
+      });
+
+      // NEW booking — pass the real previous booking id
+      await setInactive({
+        booking_id: newBooking.id,
+        prev_booking_id: booking.id, // 🔥 IMPORTANT
+        status: "rescheduled",
+        difference,
+      });
 
       setToast({
         message: "Booking rescheduled successfully!",
         type: "success",
       });
+
       setShowComputationModal(false);
       refetch();
-    } catch {
-      setToast({ message: "Failed to reschedule booking.", type: "error" });
+      refetchApproved();
+      setShowForm(null);
+    } catch (err) {
+      console.error(err);
+      setToast({
+        message: "Failed to reschedule booking.",
+        type: "error",
+      });
     }
   };
-
-  console.log("PREV BOOKING : ", booking?.id);
-  console.log("NEW BOOKING : ", newBooking?.id);
 
   return (
     <>
@@ -132,12 +135,10 @@ function ReSchedBookingFh({ booking, onClose }) {
               Function Hall Booking Record
             </h1>
 
-            <button
-              className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-200"
-              onClick={onClose}
-            >
-              ✕
-            </button>
+            <icons.IoIosCloseCircleOutline
+              onClick={() => setShowForm(null)}
+              className="text-2xl cursor-pointer"
+            />
           </div>
 
           {/* SEARCH + COUNT */}

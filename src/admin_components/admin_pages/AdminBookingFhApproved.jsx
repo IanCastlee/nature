@@ -295,7 +295,7 @@ function AdminBookingFhApproved() {
                 viewFHDetails,
                 onSetReshed: (item) => {
                   setReschedItem(item);
-                  setShowResched(true);
+                  setShowForm("resched_booking_fh");
                 },
 
                 onSetPending: (item) => {
@@ -375,7 +375,9 @@ function AdminBookingFhApproved() {
       )}
 
       {/*  RESCHED MODAL */}
-      {showResched && reschedItem && <ReSchedBookingFh booking={reschedItem} />}
+      {showForm === "resched_booking_fh" && (
+        <ReSchedBookingFh booking={reschedItem} refetchApproved={refetch} />
+      )}
     </>
   );
 }

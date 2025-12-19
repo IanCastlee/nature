@@ -36,12 +36,16 @@ if ($method === "GET") {
         if (!empty($statuses)) {
             $placeholders = implode(",", array_fill(0, count($statuses), "?"));
             $query .= " WHERE orb.status IN ($placeholders)";
-            $stmt = $conn->prepare($query);
+        }
 
+        // ORDER BY must come after WHERE clause
+        $query .= " ORDER BY orb.updated_at DESC";
+
+        $stmt = $conn->prepare($query);
+
+        if (!empty($statuses)) {
             $types = str_repeat("s", count($statuses));
             $stmt->bind_param($types, ...$statuses);
-        } else {
-            $stmt = $conn->prepare($query);
         }
 
         $stmt->execute();
@@ -122,7 +126,7 @@ if ($method === "GET") {
             LEFT JOIN booking_extras AS be ON be.booking_id = rb.booking_id
             LEFT JOIN booking_note_fh AS bn ON bn.booking_id = rb.booking_id
             WHERE rb.user_id = ?
-            ORDER BY rb.booking_id DESC
+            ORDER BY rb.updated_at DESC
         ");
 
         $stmt->bind_param("i", $userId);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Pagination from "../admin_molecules/Pagination";
 import { useForm } from "../../store/useRoomStore";
 import useGetData from "../../hooks/useGetData";
@@ -9,7 +9,8 @@ import { bookingPending } from "../../constant/tableColumns";
 import Toaster from "../../components/molecules/Toaster";
 import useSetInactive from "../../hooks/useSetInactive";
 import { icons } from "../../constant/icon";
-function ReSchedBooking({ booking, onClose }) {
+
+function ReSchedBooking({ booking, onClose, refetchBooking }) {
   const setShowForm = useForm((state) => state.setShowForm);
 
   const [toast, setToast] = useState(null);
@@ -29,20 +30,21 @@ function ReSchedBooking({ booking, onClose }) {
       message: "Booking updated successfully!",
       type: "success",
     });
-    onclose;
+    refetchBooking();
+    onClose();
     setShowComputationModal(false);
     refetch();
   });
-
-  console.log("ERROR : ", subError);
 
   // Fetch pending booking data
   const { data, loading, error, refetch } = useGetData(
     `/booking/get-booking.php?status=pending`
   );
 
-  console.log("BOOKING : ", booking);
-  console.log("RESCHED TO : ", data);
+  // Reset to page 1 whenever search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   // Helper: Convert mixed values (string/number) to usable number
   const toNumber = (value) => {
@@ -100,32 +102,34 @@ function ReSchedBooking({ booking, onClose }) {
     const newHalf = toNumber(newBooking.half_price);
     const difference = prevPaid - newHalf;
 
-    const prevBookingForm = {
-      booking_id: booking.booking_id,
-      status: "resched",
-      difference,
-      prevRoom: booking.room_name,
-    };
-
-    const newBookingForm = {
-      booking_id: newBooking.booking_id,
-      status: "rescheduled",
-      difference,
-      newRoom: newBooking.room_name,
-    };
-
     try {
-      await setInactive(prevBookingForm);
-      await setInactive(newBookingForm);
+      // STEP 1: mark OLD booking as resched
+      await setInactive({
+        booking_id: booking.booking_id,
+        status: "resched",
+        difference,
+      });
+
+      // STEP 2: mark NEW booking as rescheduled
+      await setInactive({
+        booking_id: newBooking.booking_id,
+        prev_booking_id: booking.booking_id,
+        status: "rescheduled",
+        difference,
+      });
 
       setToast({
         message: "Booking rescheduled successfully!",
         type: "success",
       });
+
       setShowComputationModal(false);
-      refetch();
     } catch (error) {
-      setToast({ message: "Failed to reschedule booking.", type: "error" });
+      console.error(error);
+      setToast({
+        message: "Failed to reschedule booking.",
+        type: "error",
+      });
     }
   };
 
