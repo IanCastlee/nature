@@ -565,7 +565,7 @@ function OtherFacilitiesBookingPage() {
               <div className="w-full flex flex-col items-center mb-2 text-center">
                 <p className="text-xs">{currentDate}</p>
                 <p className="text-xs font-bold">
-                  2JKLA NATURE HOT SPRING AND INN RESORT COPR.
+                  2JKLA NATURE HOT SPRING AND INN RESORT CORP.
                 </p>
                 <p className="text-xs font-normal">Monbon, Irosin, Sorsgon</p>
               </div>
@@ -647,7 +647,7 @@ function OtherFacilitiesBookingPage() {
             <div className="bg-black bg-opacity-50 flex items-center justify-center w-full h-full p-4">
               <div className="bg-white rounded-xl p-5 text-center shadow-xl max-w-md w-full space-y-3 border border-gray-200">
                 {/* Pending Booking Note with Contact */}
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-900 text-sm">
                   Your booking is currently <strong>pending</strong>. To make it
                   approved, kindly contact{" "}
                   <a
@@ -678,6 +678,10 @@ function OtherFacilitiesBookingPage() {
                 >
                   📸 Save Reservation Details
                 </button>
+
+                <p className="dark:text-gray-100 text-gray-800 text-xs">
+                  Kindly save these reservation details.
+                </p>
               </div>
             </div>
           </div>

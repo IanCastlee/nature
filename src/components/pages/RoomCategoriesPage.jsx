@@ -44,8 +44,6 @@ function RoomCategoriesPage() {
       ? roomDetails[0].category
       : "NO ROOM AVAILABLE";
 
-  console.log("Error: ", error);
-
   return (
     <>
       <main className="w-full min-h-screen dark:bg-black scroll-smooth pb-20 mt-[50px]">
@@ -72,8 +70,8 @@ function RoomCategoriesPage() {
         {/* <SearchBox /> */}
 
         <section className="w-full px-2 md:px-2 lg:px-[130px] pt-10">
-          <div className="flex flex-row justify-between items-end gap-2 mb-2">
-            <p
+          <div className="flex flex-row justify-end items-end gap-2 mb-2">
+            {/* <p
               className="
     text-xs 
     px-3 py-1.5 rounded-md inline-block
@@ -82,7 +80,7 @@ function RoomCategoriesPage() {
   "
             >
               Business Hours: <br /> 8:00 AM – 5:00 PM (Every Day)
-            </p>
+            </p> */}
 
             <button
               onClick={() => setShowHouseRules(true)}

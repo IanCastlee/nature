@@ -80,29 +80,34 @@ function HomePage() {
   return (
     <>
       <main className="w-full min-h-screen bg-white dark:bg-black scroll-smooth pb-20">
-        <section className="relative h-screen w-full overflow-hidden">
+        <section className="relative min-h-screen w-full overflow-hidden">
           <Swiper
             modules={[Autoplay, EffectFade]}
             effect="fade"
             autoplay={{ delay: 4000, disableOnInteraction: false }}
             loop={swiperLoop}
             speed={1000}
-            className="w-full h-screen"
+            className="w-full min-h-screen"
           >
             {loadingHero && (
-              <div className="flex items-center justify-center h-screen">
+              <div className="flex items-center justify-center min-h-screen">
                 <p>Loading...</p>
               </div>
             )}
+
             {errorHero && (
-              <div className="flex items-center justify-center h-screen">
+              <div className="flex items-center justify-center min-h-screen">
                 <p className="text-red-500">{errorHero.message}</p>
               </div>
             )}
 
             {!loadingHero &&
               heroImages.map((img, idx) => (
-                <SwiperSlide key={img.id} className="w-full h-screen relative">
+                <SwiperSlide
+                  key={img.id}
+                  className="w-full min-h-screen relative"
+                >
+                  {/* Background */}
                   <LazyLoadImage
                     src={`${uploadUrl.uploadurl}/hero/${img.image}`}
                     alt={`Slide ${idx + 1}`}
@@ -111,12 +116,12 @@ function HomePage() {
                     className="w-full h-full object-cover object-center"
                   />
 
-                  {/* Overlay */}
+                  {/* Dark overlay */}
                   <div className="absolute inset-0 bg-black bg-opacity-40" />
 
-                  {/* Caption */}
-                  <figcaption className="relative flex flex-col justify-start items-start text-white pl-4 lg:pl-20 pt-44 sm:pt-28 md:absolute md:inset-0 md:justify-center md:pt-0 z-20">
-                    <h1 className="lg:text-5xl md:text-[30px] text-xl font-playfair max-w-2xl mb-6 px-2 lg:px-0">
+                  {/* Caption (NO MORE absolute – will now push stuff down) */}
+                  <figcaption className="relative z-20 flex flex-col items-start text-white pl-4 lg:mt-16 mt-4 lg:pl-20 pt-40 space-y-4">
+                    <h1 className="lg:text-5xl md:text-[30px]  text-xl font-playfair max-w-2xl px-2 lg:px-0">
                       Experience the Serenity of{" "}
                       <span className="text-blue-400 relative inline-block">
                         Nature Hot Spring{" "}
@@ -129,27 +134,31 @@ function HomePage() {
                       </span>
                       Retreat
                     </h1>
+
                     <p className="max-w-2xl text-white text-sm md:text-base lg:text-lg px-2 lg:px-0">
                       Relax in our natural hot spring pools surrounded by lush
                       greenery. Enjoy a peaceful overnight stay in our cozy
-                      rooms — perfect for families, couples, and solo travelers
-                      seeking rest and rejuvenation.
+                      rooms — perfect for families, couples, and solo travelers.
                     </p>
-
-                    <div className="w-full flex flex-row lg:justify-start justify-end items-start lg:px-0 px-4 lg:mb-0 mb-4">
-                      <a
-                        href="#room-categories"
-                        className="bg-blue-600 hover:bg-blue-700 text-white text-sm lg:mt-4 mt-2 p-2 rounded-md inline-block"
-                      >
-                        Show Rooms
-                      </a>
-                    </div>
+                    <a
+                      href="#room-categories"
+                      className="
+    bg-blue-600 text-white rounded-md inline-block
+    hover:bg-blue-700 transition
+    text-xs sm:text-sm md:text-base lg:text-sm xl:text-base
+    px-3 py-2 md:px-4 md:py-2
+    mt-0 lg:mt-4
+    ml-1 lg:ml-0 font-semibold border border-gray-400 shadow-md
+  "
+                    >
+                      Show Rooms
+                    </a>
                   </figcaption>
                 </SwiperSlide>
               ))}
           </Swiper>
 
-          {/* Search Box */}
+          {/* Search Box - NOW PUSHED DOWN PROPERLY */}
           <SearchBox />
         </section>
 
@@ -161,14 +170,6 @@ function HomePage() {
           }
         >
           <About />
-        </Suspense>
-
-        <Suspense
-          fallback={
-            <div className="text-center py-10 text-gray-400">Loading...</div>
-          }
-        >
-          <WhyChooseUs />
         </Suspense>
 
         {/* Room Categories Section */}
@@ -310,7 +311,13 @@ function HomePage() {
               />
             </div>
           )}
-
+          {/* <Suspense
+            fallback={
+              <div className="text-center py-10 text-gray-400">Loading...</div>
+            }
+          >
+            <WhyChooseUs />
+          </Suspense> */}
           <Suspense
             fallback={
               <div className="fixed bottom-4 right-10 text-white">
@@ -328,7 +335,7 @@ function HomePage() {
         title="Street View"
         src={images.location}
         alt="Street View Icon"
-        className="h-[60px] w-[60px] fixed bottom-4 right-10 z-30"
+        className="h-[40px] w-[40px] fixed bottom-4 right-4 z-30 cursor-pointer"
       />
     </>
   );

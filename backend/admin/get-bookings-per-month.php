@@ -11,7 +11,7 @@ $monthlyPaidCounts = array_fill(1, 12, 0);
 $totalPaid = 0;
 
 // Base SQL
-$sql = "SELECT start_date, paid FROM room_booking WHERE paid > 0";
+$sql = "SELECT start_date, paid FROM room_booking WHERE paid > 0 AND status = 'arrived'";
 
 // Add year filter ONLY if provided
 if ($hasYear) {

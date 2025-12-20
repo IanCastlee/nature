@@ -27,7 +27,7 @@ function About() {
 
         <p className="dark:text-white text-black leading-relaxed text-center md:text-left">
           Welcome to{" "}
-          <span className="text-blue-400">
+          <span className="text-blue-700">
             2JKLA Nature Hot Spring Inn and Resort Corp
           </span>
           , your premier destination for relaxation, adventure, and
@@ -40,8 +40,7 @@ function About() {
           <ReadMoreButton
             label={
               <>
-                Read More{" "}
-                <icons.HiArrowSmallRight className="text-white inline" />
+                Read More <icons.HiArrowSmallRight className="inline" />
               </>
             }
             onClick={() => navigate("/about")}

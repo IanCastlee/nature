@@ -161,7 +161,7 @@ function ViewRoomPage() {
                 <div
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`w-2.5 h-2.5 rounded-full cursor-pointer ${
+                  className={`lg:w-2.5 lg:h-2.5 h-1 w-1 rounded-full cursor-pointer ${
                     currentIndex === index ? "bg-white" : "bg-white/40"
                   }`}
                 ></div>
@@ -191,24 +191,45 @@ function ViewRoomPage() {
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-start gap-5">
+          <div className="flex flex-wrap justify-start gap-6 mt-3">
             {/* Capacity */}
-            <span className="inline-flex items-center text-xs lg:text-lg dark:text-gray-100 text-gray-700">
-              <icons.LuUsers className="mr-1 text-blue-400 dark:text-blue-400 text-xs lg:text-base" />
-              {capacity} Person
-            </span>
+            <div className="flex items-center gap-2">
+              <icons.LuUsers className="text-blue-500 dark:text-blue-400 text-base lg:text-xl" />
+              <div className="flex flex-col leading-tight">
+                <span className="text-[10px] lg:text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                  Good For
+                </span>
+                <span className="text-sm lg:text-lg font-semibold text-gray-800 dark:text-gray-100">
+                  {capacity} Person
+                </span>
+              </div>
+            </div>
 
             {/* Duration */}
-            <span className="inline-flex items-center text-xs lg:text-lg dark:text-gray-100 text-gray-700">
-              <icons.GiDuration className="mr-1 text-blue-400 dark:text-blue-400 text-xs lg:text-base" />
-              {duration} hrs
-            </span>
+            <div className="flex items-center gap-2">
+              <icons.GiDuration className="text-blue-500 dark:text-blue-400 text-base lg:text-xl" />
+              <div className="flex flex-col leading-tight">
+                <span className="text-[10px] lg:text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                  Duration
+                </span>
+                <span className="text-sm lg:text-lg font-semibold text-gray-800 dark:text-gray-100">
+                  {duration} hrs
+                </span>
+              </div>
+            </div>
 
             {/* Time In/Out */}
-            <span className="inline-flex items-center text-xs lg:text-lg dark:text-gray-100 text-gray-700">
-              <icons.IoIosTimer className="mr-1 text-blue-400 dark:text-blue-400 text-xs lg:text-base" />
-              {time_in_out}
-            </span>
+            <div className="flex items-center gap-2">
+              <icons.IoIosTimer className="text-blue-500 dark:text-blue-400 text-base lg:text-xl" />
+              <div className="flex flex-col leading-tight">
+                <span className="text-[10px] lg:text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                  Time In & Out
+                </span>
+                <span className="text-sm lg:text-lg font-semibold text-gray-800 dark:text-gray-100">
+                  {time_in_out}
+                </span>
+              </div>
+            </div>
           </div>
         </section>
         <section className="w-full px-2 md:px-2 lg:px-[130px] mt-4">
@@ -276,11 +297,11 @@ function ViewRoomPage() {
         {/* Description */}
         <section className="w-full flex flex-col px-2 md:px-2 lg:px-[130px] mt-4">
           <div className="w-full border-t dark:border-gray-800 mt-4 pt-4">
-            <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50 text-xs lg:text-lg">
-              * Description
+            <h3 className="font-normal mb-2 text-gray-800 dark:text-gray-50 text-xs lg:text-lg">
+              Description
             </h3>
 
-            <p className="dark:text-white text-xs lg:text-lg leading-relaxed">
+            <p className="dark:text-white text-sm lg:text-lg leading-relaxed">
               {description}
             </p>
           </div>
@@ -288,7 +309,7 @@ function ViewRoomPage() {
       </main>
 
       <icons.FiArrowLeftCircle
-        className="text-2xl text-white cursor-pointer absolute top-8 left-8 z-20"
+        className="text-2xl text-white cursor-pointer absolute top-8 lg:left-8 left-4 z-20"
         onClick={() => navigate(-1)}
       />
     </>

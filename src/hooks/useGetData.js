@@ -7,6 +7,8 @@ function useGetData(url, options = {}, autoFetch = true) {
   const [loading, setLoading] = useState(autoFetch);
   const [error, setError] = useState(null);
 
+  console.log("Fetching URL:", url);
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -16,12 +18,12 @@ function useGetData(url, options = {}, autoFetch = true) {
         setError(null);
       } else {
         setError(new Error(res.data || "API responded with an error."));
-        console.log("Error Log", res.data);
+        // console.log("Error Log", res.data);
       }
     } catch (err) {
       const message =
         err.response?.data?.message || err.message || "Network or server error";
-      console.error("Fetch error:", err);
+      console.error("Fetch error:", err.message);
       setError(new Error(message));
     } finally {
       setLoading(false);
@@ -29,6 +31,10 @@ function useGetData(url, options = {}, autoFetch = true) {
   };
 
   useEffect(() => {
+    if (!url) {
+      console.warn("Skipping fetch — invalid URL:", url);
+      return;
+    }
     if (autoFetch) fetchData();
   }, [url]);
 

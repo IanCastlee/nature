@@ -114,7 +114,7 @@ if ($method === 'POST') {
             ]);
         }
 
-        exit; // ✅ Exit after update
+        exit; //  Exit after update
     }
 
 

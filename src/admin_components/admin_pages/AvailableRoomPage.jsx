@@ -156,7 +156,6 @@ function AvailableRoomPage() {
     setForm((prev) => ({ ...prev, images: [] }));
   });
 
-  console.log(formError);
   //amenity
   const {
     submit: submitAmenity,
@@ -186,7 +185,6 @@ function AvailableRoomPage() {
     refetchExtras();
     //clearField2();
   });
-  console.log("formErrorExtras ____", formErrorExtras);
   //=================//
   //  HANDLE SUBMIT //
   //===============//

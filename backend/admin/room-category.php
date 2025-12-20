@@ -1,15 +1,7 @@
 <?php
 include("../header.php");
 include("../dbConn.php");
-//require_once("../auth/auth_middleware.php"); 
 
-// ==========================
-// 1. AUTHENTICATE USER
-// ==========================
-
-// ==========================
-// 2. HANDLE REQUEST
-// ==========================
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Accept raw JSON if sent

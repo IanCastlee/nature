@@ -83,50 +83,87 @@ function SearchBox() {
 
       <div className="absolute bottom-8 lg:left-16 left-0 right-0 px-4 z-30 flex justify-center lg:justify-start">
         <div
-          className="backdrop-blur-md border border-gray-300 dark:border-gray-600 rounded-md shadow-lg
+          className="backdrop-blur-md  dark:border-gray-600 rounded-md shadow-lg
           p-4 sm:p-5 flex flex-col md:flex-row gap-3 md:items-end w-full
           max-w-full sm:max-w-4xl md:max-w-5xl lg:max-w-[60%]
-          bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+          bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-t-2 border-blue-500"
         >
           {/* Dates */}
-          <div className="flex lg:flex-row md:flex-row flex-col gap-1">
+          <div className="flex lg:flex-row md:flex-row flex-col gap-3">
             {/* Check-In */}
             <div className="flex-1">
-              <label className="text-xs block mb-1">Check-In</label>
+              <label className="text-xs font-medium text-gray-700 dark:text-gray-300 block mb-1">
+                Check-in Date
+              </label>
               <input
                 type="date"
                 value={searchData.checkIn}
                 onChange={(e) => handleChange("checkIn", e.target.value)}
                 min={minDate}
-                className="w-full bg-transparent border border-gray-400 dark:border-gray-600 rounded-lg px-4 py-2 outline-none text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                className="
+        w-full bg-white dark:bg-gray-800
+        border border-gray-300 dark:border-gray-700
+        rounded-lg px-4 py-2.5
+        outline-none text-sm
+        text-gray-900 dark:text-white
+        placeholder-gray-400 dark:placeholder-gray-500
+        transition-all duration-200
+        focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+      "
               />
             </div>
 
             {/* Check-Out */}
             <div className="flex-1">
-              <label className="text-xs block mb-1">Check-Out</label>
+              <label className="text-xs font-medium text-gray-700 dark:text-gray-300 block mb-1">
+                Check-out Date
+              </label>
               <input
                 type="date"
                 value={searchData.checkOut}
                 onChange={(e) => handleChange("checkOut", e.target.value)}
                 min={getNextDay(searchData.checkIn) || minDate}
                 disabled={!searchData.checkIn}
-                className="w-full bg-transparent border border-gray-400 dark:border-gray-600 rounded-lg px-4 py-2 outline-none text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="
+        w-full bg-white dark:bg-gray-800
+        border border-gray-300 dark:border-gray-700
+        rounded-lg px-4 py-2.5
+        outline-none text-sm
+        text-gray-900 dark:text-white
+        placeholder-gray-400 dark:placeholder-gray-500
+        transition-all duration-200
+        focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+        disabled:opacity-50 disabled:cursor-not-allowed
+      "
               />
             </div>
           </div>
 
           {/* Guests */}
           <div className="w-full sm:w-auto flex-1">
-            <label className="text-xs block mb-1">Number of Guests</label>
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300 block mb-1">
+              Number of Guests
+            </label>
+
             <select
               value={searchData.guests}
               onChange={(e) => handleChange("guests", e.target.value)}
-              className="w-full bg-transparent border border-gray-400 dark:border-gray-600 rounded-lg px-4 py-2 outline-none text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+              className="
+      w-full
+      bg-white dark:bg-gray-800
+      border border-gray-300 dark:border-gray-700
+      rounded-lg px-4 py-2.5
+      outline-none text-sm
+      text-gray-900 dark:text-white
+      placeholder-gray-400 dark:placeholder-gray-500
+      transition-all duration-200
+      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+    "
             >
               <option value="" disabled hidden>
                 Select Guests
               </option>
+
               {[...Array(10)].map((_, i) => (
                 <option key={i + 1} value={i + 1}>
                   {i + 1} Guest{i > 0 ? "s" : ""}

@@ -29,7 +29,7 @@ function Footer() {
             href={data?.fb || "#"}
             target="_blank"
             rel="noopener noreferrer"
-            className="dark:text-white text-sm flex items-center gap-3 hover:text-blue-400 transition"
+            className="text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 text-sm underline flex items-center gap-3 hover:text-blue-400 transition"
           >
             <icons.FaFacebookMessenger className="text-blue-400 text-2xl border rounded-full border-blue-400 p-1" />
             Nature Hot Spring Page
@@ -43,10 +43,17 @@ function Footer() {
             <icons.FaPhoneAlt className="text-blue-400 text-2xl border rounded-full border-blue-400 p-1" />
             Globe: {data?.globe_no || "0922-XXXXXXX"}
           </Link>
-          <Link className="dark:text-white text-sm flex items-center gap-3">
+          <div className="dark:text-white text-sm flex items-center gap-3 cursor-pointer">
             <icons.IoIosMail className="text-blue-400 text-2xl border rounded-full border-blue-400 p-1" />
-            {data?.email || "info@example.com"}
-          </Link>
+
+            <a
+              href={`mailto:${data?.email}`}
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline break-all"
+              title={`Send an email to ${data?.email}`}
+            >
+              {data?.email || "info@example.com"}
+            </a>
+          </div>
         </div>
 
         {/* Quick Links */}
@@ -69,6 +76,12 @@ function Footer() {
             className="dark:text-white text-sm hover:text-blue-400 transition"
           >
             Contact
+          </Link>
+          <Link
+            to="/faq"
+            className="dark:text-white text-sm hover:text-blue-400 transition"
+          >
+            FAQs
           </Link>
           <Link
             to="/terms"

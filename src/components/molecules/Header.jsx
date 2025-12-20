@@ -182,7 +182,7 @@ function Header({ isHome }) {
                   isLink: true,
                 },
                 {
-                  label: "FAQ",
+                  label: "FAQs",
                   path: "/faq",
                   isLink: true,
                 },
@@ -317,7 +317,7 @@ function Header({ isHome }) {
                     <Link
                       to={`/${item === "Home" ? "" : item.toLowerCase()}`}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="block py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="block py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-black dark:text-white"
                     >
                       {item}
                     </Link>
@@ -330,7 +330,7 @@ function Header({ isHome }) {
                     className="w-full flex items-center justify-between py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => setMobileOfferOpen(!mobileOfferOpen)}
                   >
-                    Offer
+                    Offers
                     {mobileOfferOpen ? (
                       <icons.MdOutlineKeyboardArrowUp className="text-xl" />
                     ) : (
@@ -429,6 +429,7 @@ function Header({ isHome }) {
                 {[
                   { label: "Announcement", form: "announcement" },
                   { label: "Contacts", form: "/contacts", navigate: true },
+                  { label: "FAQs", form: "/faq", navigate: true },
                 ].map((item) => (
                   <li key={item.label}>
                     <div
@@ -442,7 +443,9 @@ function Header({ isHome }) {
                       className="relative flex items-center justify-between py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                     >
                       {/* Text */}
-                      <span>{item.label}</span>
+                      <span className="text-black dark:text-white">
+                        {item.label}
+                      </span>
 
                       {/*  Announcement Badge */}
                       {item.label === "Announcement" &&
@@ -459,7 +462,7 @@ function Header({ isHome }) {
                 <li>
                   <button
                     onClick={toggleDarkMode}
-                    className="w-full flex items-center justify-between py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="w-full flex items-center justify-between py-2 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-black dark:text-white"
                   >
                     {darkMode ? "Light Mode" : "Dark Mode"}
                     {darkMode ? (
