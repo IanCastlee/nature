@@ -57,16 +57,33 @@ function AdminBookingFhNotAttended() {
     data?.filter((item) => {
       if (!searchTerm) return true;
 
-      const search = searchTerm.toLowerCase();
+      const s = String(searchTerm).toLowerCase();
 
       return (
-        (item?.fullname || "").toLowerCase().includes(search) ||
-        (item?.lastname || "").toLowerCase().includes(search) ||
-        (item?.room_name || "").toLowerCase().includes(search) ||
-        (item?.start_date || "").toLowerCase().includes(search) ||
-        (item?.end_date || "").toLowerCase().includes(search) ||
-        (item?.nights?.toString() || "").includes(search) ||
-        (item?.status || "").toLowerCase().includes(search)
+        String(item?.id || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.fullname || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.phone || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.name || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.start_time || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.end_time || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.date || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.status || "")
+          .toLowerCase()
+          .includes(s)
       );
     }) || [];
 

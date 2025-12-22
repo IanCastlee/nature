@@ -33,7 +33,7 @@ function AdminFhBooking() {
     `/booking/get-fhbooking.php?status=pending`
   );
 
-  console.log("DATA : ", viewFHDetailsData);
+  console.log("DATA : ", data);
 
   // PAGINATION
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
@@ -42,14 +42,34 @@ function AdminFhBooking() {
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
-      const s = searchTerm.toLowerCase();
+
+      const s = String(searchTerm).toLowerCase();
+
       return (
-        (item?.fullname || "").toLowerCase().includes(s) ||
-        (item?.name || "").toLowerCase().includes(s) ||
-        (item?.start_time || "").toLowerCase().includes(s) ||
-        (item?.end_time || "").toLowerCase().includes(s) ||
-        (item?.date?.toString() || "").includes(s) ||
-        (item?.status || "").toLowerCase().includes(s)
+        String(item?.id || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.fullname || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.phone || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.name || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.start_time || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.end_time || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.date || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.status || "")
+          .toLowerCase()
+          .includes(s)
       );
     }) || [];
 

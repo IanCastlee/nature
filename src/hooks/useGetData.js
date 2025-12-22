@@ -7,8 +7,6 @@ function useGetData(url, options = {}, autoFetch = true) {
   const [loading, setLoading] = useState(autoFetch);
   const [error, setError] = useState(null);
 
-  console.log("Fetching URL:", url);
-
   const fetchData = async () => {
     try {
       setLoading(true);

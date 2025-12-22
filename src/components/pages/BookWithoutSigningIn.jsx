@@ -404,6 +404,15 @@ function BookWithoutSigningIn() {
     currency: "PHP",
   });
   const currentDate = new Date().toLocaleDateString();
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
     <>
       {toast && (
@@ -502,30 +511,30 @@ function BookWithoutSigningIn() {
                     {selectedRange?.to ? (
                       <div className="flex lg:flex-col md:flex-row flex-col mt-2 text-sm text-gray-800 dark:text-gray-300 gap-2">
                         <p className="lg:text-lg text-sm font-semibold">
-                          <span className="mr-2">Check-in:</span>{" "}
-                          {selectedRange.from.toLocaleDateString()}
+                          <span className="mr-2">Check-in:</span>
+                          {formatDate(selectedRange.from)}
                         </p>
 
                         {selectedRange.from !== selectedRange.to ? (
                           <p className="lg:text-lg text-sm font-semibold">
-                            <span className="mr-2">Check-out:</span>{" "}
-                            {selectedRange.to.toLocaleDateString()}
+                            <span className="mr-2">Check-out:</span>
+                            {formatDate(selectedRange.to)}
                           </p>
                         ) : (
                           <p
                             className="
-    text-xs 
-    font-medium 
-    bg-yellow-100 
-    text-yellow-800 
-    dark:bg-yellow-900/40 
-    dark:text-yellow-300 
-    px-3 py-1.5 
-    rounded-md 
-    ml-4 
-    whitespace-nowrap 
-    shadow-sm
-  "
+            text-xs 
+            font-medium 
+            bg-yellow-100 
+            text-yellow-800 
+            dark:bg-yellow-900/40 
+            dark:text-yellow-300 
+            px-3 py-1.5 
+            rounded-md 
+            ml-4 
+            whitespace-nowrap 
+            shadow-sm
+          "
                           >
                             ⚠ Select your check-out date
                           </p>

@@ -24,7 +24,7 @@ function Contacts() {
   return (
     <main className="w-full bg-white dark:bg-black pb-20">
       {/* Hero Section */}
-      <section className="w-full h-[300px] relative mt-[70px]">
+      <section className="w-full lg:h-[300px] h-[180px] relative mt-[70px]">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${images.contact})` }}
@@ -64,9 +64,19 @@ function Contacts() {
                       href={fb}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex flex-row items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                      className="flex items-center gap-2 
+  bg-blue-600 hover:bg-blue-700 
+  text-white 
+  px-3 py-2 rounded-md 
+  text-sm font-medium 
+  shadow-md 
+  transition-all 
+  hover:scale-105
+  active:scale-95
+  cursor-pointer"
                     >
-                      <icons.FaFacebookMessenger className="mr-1" /> Facebook
+                      <icons.FaFacebookMessenger className="text-lg" />
+                      Visit Facebook Page
                     </a>
                   )}
                   {ig && (

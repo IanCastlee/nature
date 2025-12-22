@@ -36,14 +36,33 @@ function AdminBookingDeclined() {
     data?.filter((item) => {
       if (!searchTerm) return true;
 
-      const s = searchTerm.toLowerCase();
+      const q = String(searchTerm).toLowerCase();
 
       return (
-        (item?.fullname || "").toLowerCase().includes(s) ||
-        (item?.room_name || "").toLowerCase().includes(s) ||
-        (item?.start_date || "").toLowerCase().includes(s) ||
-        (item?.end_date || "").toLowerCase().includes(s) ||
-        (item?.status || "").toLowerCase().includes(s)
+        String(item?.booking_id || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.fullname || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.phone || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.room_name || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.start_date || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.end_date || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.nights || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.status || "")
+          .toLowerCase()
+          .includes(q)
       );
     }) || [];
 

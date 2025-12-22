@@ -46,19 +46,41 @@ function AdminBookingPage() {
   // DATA FILTERING //
   //===============//
 
+  console.log(data);
+
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
 
       const search = searchTerm.toLowerCase();
 
+      const q = String(search).toLowerCase();
+
       return (
-        (item?.fullname || "").toLowerCase().includes(search) ||
-        (item?.room_name || "").toLowerCase().includes(search) ||
-        (item?.start_date || "").toLowerCase().includes(search) ||
-        (item?.end_date || "").toLowerCase().includes(search) ||
-        (item?.nights?.toString() || "").includes(search) ||
-        (item?.status || "").toLowerCase().includes(search)
+        String(item?.booking_id || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.fullname || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.phone || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.room_name || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.start_date || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.end_date || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.nights || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.status || "")
+          .toLowerCase()
+          .includes(q)
       );
     }) || [];
 

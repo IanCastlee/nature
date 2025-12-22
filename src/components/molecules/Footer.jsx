@@ -6,7 +6,6 @@ import useGetData from "../../hooks/useGetData";
 
 function Footer() {
   const currentYear = new Date().getFullYear();
-
   // fetch data
   const { data } = useGetData(`/admin/admin_setting.php`);
 
@@ -29,10 +28,23 @@ function Footer() {
             href={data?.fb || "#"}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 text-sm underline flex items-center gap-3 hover:text-blue-400 transition"
+            className="flex items-center gap-2 
+  text-blue-600 hover:text-blue-800 
+  dark:text-blue-400 dark:hover:text-blue-300
+  text-sm font-medium transition-all"
           >
-            <icons.FaFacebookMessenger className="text-blue-400 text-2xl border rounded-full border-blue-400 p-1" />
-            Nature Hot Spring Page
+            <span
+              className="p-1.5 rounded-full border border-blue-400 
+    dark:border-blue-500 text-blue-600 dark:text-blue-300
+    bg-white dark:bg-gray-800 
+    shadow-sm hover:shadow-md transition"
+            >
+              <icons.FaFacebookMessenger className="text-lg" />
+            </span>
+
+            <span className="underline underline-offset-2 hover:underline-offset-4 transition-all">
+              Nature Hot Spring Page
+            </span>
           </a>
 
           <Link className="dark:text-white text-sm flex items-center gap-3">

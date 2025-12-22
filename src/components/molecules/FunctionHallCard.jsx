@@ -12,33 +12,10 @@ function FunctionHallCard({ item, index }) {
   const navigate = useNavigate();
   const [toast, setToast] = useState(null);
 
-  //  Check if user is logged in (same logic as RoomCard)
-  const isLoggedIn = () => {
-    const authStorage = sessionStorage.getItem("auth-storage");
-    try {
-      const parsed = JSON.parse(authStorage);
-      return parsed?.state?.token ? true : false;
-    } catch {
-      return false;
-    }
-  };
-
-  //  Handles protected reserve action
   const handleReserveClick = () => {
-    // if (!isLoggedIn()) {
-    //   setToast({
-    //     message: "Please sign in first before continuing.",
-    //     type: "warning",
-    //   });
-
-    //   return;
-    // }
-
     navigate(`/other-facilities-booking/${item.fh_id}`);
-    // navigate(`/booking-fh/${item.fh_id}`);
   };
 
-  //  Auto-hide toast after 3 seconds
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 3000);
@@ -48,7 +25,6 @@ function FunctionHallCard({ item, index }) {
 
   return (
     <>
-      {/* Toast */}
       {toast && (
         <Toaster
           message={toast.message}
@@ -58,83 +34,113 @@ function FunctionHallCard({ item, index }) {
       )}
 
       <motion.article
-        className="w-full flex flex-col md:basis-[calc(50%-0.3rem)] lg:basis-[calc(50%-0.3rem)] h-auto relative group overflow-hidden rounded-md cursor-pointer shadow-lg dark:border dark:border-gray-800"
+        className="w-full flex flex-col 
+        md:basis-[calc(50%-0.3rem)] lg:basis-[calc(50%-0.3rem)] 
+        overflow-hidden rounded-xl cursor-pointer
+        bg-white dark:bg-gray-900
+        shadow-sm hover:shadow-xl 
+        dark:border dark:border-gray-800
+        transition-all duration-300"
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ amount: 0.2 }}
-        transition={{
-          duration: 0.6,
-          ease: "easeOut",
-          delay: index * 0.1,
-        }}
+        transition={{ duration: 0.6, ease: "easeOut", delay: index * 0.1 }}
       >
-        {/* Image */}
-        <div className="w-full h-full">
+        {/* IMAGE */}
+        <div
+          className="relative w-full 
+        h-[180px] md:h-[230px] 
+        overflow-hidden group"
+        >
           <LazyLoadImage
             src={`${uploadUrl.uploadurl}function_hall/${item.image}`}
             alt={item.name}
             effect="blur"
-            wrapperClassName="w-full h-[230px]"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
 
-          {/* Details */}
-          <div className="p-4 shadow-lg">
-            <div className="flex flex-row justify-between">
-              <div>
-                <h4 className="dark:text-white text-gray-800 text-lg md:text-lg lg:text-xl font-semibold max-w-[400px]">
-                  {item.name}
-                </h4>
-                <p className="text-blue-400 text-lg font-medium">
-                  ₱ {item.price}
-                </p>
-              </div>
+          {/* 360 BUTTON */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 200 }}
+            onClick={() => navigate(`/room-view/${item.photosphere}`)}
+            className="absolute top-3 right-3 
+            text-blue-600 dark:text-blue-400
+            border border-blue-300 dark:border-blue-500
+            hover:border-blue-500 dark:hover:border-blue-300
+            hover:text-blue-700 dark:hover:text-blue-300
+            bg-white/70 dark:bg-gray-800/70
+            backdrop-blur-sm
+            px-3 py-1.5 rounded-md 
+            text-xs font-medium shadow-md
+            flex items-center gap-2"
+          >
+            <icons.FaStreetView className="text-lg" />
+            View 360°
+          </motion.button>
+        </div>
 
-              <icons.FaStreetView
-                onClick={() => navigate(`/room-view/${item.photosphere}`)}
-                title="View Room"
-                className="text-3xl dark:text-white text-gray-800 cursor-pointer transform transition-transform duration-300 hover:scale-125 border dark:border-gray-700 border-gray-300 rounded-full p-1"
-              />
-            </div>
-
-            <div className="border-t dark:border-gray-800 mt-4 flex flex-wrap justify-start pt-4 gap-5">
-              <div className="flex flex-row gap-4 flex-wrap">
-                <span className="inline-flex items-center text-sm dark:text-gray-100 text-gray-700 font-medium">
-                  <icons.LuUsers className="mr-1 text-blue-600 dark:text-blue-400" />{" "}
-                  {item.capacity} per person
-                </span>
-
-                <span className="inline-flex items-center text-sm dark:text-gray-100 text-gray-700 font-medium">
-                  <icons.IoIosTimer className="mr-1 text-blue-600 dark:text-blue-400" />{" "}
-                  Duration: {item.duration} hrs
-                </span>
-              </div>
-
-              {/* More Details */}
-              <button
-                onClick={() => navigate(`/funtionhall-deatails/${item.fh_id}`)}
-                className="group relative flex flex-row items-center text-blue-500 text-sm font-medium rounded-sm h-[30px] self-end ml-auto transition-colors duration-300 hover:text-blue-400"
+        {/* DETAILS */}
+        <div className="p-5">
+          <div className="flex flex-row justify-between items-start">
+            <div>
+              <h4
+                className="text-gray-900 dark:text-white 
+              text-lg lg:text-xl font-semibold leading-tight"
               >
-                <span
-                  className="relative before:content-[''] before:absolute before:bottom-0 before:left-1/2 
-                  before:translate-x-[-50%] before:h-[2px] before:w-0 
-                  before:bg-blue-400 before:transition-all before:duration-300 
-                  group-hover:before:w-full"
-                >
-                  More Details
-                </span>
-                <icons.FiArrowUpRight className="ml-1 text-blue-600 text-lg font-bold" />
-              </button>
-            </div>
+                {item.name}
+              </h4>
 
-            {/* Button */}
-            <div className="flex flex-row justify-end mt-8">
-              <Button
-                onClick={handleReserveClick}
-                style="w-full bg-green-600 h-[30px] text-sm text-white font-medium rounded-sm px-2 transition-all duration-300 transform hover:scale-105"
-                label="Reserve Now"
-              />
+              <p
+                className="text-blue-600 dark:text-blue-400 
+              text-xl font-bold mt-1"
+              >
+                ₱ {item.price}
+              </p>
             </div>
+          </div>
+
+          {/* INFO */}
+          <div
+            className="border-t dark:border-gray-800 mt-4 pt-4 
+          flex flex-wrap gap-4 lg:gap-6"
+          >
+            <span
+              className="inline-flex items-center text-sm 
+            text-gray-700 dark:text-gray-200"
+            >
+              <icons.LuUsers className="mr-2 text-blue-500 dark:text-blue-400 text-lg" />
+              {item.capacity} Persons
+            </span>
+
+            <span
+              className="inline-flex items-center text-sm 
+            text-gray-700 dark:text-gray-200"
+            >
+              <icons.IoIosTimer className="mr-2 text-blue-500 dark:text-blue-400 text-lg" />
+              {item.duration} hrs
+            </span>
+          </div>
+
+          {/* BUTTON SECTION */}
+          <div className="mt-6 flex flex-row justify-between items-center w-full">
+            {/* RESERVE */}
+            <Button
+              onClick={handleReserveClick}
+              style="bg-green-600 h-[36px] text-white font-medium rounded-md 
+              px-4 py-2 text-sm transition hover:scale-105"
+              label="Reserve Now"
+            />
+
+            {/* MORE DETAILS */}
+            <button
+              onClick={() => navigate(`/funtionhall-deatails/${item.fh_id}`)}
+              className="flex items-center gap-1 text-blue-600 dark:text-blue-400 
+              text-sm font-medium hover:underline"
+            >
+              More Details
+              <icons.FiArrowUpRight className="text-lg" />
+            </button>
           </div>
         </div>
       </motion.article>

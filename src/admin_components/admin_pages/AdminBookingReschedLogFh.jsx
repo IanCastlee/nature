@@ -29,15 +29,31 @@ function AdminBookingReschedLogFh() {
     setCurrentPage(pageNumber);
   };
 
+  console.log("RESCHED DATA : ", data);
+
   // FILTER DATA BASED ON SEARCH
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
-      const s = searchTerm.toLowerCase();
+
+      const s = String(searchTerm).toLowerCase();
+
       return (
-        (item?.fullname || "").toLowerCase().includes(s) ||
-        (item?.new_facility || "").toLowerCase().includes(s) ||
-        (item?.resched_date || "").toLowerCase().includes(s)
+        String(item?.rescheduled_booking_id || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.fullname || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.phone || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.new_facility || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.resched_date || "")
+          .toLowerCase()
+          .includes(s)
       );
     }) || [];
 

@@ -29,64 +29,75 @@ function ViewFunctionHallPage() {
     <>
       <main className="min-h-screen w-full dark:bg-black pb-20">
         {/* IMAGE SECTION */}
-        <section className="w-full flex flex-row gap-1 h-[250px] sm:h-[300px] md:h-[350px] lg:h-[450px]">
-          <div className="w-full h-full">
-            <LazyLoadImage
-              src={`${uploadUrl.uploadurl}/function_hall/${image}`}
-              alt="Function Hall"
-              effect="blur"
-              wrapperClassName="w-full h-full"
-              className="w-full h-full object-cover"
-            />
-          </div>
+        <section className="relative w-full h-[250px] sm:h-[300px] md:h-[350px] lg:h-[450px] overflow-hidden">
+          {/* Image */}
+          <LazyLoadImage
+            src={`${uploadUrl.uploadurl}/function_hall/${image}`}
+            alt="Function Hall"
+            effect="blur"
+            wrapperClassName="w-full h-full"
+            className="w-full h-full object-cover"
+          />
+
+          {/* Gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
         </section>
 
         {/* DETAILS SECTION */}
-        <section className="w-full px-4 sm:px-8 md:px-10 lg:px-20 xl:px-[130px] mt-4">
-          {/* HEADER: NAME, PRICE & BUTTON */}
-          <div className="w-full flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 lg:gap-20">
-            {/* Name + Price + View Button */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-10 md:gap-20">
-              <div className="flex flex-col gap-2">
-                <h3 className="dark:text-gray-300 text-gray-700 text-3xl sm:text-4xl md:text-5xl font-semibold">
-                  {name}
-                </h3>
-                <p className="text-blue-400 text-xl sm:text-2xl font-medium flex items-center">
-                  <icons.IoPricetagsOutline className="mr-1 text-lg" /> P{price}
-                </p>
-              </div>
+        <section className="w-full px-4 sm:px-8 md:px-10 lg:px-20 xl:px-[150px] mt-6">
+          {/* HEADER */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            {/* Name + Price */}
+            <div className="flex flex-col gap-2">
+              <h3 className="dark:text-gray-200 text-gray-800 text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+                {name}
+              </h3>
 
-              <icons.FaStreetView
-                onClick={() => navigate(`/room-view/${photosphere}`)}
-                title="View Room"
-                className="text-[35px] sm:text-[40px] text-blue-400 cursor-pointer transform transition-transform duration-300 hover:scale-125"
-              />
+              <p className="text-blue-500 text-xl sm:text-2xl font-semibold flex items-center">
+                <icons.IoPricetagsOutline className="mr-2 text-2xl" />P{price}
+              </p>
             </div>
+
+            {/* View 360 Button */}
+            <button
+              onClick={() => navigate(`/room-view/${photosphere}`)}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white 
+                   px-4 py-2 rounded-lg text-sm sm:text-base transition shadow-md"
+            >
+              <icons.FaStreetView className="text-xl" />
+              View 360°
+            </button>
           </div>
 
           {/* CAPACITY & DURATION */}
-          <div className="flex flex-wrap justify-start gap-5 mt-4">
-            <span className="inline-flex items-center text-md sm:text-lg dark:text-gray-100 text-gray-700">
-              <icons.LuUsers className="mr-1 text-blue-400" />
-              <span className="text-sm mr-2">Capacity:</span>
-              {capacity} Person
-            </span>
+          <div className="flex flex-wrap gap-5 mt-6">
+            <div className="flex items-center bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg">
+              <icons.LuUsers className="mr-2 text-blue-500 text-xl" />
+              <p className="text-gray-700 dark:text-gray-100 text-sm sm:text-base">
+                <span className="font-medium">Capacity:</span> {capacity}{" "}
+                Persons
+              </p>
+            </div>
 
-            <span className="inline-flex items-center text-md sm:text-lg dark:text-gray-100 text-gray-700">
-              <icons.IoIosTimer className="mr-1 text-blue-400" />
-              <span className="text-sm mr-2">Duration:</span>
-              {duration} hrs
-            </span>
+            <div className="flex items-center bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg">
+              <icons.IoIosTimer className="mr-2 text-blue-500 text-xl" />
+              <p className="text-gray-700 dark:text-gray-100 text-sm sm:text-base">
+                <span className="font-medium">Stay Duration:</span> {duration}{" "}
+                hrs
+              </p>
+            </div>
           </div>
         </section>
 
         {/* DESCRIPTION */}
-        <section className="w-full px-4 sm:px-8 md:px-10 lg:px-20 xl:px-[130px] mt-6">
-          <div className="w-full border-t dark:border-gray-800 mt-4 pt-4">
-            <h3 className="font-semibold mb-2 text-gray-800 dark:text-gray-50">
-              * Description
+        <section className="w-full px-4 sm:px-8 md:px-10 lg:px-20 xl:px-[150px] mt-10">
+          <div className="border-t dark:border-gray-700 pt-6">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
+              Description
             </h3>
-            <p className="dark:text-white text-md sm:text-lg">{description}</p>
+            <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed">
+              {description}
+            </p>
           </div>
         </section>
       </main>

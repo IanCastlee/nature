@@ -120,37 +120,27 @@ function RoomCard({ rooms }) {
 
                 <div className="flex flex-col items-end justify-end">
                   {/* View Room (Photo Sphere) */}
-                  <motion.div
-                    whileHover={{ scale: 1.2, rotate: 10 }}
-                    transition={{ type: "spring", stiffness: 200 }}
-                  >
-                    <icons.FaStreetView
-                      onClick={() =>
-                        safeNavigate(
-                          item?.photo_sphere
-                            ? `/room-view/${item.photo_sphere}`
-                            : null,
-                          "Room preview unavailable."
-                        )
-                      }
-                      className="text-2xl text-blue-600 cursor-pointer"
-                    />
-                  </motion.div>
-
-                  {/* More Details */}
                   <motion.button
-                    whileHover={{ x: 5 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ type: "spring", stiffness: 200 }}
                     onClick={() =>
                       safeNavigate(
-                        item?.room_id ? `/room-deatails/${item.room_id}` : null,
-                        "Room details unavailable."
+                        item?.photo_sphere
+                          ? `/room-view/${item.photo_sphere}`
+                          : null,
+                        "Room preview unavailable."
                       )
                     }
-                    className="group flex flex-row items-center text-blue-500 text-sm font-medium"
+                    className="flex items-center gap-2 
+             text-blue-600 dark:text-blue-400
+             border border-blue-300 dark:border-blue-500
+             hover:border-blue-500 dark:hover:border-blue-300
+             hover:text-blue-700 dark:hover:text-blue-300
+             px-2 py-1 rounded-md
+             text-xs font-medium transition-all"
                   >
-                    More Details
-                    <icons.FiArrowUpRight className="ml-1 text-blue-600 text-lg" />
+                    <icons.FaStreetView className="text-lg" />
+                    View 360°
                   </motion.button>
                 </div>
               </div>
@@ -227,6 +217,21 @@ function RoomCard({ rooms }) {
                     }
                   />
                 </motion.div>
+                {/* More Details */}
+                <motion.button
+                  whileHover={{ x: 5 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() =>
+                    safeNavigate(
+                      item?.room_id ? `/room-deatails/${item.room_id}` : null,
+                      "Room details unavailable."
+                    )
+                  }
+                  className="group flex flex-row items-center text-blue-500 text-sm font-medium"
+                >
+                  More Details
+                  <icons.FiArrowUpRight className="ml-1 text-blue-600 text-lg" />
+                </motion.button>
               </div>
             </div>
           </motion.article>

@@ -33,18 +33,39 @@ function AdminBookingReschedLog() {
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
-
+  console.log(data);
   // FILTERING BY SEARCH TERM
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
-      const s = searchTerm.toLowerCase();
+
+      const q = String(searchTerm).toLowerCase();
+
       return (
-        (item?.fullname || "").toLowerCase().includes(s) ||
-        (item?.room_name || "").toLowerCase().includes(s) ||
-        (item?.sched_date || "").toLowerCase().includes(s) ||
-        (item?.resched_to || "").toLowerCase().includes(s) ||
-        (item?.status || "").toLowerCase().includes(s)
+        String(item?.rescheduled_booking_id || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.fullname || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.phone || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.room_name || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.start_date || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.end_date || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.nights || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(item?.status || "")
+          .toLowerCase()
+          .includes(q)
       );
     }) || [];
 

@@ -36,11 +36,11 @@ function CattageCard({ item }) {
           <icons.IoPricetagsOutline /> P {item.price}
         </span>
         <span className="flex flex-row items-center text-sm text-white font-medium gap-2">
-          <icons.LuUsers /> Capacity : {item.capacity}
+          <icons.LuUsers /> Capacity : {item.capacity} persons
         </span>
         <span className="flex flex-row items-center text-sm text-white font-medium gap-2">
           <icons.IoIosTimer />
-          Duration : {item.duration}
+          Stay Duration : {item.duration} hrs
         </span>
       </motion.div>
 
@@ -60,8 +60,8 @@ function CattageCard({ item }) {
 
       <icons.FaStreetView
         onClick={() => navigate(`/room-view/${item.photosphere}`)}
-        title="View Room"
-        className="text-3xl hover:text-blue-400 text-white cursor-pointer transform transition-transform duration-300 hover:scale-125 absolute right-2 bottom-2 bg-black/60 rounded-full p-1"
+        title="View in 360°"
+        className="text-3xl hover:text-blue-400 text-white cursor-pointer transform transition-transform duration-300 hover:scale-125 absolute right-2 top-2 bg-black/60 rounded-full p-1"
       />
     </article>
   );

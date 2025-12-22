@@ -164,8 +164,8 @@ function HomePage() {
 
         <Suspense
           fallback={
-            <div className="text-center py-10 text-gray-400">
-              Loading About...
+            <div className="flex justify-center items-center py-10">
+              <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           }
         >
@@ -181,8 +181,8 @@ function HomePage() {
 
           <div className="w-full flex flex-row flex-wrap px-2 md:px-2 lg:px-[130px] justify-center gap-2">
             {loading && (
-              <div className="text-sm text-blue-600 mt-4">
-                Loading room categories...
+              <div className="flex justify-center items-center py-10">
+                <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
               </div>
             )}
 
@@ -223,8 +223,8 @@ function HomePage() {
 
           <div className="w-full flex flex-row flex-wrap px-2 md:px-2 lg:px-[130px] justify-center gap-2">
             {loadingFh && (
-              <div className="text-sm text-blue-600 mt-4">
-                Loading function halls...
+              <div className="flex justify-center items-center py-10">
+                <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
               </div>
             )}
 
@@ -274,8 +274,8 @@ function HomePage() {
 
           <div className="w-full flex flex-row flex-wrap md:flex-nowrap lg:flex-nowrap px-2 md:px-2 lg:px-[130px] justify-center gap-2">
             {loadingCottage && (
-              <div className="text-sm text-blue-600 mt-4">
-                Loading cottages...
+              <div className="flex justify-center items-center py-10">
+                <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
               </div>
             )}
 
@@ -320,8 +320,8 @@ function HomePage() {
           </Suspense> */}
           <Suspense
             fallback={
-              <div className="fixed bottom-4 right-10 text-white">
-                Loading...
+              <div className="flex justify-center items-center py-10">
+                <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
               </div>
             }
           >
