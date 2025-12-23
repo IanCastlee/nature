@@ -267,7 +267,7 @@ function HomePage() {
         <section className="w-full flex flex-col dark:bg-black mt-28">
           <div className="flex flex-col justify-center items-center">
             <div className="flex flex-row justify-center items-center gap-2">
-              <SubtTitle title="OUR CATTAGES" />
+              <SubtTitle title="OUR COTTAGES" />
             </div>
             <Title title="FIND THE PERFECT COTTAGE FOR YOUR STAY" />
           </div>

@@ -412,23 +412,23 @@ function OtherFacilitiesBookingPage() {
             />
 
             <div className="flex flex-col md:flex-row md:gap-12">
-              <div className="md:w-3/5 mb-8 md:mb-0 pr-6 border-r border-gray-300 dark:border-gray-600">
+              <div className="md:w-3/5 mb-8 md:mb-0 pr-6 lg:border-r border-r-0 border-gray-300 dark:border-gray-600">
                 <div className="grid grid-cols-3 gap-6 mb-6 text-gray-700 dark:text-gray-300">
                   {/* Make "Choosen Date" span 2 columns */}
                   <div className="flex flex-col items-center border-r border-gray-300 dark:border-gray-600 pr-4 col-span-2">
-                    <span className="text-xs md:text-sm uppercase font-semibold mb-1">
-                      Choosen Date
+                    <span className="text-xs md:text-sm uppercase font-semibold mb-1 text-center">
+                      Chosen Date
                     </span>
-                    <span className="text-xs md:text-sm font-medium">
+                    <span className="text-xs md:text-sm font-medium text-center">
                       {formattedDate}
                     </span>
                   </div>
 
                   <div className="flex flex-col items-center pl-4">
-                    <span className="text-xs md:text-sm uppercase font-semibold mb-1">
+                    <span className="text-xs md:text-sm uppercase font-semibold mb-1 text-center">
                       Start Time
                     </span>
-                    <span className="text-xs md:text-sm font-medium">
+                    <span className="text-xs md:text-sm font-medium text-center">
                       {startTime} AM
                     </span>
                   </div>
@@ -681,11 +681,11 @@ function OtherFacilitiesBookingPage() {
                   onClick={handleScreenshot}
                   className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-5 rounded-lg transition-shadow shadow-md"
                 >
-                  📸 Save Reservation Details
+                  📸 Download Reservation Details
                 </button>
 
-                <p className="dark:text-gray-100 text-gray-800 text-xs">
-                  Kindly save these reservation details.
+                <p className=" text-gray-800 text-xs">
+                  Please save your reservation details.
                 </p>
               </div>
             </div>

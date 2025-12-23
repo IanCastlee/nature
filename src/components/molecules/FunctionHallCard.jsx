@@ -110,7 +110,7 @@ function FunctionHallCard({ item, index }) {
             text-gray-700 dark:text-gray-200"
             >
               <icons.LuUsers className="mr-2 text-blue-500 dark:text-blue-400 text-lg" />
-              {item.capacity} Persons
+              Capacity: {item.capacity} Persons
             </span>
 
             <span
@@ -118,7 +118,7 @@ function FunctionHallCard({ item, index }) {
             text-gray-700 dark:text-gray-200"
             >
               <icons.IoIosTimer className="mr-2 text-blue-500 dark:text-blue-400 text-lg" />
-              {item.duration} hrs
+              Stay Duration: {item.duration} hrs
             </span>
           </div>
 

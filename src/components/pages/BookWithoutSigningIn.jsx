@@ -1094,8 +1094,8 @@ function BookWithoutSigningIn() {
                   📸 Save Reservation Details
                 </button>
 
-                <p className="dark:text-gray-100 text-gray-800 text-xs">
-                  Kindly save these reservation details.
+                <p className=" text-gray-800 text-xs">
+                  Please save your reservation details.
                 </p>
               </div>
             </div>

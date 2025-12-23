@@ -2,34 +2,48 @@
 include("../header.php");
 include("../dbConn.php");
 
-$checkIn = $_GET['checkIn'];
-$checkOut = $_GET['checkOut'];
-$guests = (int)$_GET['guests'];
-// $categoryId = (int)$_GET['categoryId'];
+$checkIn  = $_GET['checkIn'];   // YYYY-MM-DD
+$checkOut = $_GET['checkOut'];  // YYYY-MM-DD
+$guests   = (int)$_GET['guests'];
 
-// Query to get rooms that match capacity & category, and are active (available)
 $sql = "
 SELECT r.*
 FROM rooms r
 WHERE 
-   r.capacity >= ?
-  AND r.status = 'active'
-  AND r.room_id NOT IN (
-    SELECT rb.facility_id
-    FROM room_booking rb
-    WHERE rb.status IN ('booked', 'pending')
-      AND NOT (rb.end_date <= ? OR rb.start_date >= ?)
-  )
+    r.capacity >= ?
+    AND r.status = 'active'
+    AND r.room_id NOT IN (
+        SELECT rb.facility_id
+        FROM room_booking rb
+        WHERE rb.status IN ('resched', 'pending', 'approved', 'not_attended', 'arrived')
+          AND rb.start_date <= ?
+          AND rb.end_date   >= ?
+    )
+ORDER BY
+    CASE 
+        WHEN r.capacity = ? THEN 0
+        ELSE 1
+    END,
+    r.capacity ASC
 ";
 
 $stmt = $conn->prepare($sql);
 if (!$stmt) {
-    echo json_encode(['success' => false, 'error' => $conn->error]);
+    echo json_encode([
+        'success' => false,
+        'error' => $conn->error
+    ]);
     exit;
 }
 
-// Bind parameters: categoryId, guests, checkIn, checkOut
-$stmt->bind_param("iss", $guests, $checkIn, $checkOut);
+// PARAMETER ORDER IS IMPORTANT
+$stmt->bind_param(
+    "isss",
+    $guests,     // capacity >= ?
+    $checkOut,   // start_date <= ?
+    $checkIn,    // end_date >= ?
+    $guests      // capacity = ? (priority)
+);
 
 $stmt->execute();
 $result = $stmt->get_result();
@@ -46,8 +60,7 @@ echo json_encode([
     'debug' => [
         'checkIn' => $checkIn,
         'checkOut' => $checkOut,
-        'guests' => $guests,
-       
+        'guests' => $guests
     ]
 ]);
 ?>

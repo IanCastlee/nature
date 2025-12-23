@@ -94,7 +94,7 @@ function SearchBox() {
             Check-in
           </label>
           <div
-            className="flex items-center justify-between border border-blue-500 dark:border-blue-400
+            className="flex items-center justify-between border-2 border-blue-200 dark:border-blue-400
                        rounded-lg px-3 py-2 cursor-pointer
                        bg-white dark:bg-gray-800"
             onClick={() => setOpenCalendar({ checkIn: true, checkOut: false })}
@@ -112,11 +112,11 @@ function SearchBox() {
             Check-out
           </label>
           <div
-            className={`flex items-center justify-between border rounded-lg px-3 py-2
+            className={`flex items-center justify-between border-2 rounded-lg px-3 py-2
               bg-white dark:bg-gray-800 ${
                 !searchData.checkIn
-                  ? "opacity-50 cursor-not-allowed border-blue-300 dark:border-blue-700"
-                  : "cursor-pointer border-blue-500 dark:border-blue-400"
+                  ? "opacity-50 cursor-not-allowed  border-blue-200 dark:border-blue-700"
+                  : "cursor-pointer border-blue-200 dark:border-blue-400"
               }`}
             onClick={() =>
               searchData.checkIn &&
@@ -135,7 +135,7 @@ function SearchBox() {
           <label className="text-xs font-medium mb-1 block text-gray-700 dark:text-gray-200">
             Guests
           </label>
-          <div className="flex items-center border border-blue-500 dark:border-blue-400 rounded-lg px-3 py-2 bg-white dark:bg-gray-800">
+          <div className="flex items-center border-2 border-blue-200 dark:border-blue-400 rounded-lg px-3 py-2 bg-white dark:bg-gray-800">
             <select
               className="w-full bg-transparent outline-none text-gray-900 dark:text-gray-200
                          [&>option]:bg-white dark:[&>option]:bg-gray-800

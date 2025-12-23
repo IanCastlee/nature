@@ -249,17 +249,17 @@ function Header({ isHome }) {
 
             <div
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`flex items-center justify-center w-10 h-10 rounded-md cursor-pointer transition-all
-        ${
-          mobileMenuOpen
-            ? "bg-red-500 text-white"
-            : isHome && !scrolled
-            ? "bg-transparent text-white" // home & not scrolled: transparent bg, white text
-            : scrolled
-            ? "dark:bg-gray-900 dark:text-white bg-white text-black shadow-md"
-            : "dark:bg-gray-900 dark:text-white"
-        }
-      `}
+              className={`flex items-center justify-center w-10 h-10 rounded-md cursor-pointer transition-all duration-300
+    ${
+      mobileMenuOpen
+        ? "bg-red-500 text-white"
+        : isHome && !scrolled
+        ? "bg-white/20 dark:bg-gray-900/60 text-white backdrop-blur-sm"
+        : scrolled
+        ? "bg-white text-black shadow-md dark:bg-gray-900 dark:text-white"
+        : "bg-white text-black dark:bg-gray-900 dark:text-white"
+    }
+  `}
             >
               {mobileMenuOpen ? (
                 <icons.MdOutlineClose className="text-2xl" />
