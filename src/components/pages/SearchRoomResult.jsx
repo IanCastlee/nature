@@ -27,6 +27,8 @@ function SearchRoomResult() {
     `/booking/search-rooms.php?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`
   );
 
+  console.log("roomDetails : ", roomDetails);
+
   /* -------------------- LOADER -------------------- */
   if (loading) {
     return (

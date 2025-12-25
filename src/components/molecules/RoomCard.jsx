@@ -158,7 +158,7 @@ function RoomCard({ rooms }) {
                 </span>
                 <span className="inline-flex items-center text-sm dark:text-gray-100 text-gray-700">
                   <icons.IoIosTimer className="mr-1 text-blue-600" />
-                  Time In/Out: {item?.time_in_out}
+                  Time In & Out: {item?.time_in_out}
                 </span>
               </div>
 

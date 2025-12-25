@@ -2,13 +2,16 @@
 include("../header.php");
 include("../dbConn.php");
 
-$checkIn  = $_GET['checkIn'];   // YYYY-MM-DD
-$checkOut = $_GET['checkOut'];  // YYYY-MM-DD
+$checkIn  = $_GET['checkIn'];
+$checkOut = $_GET['checkOut'];
 $guests   = (int)$_GET['guests'];
 
 $sql = "
-SELECT r.*
+SELECT 
+    r.*,
+    GROUP_CONCAT(ri.image_path) AS images
 FROM rooms r
+LEFT JOIN room_images ri ON ri.room_id = r.room_id
 WHERE 
     r.capacity >= ?
     AND r.status = 'active'
@@ -19,6 +22,7 @@ WHERE
           AND rb.start_date <= ?
           AND rb.end_date   >= ?
     )
+GROUP BY r.room_id
 ORDER BY
     CASE 
         WHEN r.capacity = ? THEN 0
@@ -28,39 +32,22 @@ ORDER BY
 ";
 
 $stmt = $conn->prepare($sql);
-if (!$stmt) {
-    echo json_encode([
-        'success' => false,
-        'error' => $conn->error
-    ]);
-    exit;
-}
-
-// PARAMETER ORDER IS IMPORTANT
-$stmt->bind_param(
-    "isss",
-    $guests,     // capacity >= ?
-    $checkOut,   // start_date <= ?
-    $checkIn,    // end_date >= ?
-    $guests      // capacity = ? (priority)
-);
-
+$stmt->bind_param("isss", $guests, $checkOut, $checkIn, $guests);
 $stmt->execute();
-$result = $stmt->get_result();
 
+$result = $stmt->get_result();
 $rooms = [];
+
 while ($row = $result->fetch_assoc()) {
+    $row['images'] = $row['images']
+        ? explode(',', $row['images'])
+        : [];
     $rooms[] = $row;
 }
 
 echo json_encode([
     'success' => true,
     'data' => $rooms,
-    'count' => count($rooms),
-    'debug' => [
-        'checkIn' => $checkIn,
-        'checkOut' => $checkOut,
-        'guests' => $guests
-    ]
+    'count' => count($rooms)
 ]);
 ?>

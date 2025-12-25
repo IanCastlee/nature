@@ -140,6 +140,7 @@ function HomePage() {
                       greenery. Enjoy a peaceful overnight stay in our cozy
                       rooms — perfect for families, couples, and solo travelers.
                     </p>
+
                     <a
                       href="#room-categories"
                       className="
@@ -153,6 +154,9 @@ function HomePage() {
                     >
                       Show Rooms
                     </a>
+                    <span className="lg:flex hidden text-xs text-gray-700 bg-yellow-400 px-2 py-1 rounded-full font-semibold">
+                      Open 24 hours • Every day
+                    </span>
                   </figcaption>
                 </SwiperSlide>
               ))}

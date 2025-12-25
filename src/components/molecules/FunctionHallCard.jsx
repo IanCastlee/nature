@@ -37,7 +37,7 @@ function FunctionHallCard({ item, index }) {
         className="w-full flex flex-col 
         md:basis-[calc(50%-0.3rem)] lg:basis-[calc(50%-0.3rem)] 
         overflow-hidden rounded-xl cursor-pointer
-        bg-white dark:bg-gray-900
+        bg-white dark:bg-gray-950
         shadow-sm hover:shadow-xl 
         dark:border dark:border-gray-800
         transition-all duration-300"

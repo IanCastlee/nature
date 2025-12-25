@@ -247,9 +247,14 @@ function Header({ isHome }) {
               </li>
             )}
 
-            <div
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`flex items-center justify-center w-10 h-10 rounded-md cursor-pointer transition-all duration-300
+            <div className="flex flex-row gap-4 items-center">
+              <span className="text-[10px] text-white bg-white/15 backdrop-blur-sm border border-white/20 px-2 py-1 rounded-full font-semibold">
+                Open 24 hours • Every day
+              </span>
+
+              <div
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className={`flex items-center justify-center w-10 h-10 rounded-md cursor-pointer transition-all duration-300
     ${
       mobileMenuOpen
         ? "bg-red-500 text-white"
@@ -260,12 +265,13 @@ function Header({ isHome }) {
         : "bg-white text-black dark:bg-gray-900 dark:text-white"
     }
   `}
-            >
-              {mobileMenuOpen ? (
-                <icons.MdOutlineClose className="text-2xl" />
-              ) : (
-                <icons.RiMenuLine className="text-2xl" />
-              )}
+              >
+                {mobileMenuOpen ? (
+                  <icons.MdOutlineClose className="text-2xl" />
+                ) : (
+                  <icons.RiMenuLine className="text-2xl" />
+                )}
+              </div>
             </div>
           </div>
         </div>

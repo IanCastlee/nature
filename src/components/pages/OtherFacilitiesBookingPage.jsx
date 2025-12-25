@@ -672,7 +672,7 @@ function OtherFacilitiesBookingPage() {
                 <p className="text-gray-500 text-xs mt-1">
                   <span className="font-semibold">Business Hours:</span>{" "}
                   <span className="px-2 py-1 rounded-md bg-gray-100 text-black dark:bg-gray-200 dark:text-black text-[0.7rem]">
-                    8:00 AM – 5:00 PM (Every Day)
+                    Open 24 hours • Every day
                   </span>
                 </p>
 

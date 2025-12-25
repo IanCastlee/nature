@@ -394,6 +394,42 @@ foreach ($extras as $extra) {
 
 $totalPrice = $basePrice + $extrasTotal;
 
+
+
+/**
+ * ========================================================
+ * CHECK AVAILABILITY (CRITICAL)
+ * ========================================================
+ */
+$availabilityCheck = $conn->prepare("
+    SELECT 1
+    FROM room_booking
+    WHERE facility_id = ?
+      AND status IN ('pending', 'approved', 'arrived', 'rescheduled')
+      AND start_date < ?
+      AND end_date > ?
+    LIMIT 1
+");
+
+$availabilityCheck->bind_param(
+    "iss",
+    $facilityId,
+    $checkOut, // existing start < new end
+    $checkIn   // existing end > new start
+);
+
+$availabilityCheck->execute();
+$availabilityResult = $availabilityCheck->get_result();
+
+if ($availabilityResult->num_rows > 0) {
+    http_response_code(409);
+    echo json_encode([
+        "error" => "Selected dates are no longer available."
+    ]);
+    exit;
+}
+
+
 // INSERT MAIN BOOKING
 $insertBooking = $conn->prepare("
     INSERT INTO room_booking 

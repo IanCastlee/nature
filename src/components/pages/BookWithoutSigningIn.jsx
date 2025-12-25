@@ -134,12 +134,6 @@ function BookWithoutSigningIn() {
         }
       }
 
-      //  4. Always disable today
-      // if (!disabledSet.has(today.getTime())) {
-      //   extendedDisabled.push(today);
-      //   disabledSet.add(today.getTime());
-      // }
-
       // 5. Remove duplicates
       const finalDisabled = Array.from(
         new Set(extendedDisabled.map((d) => d.getTime()))
@@ -373,10 +367,6 @@ function BookWithoutSigningIn() {
     withExtras,
   } = roomDetails;
 
-  // const parsedAmenities = amenities?.split(",") || [];
-  // const parsedInclusions = inclusion?.split(",") || [];
-  // const parsedExtras = extrasData?.data || [];
-
   const nights = getNumberOfNights();
   const roomTotal = nights * Number(price);
   const extrasTotal = addedExtras.reduce(
@@ -413,6 +403,32 @@ function BookWithoutSigningIn() {
     });
   };
 
+  //helper
+  const isRangeInvalid = (from, to, disabledRanges) => {
+    if (!from || !to) return false;
+
+    const start = new Date(from);
+    const end = new Date(to);
+
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const time = d.setHours(0, 0, 0, 0);
+
+      for (const dis of disabledRanges) {
+        // case: exact disabled date
+        if (dis instanceof Date && dis.getTime() === time) {
+          return true;
+        }
+
+        // case: before today rule
+        if (dis.before && time < dis.before.getTime()) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
   return (
     <>
       {toast && (
@@ -433,23 +449,10 @@ function BookWithoutSigningIn() {
           />
           <div className="w-full md:w-full lg:w-1/2  p-6 overflow-y-auto h-screen">
             <div className="w-full flex flex-row justify-between items-center mb-5 pb-1 border-b dark:border-gray-600 border-gray-300 ">
-              {/* <h2 className="font-semibold text-sm dark:text-gray-200 text-gray-800">
-                Room Details
-              </h2> */}
               <h1 className="text-3xl dark:text-white text-gray-800 font-semibold">
                 {room_name}
               </h1>
               <div className="flex flex-row items-center lg:gap-10 md:gap-10 gap-4">
-                {/* <Button
-                  onClick={handlePreviousRoom}
-                  label={
-                    <>
-                      <icons.BsArrowRight className="transform -scale-x-100" />
-                      Previous Room
-                    </>
-                  }
-                  style="flex flex-row items-center gap-1 text-sm text-blue-500 font-medium rounded-sm px-2 transition-all duration-300 transform hover:scale-105 mb-4"
-                /> */}
                 <Button
                   onClick={handleNextRoom}
                   label={
@@ -476,24 +479,53 @@ function BookWithoutSigningIn() {
                 Select your prepared date
               </h3>
               <div className="flex lg:flex-row md:flex-col flex-col gap-6 items-center">
-                <div className="lg:scale-90   md:scale-100 scale-100  w-fit border p-2 rounded-lg text-black dark:text-white bg-white dark:bg-gray-900">
+                <div className="lg:scale-90   md:scale-100 scale-100  w-fit border dark:border-gray-700 border-gray-300 p-2 rounded-lg text-black dark:text-white bg-white dark:bg-gray-900">
                   <DayPicker
                     mode="range"
                     selected={selectedRange}
+                    disabled={disabledRanges}
                     onSelect={(range) => {
-                      if (range?.from && !range?.to) {
-                        setSelectedRange({ from: range.from, to: undefined });
-                      } else if (range?.from && range?.to) {
-                        setSelectedRange(range);
-                      } else {
+                      // reset
+                      if (!range?.from) {
                         setSelectedRange({ from: undefined, to: undefined });
+                        return;
+                      }
+
+                      // check-in only
+                      if (range.from && !range.to) {
+                        setSelectedRange({ from: range.from, to: undefined });
+                        return;
+                      }
+
+                      // check-out selected
+                      if (range.from && range.to) {
+                        const invalid = isRangeInvalid(
+                          range.from,
+                          range.to,
+                          disabledRanges
+                        );
+
+                        if (invalid) {
+                          setToast({
+                            message:
+                              "Selected dates include unavailable days. Please choose another range.",
+                            type: "error",
+                          });
+
+                          setSelectedRange({ from: undefined, to: undefined });
+                          return;
+                        }
+
+                        //  valid range
+                        setSelectedRange(range);
                       }
                     }}
-                    disabled={disabledRanges}
                     modifiersClassNames={{
-                      selected: "bg-blue-500 text-white",
-                      today: "text-blue-500",
-                      disabled: "text-gray-400 line-through",
+                      selected:
+                        "bg-blue-500 text-white dark:bg-blue-400 dark:text-black",
+                      today: "text-blue-600 dark:text-blue-400 font-semibold",
+                      disabled:
+                        "relative bg-gray-200 text-transparent cursor-not-allowed dark:bg-gray-800",
                     }}
                   />
                 </div>
@@ -1082,7 +1114,7 @@ function BookWithoutSigningIn() {
                 <p className="text-gray-500 text-xs mt-1">
                   <span className="font-semibold">Business Hours:</span>{" "}
                   <span className="px-2 py-1 rounded-md bg-gray-100 text-black dark:bg-gray-200 dark:text-black text-[0.7rem]">
-                    8:00 AM – 5:00 PM (Every Day)
+                    Open 24 hours • Every day
                   </span>
                 </p>
 
