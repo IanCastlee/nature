@@ -423,10 +423,13 @@ $availabilityResult = $availabilityCheck->get_result();
 
 if ($availabilityResult->num_rows > 0) {
     http_response_code(409);
-    echo json_encode([
-        "error" => "Selected dates are no longer available."
-    ]);
-    exit;
+  echo json_encode([
+    "success" => false,
+   "message" => "Dates unavailable. Please refresh the page to get the latest updates."
+
+]);
+exit;
+
 }
 
 

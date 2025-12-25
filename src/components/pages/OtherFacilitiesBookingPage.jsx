@@ -56,6 +56,8 @@ function OtherFacilitiesBookingPage() {
     loading: formLoading,
     error: formError,
   } = useFormSubmit("/booking/fh-booking.php", (response) => {
+    if (!response?.success) return;
+
     setToast({
       message: "Reservation submitted successfully!",
       type: "success",
@@ -138,8 +140,8 @@ function OtherFacilitiesBookingPage() {
   const { image, name, price, capacity, duration } = fhDetails;
 
   const handleBooking = async () => {
-    if (isSubmitting) return; // prevent double click
-    setIsSubmitting(true); // disable further clicks
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     try {
       if (!form.terms) {
@@ -161,54 +163,46 @@ function OtherFacilitiesBookingPage() {
 
       setShowForm(null);
 
-      // REMEMBER ME — Save or Remove Local Storage
+      // REMEMBER ME
       if (form.remember) {
         localStorage.setItem("firstname", form.firstname);
         localStorage.setItem("lastname", form.lastname);
         localStorage.setItem("phone", form.phone);
         localStorage.setItem("remember_info", "true");
       } else {
-        localStorage.removeItem("firstname");
-        localStorage.removeItem("lastname");
-        localStorage.removeItem("phone");
-        localStorage.removeItem("remember_info");
+        localStorage.clear();
       }
 
       const slotHours = 8;
-
-      const bookingDate = new Date(selectedDate);
-      const formattedDate = bookingDate.toLocaleDateString("en-CA");
+      const formattedDate = new Date(selectedDate).toLocaleDateString("en-CA");
 
       const startDateTime = new Date(`${formattedDate}T${startTime}`);
       const endDateTime = new Date(startDateTime);
       endDateTime.setHours(endDateTime.getHours() + slotHours);
 
-      const startHour = startDateTime.getHours();
-      const endHour = endDateTime.getHours();
-
-      if (startHour < 4 || endHour > 22 || endHour <= startHour) {
+      if (startDateTime.getHours() < 4 || endDateTime.getHours() > 22) {
         setToast({
-          message: `Booking must start at least between 4:00 AM and end by 10:00 PM.`,
+          message: "Booking must be between 4:00 AM and 10:00 PM.",
           type: "error",
         });
         return;
       }
 
-      const formattedEndTime = endDateTime.toTimeString().split(" ")[0]; // HH:MM:SS
-
-      // Await the submit function if it's async
       await submit({
         fullname: `${form.firstname} ${form.lastname}`,
         phone: form.phone,
         fhId: Number(facilityId),
         date: formattedDate,
-        startTime: startTime,
-        endTime: formattedEndTime,
+        startTime,
+        endTime: endDateTime.toTimeString().split(" ")[0],
       });
     } catch (err) {
-      console.error(err);
+      setToast({
+        message: err.message, // ✅ backend message
+        type: "error",
+      });
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false); // ✅ ALWAYS unlock
     }
   };
 
@@ -345,6 +339,14 @@ function OtherFacilitiesBookingPage() {
                       onSelect={setSelectedDate}
                       required
                       disabled={[{ before: new Date() }, ...disabledDates]}
+                      modifiersStyles={{
+                        disabled: {
+                          backgroundColor: "#f3f4f6",
+                          color: "#9ca3af",
+                          textDecoration: "line-through",
+                          cursor: "not-allowed",
+                        },
+                      }}
                     />
                   </div>
                 </div>

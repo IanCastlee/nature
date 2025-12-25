@@ -294,43 +294,53 @@ $facility = $result->fetch_assoc();
 $facilityType = $facility['name'];
 $price        = $facility['price'];
 
-// Check for time conflict
+// ✅ DATE-ONLY CONFLICT CHECK (NO TIME)
 $conflict = $conn->prepare("
-    SELECT * FROM other_facilities_booking 
-    WHERE facility_type = ? AND date = ?
-    AND (
-        (start_time < ? AND end_time > ?) OR
-        (start_time >= ? AND start_time < ?)
-    )
+    SELECT 1
+    FROM other_facilities_booking
+    WHERE facility_id = ?
+      AND date = ?
+    LIMIT 1
 ");
-$conflict->bind_param("ssssss", $facilityType, $date, $endTime, $startTime, $startTime, $endTime);
+
+$conflict->bind_param("is", $fhId, $date);
 $conflict->execute();
 $conflictRes = $conflict->get_result();
 
 if ($conflictRes->num_rows > 0) {
-    echo json_encode([
-        "success" => false,
-        "message" => "This time slot is already booked."
-    ]);
-    exit;
+   http_response_code(409);
+echo json_encode([
+  "success" => false,
+  "message" => "This date is already booked. Please refresh the page to see the latest availability."
+]);
+exit;
+
 }
+
 
 // Insert booking
 $insert = $conn->prepare("
-    INSERT INTO other_facilities_booking (fullname, phone, facility_id, facility_type, date, start_time, end_time, price, created_at)
+    INSERT INTO other_facilities_booking 
+    (fullname, phone, facility_id, facility_type, date, start_time, end_time, price, created_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 ");
+
 $insert->bind_param(
     "ssisssiss",
-    $fullname, $phone, $fhId, $facilityType,
-    $date, $startTime, $endTime,
-    $price, $createdAt
+    $fullname,
+    $phone,
+    $fhId,
+    $facilityType,
+    $date,
+    $startTime,
+    $endTime,
+    $price,
+    $createdAt
 );
 
 if ($insert->execute()) {
-    $booking_id = $insert->insert_id; // <--- GET NEW ID
+    $booking_id = $insert->insert_id;
 
-    //  RETURN FULL SUMMARY for your React modal
     echo json_encode([
         "success" => true,
         "message" => "Booking successful!",

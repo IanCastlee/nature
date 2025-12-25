@@ -90,7 +90,7 @@ function HomePage() {
             className="w-full min-h-screen"
           >
             {loadingHero && (
-              <div className="flex items-center justify-center min-h-screen">
+              <div className="flex items-center justify-center min-h-screen text-black dark:text-white">
                 <p>Loading...</p>
               </div>
             )}

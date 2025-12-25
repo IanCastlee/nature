@@ -227,7 +227,7 @@ function Header({ isHome }) {
 
           {/* Mobile Hamburger Icon */}
           <div className="flex flex-row gap-4 items-center md:hidden ml-auto">
-            {user && (
+            {/* {user && (
               <li>
                 <div
                   className="relative"
@@ -245,7 +245,7 @@ function Header({ isHome }) {
                   </div>
                 </div>
               </li>
-            )}
+            )} */}
 
             <div className="flex flex-row gap-4 items-center">
               <span className="text-[10px] text-white bg-white/15 backdrop-blur-sm border border-white/20 px-2 py-1 rounded-full font-semibold">
@@ -305,7 +305,7 @@ function Header({ isHome }) {
               {/* MENU LIST */}
               <ul className="flex flex-col gap-2 px-5 py-4 text-gray-800 dark:text-gray-100 text-base">
                 {/* My Booking */}
-                {user && (
+                {/* {user && (
                   <li>
                     <Link
                       to={`/my-booking/${user?.user_id}`}
@@ -315,7 +315,7 @@ function Header({ isHome }) {
                       My Booking
                     </Link>
                   </li>
-                )}
+                )} */}
 
                 {/* Main Links */}
                 {["Home", "About", "Gallery"].map((item) => (
