@@ -15,8 +15,8 @@ import Toaster from "./Toaster";
 ======================= */
 function CalendarPortal({ children }) {
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 dark:bg-black/60">
-      <div className="pointer-events-auto">{children}</div>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      {children}
     </div>,
     document.body
   );
@@ -27,7 +27,6 @@ function SearchBox() {
   useGetData("/admin/room-category.php");
 
   const [toast, setToast] = useState(null);
-
   const [searchData, setSearchData] = useState({
     checkIn: "",
     checkOut: "",
@@ -41,11 +40,11 @@ function SearchBox() {
 
   const handleChange = (key, value) => {
     if (key === "checkIn") {
-      setSearchData((prev) => ({
-        ...prev,
+      setSearchData({
         checkIn: value,
-        checkOut: "",
-      }));
+        checkOut: "", // ✅ reset checkout when check-in changes
+        guests: searchData.guests,
+      });
     } else {
       setSearchData((prev) => ({ ...prev, [key]: value }));
     }
@@ -53,10 +52,9 @@ function SearchBox() {
 
   const handleSearch = () => {
     const { checkIn, checkOut, guests } = searchData;
-
     if (!checkIn || !checkOut || !guests) {
       setToast({
-        message: "Please fill all fields before searching.",
+        message: "Please complete all fields before searching.",
         type: "error",
       });
       return;
@@ -67,79 +65,122 @@ function SearchBox() {
     );
   };
 
-  const formatDate = (date) => {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-  };
+  const formatDate = (date) =>
+    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(date.getDate()).padStart(2, "0")}`;
 
-  const addOneDay = (dateString) => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  // ✅ helper: next day after check-in
+  const getNextDay = (dateString) => {
     const d = new Date(dateString);
     d.setDate(d.getDate() + 1);
     return d;
   };
 
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  /* =======================
+     DAYPICKER DARK STYLES
+  ======================= */
+  const dayPickerClassNames = {
+    caption: "text-gray-900 dark:text-gray-200",
+    caption_label: "text-sm font-medium text-gray-900 dark:text-gray-200",
+    head_cell: "text-xs text-gray-600 dark:text-gray-400",
+    day: "text-sm text-gray-900 dark:text-gray-200",
+    day_today: "border border-blue-500",
+    day_selected: "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600",
+    day_disabled: "text-gray-400 dark:text-gray-600 opacity-50",
+    nav_button: "text-gray-700 dark:text-gray-300 hover:text-blue-500",
+  };
 
   return (
-    <div className="absolute bottom-8 left-0 right-0 px-4 lg:pl-[80px] lg:pr-4 z-30 flex justify-center lg:justify-start w-full">
+    <div className="absolute bottom-6 left-0 right-0 z-30 px-4 lg:pl-[80px] flex justify-center lg:justify-start">
       {toast && <Toaster {...toast} onClose={() => setToast(null)} />}
 
-      <div className="backdrop-blur-md bg-white dark:bg-gray-900 border-t-2 border-blue-500 rounded-md shadow-lg p-4 sm:p-5 flex flex-col md:flex-row gap-3 md:items-end w-full sm:max-w-4xl lg:max-w-[60%]">
+      {/* SEARCH CARD */}
+      <div
+        className="
+          w-full sm:max-w-4xl lg:max-w-[60%]
+          bg-white/95 dark:bg-gray-900/95
+          backdrop-blur
+          rounded-2xl
+          shadow-xl
+          border border-gray-200 dark:border-gray-800
+          p-4 sm:p-6
+          flex flex-col md:flex-row gap-4 md:items-end
+        "
+      >
         {/* CHECK-IN */}
         <div className="flex-1">
-          <label className="text-xs font-medium mb-1 block text-gray-700 dark:text-gray-200">
+          <label className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 block">
             Check-in
           </label>
           <div
-            className="flex items-center justify-between border-2 border-blue-200 dark:border-blue-400
-                       rounded-lg px-3 py-2 cursor-pointer
-                       bg-white dark:bg-gray-800"
             onClick={() => setOpenCalendar({ checkIn: true, checkOut: false })}
+            className="
+              flex items-center justify-between
+              rounded-full px-4 py-2
+              border border-gray-300 dark:border-gray-700
+              bg-white dark:bg-gray-800
+              cursor-pointer hover:border-blue-400 transition
+            "
           >
-            <span className="text-sm text-gray-900 dark:text-gray-200">
+            <span className="text-sm text-gray-800 dark:text-gray-200">
               {searchData.checkIn || "Select date"}
             </span>
-            <IoIosCalendar className="text-xl text-blue-500 dark:text-blue-400" />
+            <IoIosCalendar className="text-lg text-blue-500" />
           </div>
         </div>
 
         {/* CHECK-OUT */}
         <div className="flex-1">
-          <label className="text-xs font-medium mb-1 block text-gray-700 dark:text-gray-200">
+          <label className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 block">
             Check-out
           </label>
           <div
-            className={`flex items-center justify-between border-2 rounded-lg px-3 py-2
-              bg-white dark:bg-gray-800 ${
-                !searchData.checkIn
-                  ? "opacity-50 cursor-not-allowed  border-blue-200 dark:border-blue-700"
-                  : "cursor-pointer border-blue-200 dark:border-blue-400"
-              }`}
             onClick={() =>
               searchData.checkIn &&
               setOpenCalendar({ checkIn: false, checkOut: true })
             }
+            className={`
+              flex items-center justify-between
+              rounded-full px-4 py-2 border
+              bg-white dark:bg-gray-800 transition
+              ${
+                searchData.checkIn
+                  ? "cursor-pointer border-gray-300 dark:border-gray-700 hover:border-blue-400"
+                  : "opacity-50 cursor-not-allowed border-gray-200"
+              }
+            `}
           >
-            <span className="text-sm text-gray-900 dark:text-gray-200">
+            <span className="text-sm text-gray-800 dark:text-gray-200">
               {searchData.checkOut || "Select date"}
             </span>
-            <IoIosCalendar className="text-xl text-blue-500 dark:text-blue-400" />
+            <IoIosCalendar className="text-lg text-blue-500" />
           </div>
         </div>
 
         {/* GUESTS */}
         <div className="flex-1">
-          <label className="text-xs font-medium mb-1 block text-gray-700 dark:text-gray-200">
+          <label className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1 block">
             Guests
           </label>
-          <div className="flex items-center border-2 border-blue-200 dark:border-blue-400 rounded-lg px-3 py-2 bg-white dark:bg-gray-800">
+          <div
+            className="
+              flex items-center rounded-full px-4 py-2
+              border border-gray-300 dark:border-gray-700
+              bg-white dark:bg-gray-800
+            "
+          >
             <select
-              className="w-full bg-transparent outline-none text-gray-900 dark:text-gray-200
-                         [&>option]:bg-white dark:[&>option]:bg-gray-800
-                         [&>option]:text-gray-900 dark:[&>option]:text-gray-200"
+              className="
+                w-full bg-transparent outline-none
+                text-sm text-gray-800 dark:text-gray-200
+                [&>option]:bg-white dark:[&>option]:bg-gray-800
+                [&>option]:text-gray-900 dark:[&>option]:text-gray-200
+              "
               value={searchData.guests}
               onChange={(e) => handleChange("guests", e.target.value)}
             >
@@ -152,22 +193,26 @@ function SearchBox() {
                 </option>
               ))}
             </select>
-            <FiUsers className="text-blue-500 dark:text-blue-400 text-lg" />
+            <FiUsers className="text-blue-500 text-lg ml-2" />
           </div>
         </div>
 
         {/* SEARCH BUTTON */}
         <Button
           onClick={handleSearch}
-          style="flex items-center justify-center gap-1
-                 bg-blue-500 hover:bg-blue-600
-                 dark:bg-blue-600 dark:hover:bg-blue-700
-                 text-white px-5 py-2 rounded-lg transition
-                 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          style="
+    bg-blue-600 hover:bg-blue-700
+    h-[36px] sm:h-[40px]
+    px-5
+    text-white text-xs sm:text-sm font-medium
+    rounded-full
+    flex items-center justify-center gap-2
+    transition hover:scale-105
+  "
           label={
             <>
-              <span className="text-sm">Search Available Room</span>
-              <icons.IoSearch className="text-lg" />
+              Search Rooms
+              <icons.IoSearch className="text-base" />
             </>
           }
         />
@@ -176,13 +221,11 @@ function SearchBox() {
       {/* CHECK-IN CALENDAR */}
       {openCalendar.checkIn && (
         <CalendarPortal>
-          <div
-            className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200
-                          p-4 rounded-xl shadow-2xl border border-blue-500 dark:border-blue-400"
-          >
+          <div className="bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-2xl">
             <DayPicker
               mode="single"
               disabled={{ before: tomorrow }}
+              classNames={dayPickerClassNames}
               onSelect={(date) => {
                 if (date) {
                   handleChange("checkIn", formatDate(date));
@@ -197,17 +240,15 @@ function SearchBox() {
       {/* CHECK-OUT CALENDAR */}
       {openCalendar.checkOut && (
         <CalendarPortal>
-          <div
-            className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200
-                          p-4 rounded-xl shadow-2xl border border-blue-500 dark:border-blue-400"
-          >
+          <div className="bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-2xl">
             <DayPicker
               mode="single"
               disabled={{
                 before: searchData.checkIn
-                  ? addOneDay(searchData.checkIn)
+                  ? getNextDay(searchData.checkIn) // ✅ remove same-day checkout
                   : undefined,
               }}
+              classNames={dayPickerClassNames}
               onSelect={(date) => {
                 if (date) {
                   handleChange("checkOut", formatDate(date));

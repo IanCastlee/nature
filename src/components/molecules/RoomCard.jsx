@@ -154,7 +154,7 @@ function RoomCard({ rooms }) {
 
                 <span className="inline-flex items-center text-sm dark:text-gray-100 text-gray-700">
                   <icons.GiDuration className="mr-1 text-blue-600" />
-                  Duration: {item?.duration || "N/A"} hrs
+                  Duration: {item?.duration || "N/A"} hours
                 </span>
                 <span className="inline-flex items-center text-sm dark:text-gray-100 text-gray-700">
                   <icons.IoIosTimer className="mr-1 text-blue-600" />
@@ -203,18 +203,23 @@ function RoomCard({ rooms }) {
                       )
                     }
                     disabled={isUnderMaintenance}
-                    style={`${
-                      isUnderMaintenance
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-green-600 hover:scale-105"
-                    } text-xs text-white rounded-sm h-[30px] px-2`}
-                    label={
-                      isUnderMaintenance
-                        ? "Unavailable"
-                        : user
-                        ? "Reserve Now"
-                        : "Reserve Now"
-                    }
+                    style={`
+    ${
+      isUnderMaintenance
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-green-600 hover:bg-green-700 hover:scale-105"
+    }
+
+    /* SIZE */
+    h-[32px] sm:h-[38px]
+    px-4 sm:px-5
+    text-xs sm:text-sm
+
+    text-white font-medium
+    rounded-full
+    transition
+  `}
+                    label={isUnderMaintenance ? "Unavailable" : "Reserve Now"}
                   />
                 </motion.div>
                 {/* More Details */}

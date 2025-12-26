@@ -90,7 +90,7 @@ function Header({ isHome }) {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-10 ml-auto pr-10">
             <ul className="flex items-center gap-10">
-              {["Home", "About", "Gallery"].map((item) => (
+              {["Home", "About Us", "Gallery"].map((item) => (
                 <li key={item} className="relative group">
                   <Link
                     to={`/${item === "Home" ? "" : item.toLowerCase()}`}
@@ -248,7 +248,17 @@ function Header({ isHome }) {
             )} */}
 
             <div className="flex flex-row gap-4 items-center">
-              <span className="text-[10px] text-white bg-white/15 backdrop-blur-sm border border-white/20 px-2 py-1 rounded-full font-semibold">
+              <span
+                className={`text-[10px] px-2 py-1 rounded-full font-semibold transition-all
+    ${
+      isHome && !scrolled
+        ? "text-white bg-white/15 border border-white/20 backdrop-blur-sm"
+        : scrolled
+        ? "text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600"
+        : "text-gray-900 dark:text-white bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700"
+    }
+  `}
+              >
                 Open 24 hours • Every day
               </span>
 

@@ -9,6 +9,15 @@ function Footer() {
   // fetch data
   const { data } = useGetData(`/admin/admin_setting.php`);
 
+  if (!data) return null;
+
+  function formatPhone(num) {
+    if (!num) return "";
+    return num.startsWith("0") ? `+63${num.slice(1)}` : num;
+  }
+  const iconWrapper =
+    "w-7 h-7 flex items-center  justify-center rounded-full border border-blue-400 text-blue-400";
+
   return (
     <footer className="w-full bg-slate-50 dark:bg-gray-950 border-t dark:border-gray-900">
       <div className="flex flex-col lg:flex-row justify-between px-4 md:px-6 lg:px-20 py-8 gap-8">
@@ -22,50 +31,62 @@ function Footer() {
         </div>
 
         {/* Contacts */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           <h3 className="text-sm dark:text-white font-semibold">CONTACTS</h3>
+
+          {/* FB Messenger */}
           <a
-            href={data?.fb || "#"}
+            href={data?.fb}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 
-  text-blue-600 hover:text-blue-800 
-  dark:text-blue-400 dark:hover:text-blue-300
-  text-sm font-medium transition-all"
+            className="group flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-gray-800 transition"
           >
-            <span
-              className="p-1.5 rounded-full border border-blue-400 
-    dark:border-blue-500 text-blue-600 dark:text-blue-300
-    bg-white dark:bg-gray-800 
-    shadow-sm hover:shadow-md transition"
-            >
-              <icons.FaFacebookMessenger className="text-lg" />
+            <span className={iconWrapper}>
+              <icons.FaFacebookMessenger className="text-sm" />
             </span>
-
-            <span className="underline underline-offset-2 hover:underline-offset-4 transition-all">
-              Nature Hot Spring Page
+            <span className="text-blue-400 text-sm group-hover:translate-x-0.5 transition">
+              Messenger
             </span>
           </a>
 
-          <Link className="dark:text-white text-sm flex items-center gap-3">
-            <icons.FaPhoneAlt className="text-blue-400 text-2xl border rounded-full border-blue-400 p-1" />
-            Smart: {data?.smart_no || "0917-XXXXXXX"}
-          </Link>
-          <Link className="dark:text-white text-sm flex items-center gap-3">
-            <icons.FaPhoneAlt className="text-blue-400 text-2xl border rounded-full border-blue-400 p-1" />
-            Globe: {data?.globe_no || "0922-XXXXXXX"}
-          </Link>
-          <div className="dark:text-white text-sm flex items-center gap-3 cursor-pointer">
-            <icons.IoIosMail className="text-blue-400 text-2xl border rounded-full border-blue-400 p-1" />
+          {/* Smart */}
+          <a
+            href={`tel:${formatPhone(data?.smart_no)}`}
+            className="group flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-gray-800 transition"
+          >
+            <span className={iconWrapper}>
+              <icons.FaPhoneAlt className="text-[11px]" />
+            </span>
+            <span className="dark:text-white text-sm group-hover:translate-x-0.5 transition">
+              Smart: {data?.smart_no}
+            </span>
+          </a>
 
-            <a
-              href={`mailto:${data?.email}`}
-              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline break-all"
-              title={`Send an email to ${data?.email}`}
-            >
-              {data?.email || "info@example.com"}
-            </a>
-          </div>
+          {/* Globe */}
+          <a
+            href={`tel:${formatPhone(data?.globe_no)}`}
+            className="group flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-gray-800 transition"
+          >
+            <span className={iconWrapper}>
+              <icons.FaPhoneAlt className="text-[11px]" />
+            </span>
+            <span className="dark:text-white text-sm group-hover:translate-x-0.5 transition">
+              Globe: {data?.globe_no}
+            </span>
+          </a>
+
+          {/* Email */}
+          <a
+            href={`mailto:${data?.email}`}
+            className="group flex items-center gap-3 px-2 py-1.5 rounded-md hover:bg-gray-800 transition"
+          >
+            <span className={iconWrapper}>
+              <icons.IoIosMail className="text-[11px]" />
+            </span>
+            <span className="text-blue-400 text-sm break-all group-hover:translate-x-0.5 transition">
+              {data?.email}
+            </span>
+          </a>
         </div>
 
         {/* Quick Links */}
@@ -81,13 +102,13 @@ function Footer() {
             to="/about"
             className="dark:text-white text-sm hover:text-blue-400 transition"
           >
-            About
+            About Us
           </Link>
           <Link
             to="/contact"
             className="dark:text-white text-sm hover:text-blue-400 transition"
           >
-            Contact
+            Contacts
           </Link>
           <Link
             to="/faq"

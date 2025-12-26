@@ -10,39 +10,72 @@ function RoomCategoryCard({ item }) {
 
   return (
     <motion.article
-      className="w-full md:w-[49%] lg:w-[49%] h-[200px] relative group overflow-hidden rounded-md cursor-pointer"
-      initial={{ opacity: 0, y: 40 }}
+      className="
+        relative w-full md:w-[49%] lg:w-[49%]
+        h-[160px] sm:h-[180px] lg:h-[200px]
+        rounded-xl overflow-hidden cursor-pointer
+        bg-gray-200 dark:bg-gray-700
+        shadow-sm hover:shadow-lg transition-shadow
+        group
+      "
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ amount: 0.2 }}
+      viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
+      onClick={() => navigate(`/room-category/${item.category_id}`)}
     >
       {/* Image */}
-      <div className="w-full h-full transition-transform duration-300 group-hover:scale-105">
-        <LazyLoadImage
-          src={`${uploadUrl.uploadurl}/room_categories/${item.image}`}
-          alt={item.category}
-          effect="blur"
-          wrapperClassName="w-full h-full"
-          className="w-full h-full object-cover"
-        />
-      </div>
+      <LazyLoadImage
+        src={`${uploadUrl.uploadurl}/room_categories/${item.image}`}
+        alt={item.category}
+        effect="blur"
+        wrapperClassName="w-full h-full"
+        className="
+          w-full h-full object-cover
+          transition-transform duration-700
+          group-hover:scale-105
+        "
+      />
 
-      {/* Overlay */}
+      {/* Gradient Overlay */}
       <div
-        className={`absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center 
-          transition-opacity duration-300 flex-col
-          opacity-100 sm:opacity-100 md:opacity-100 
-          lg:opacity-0 lg:group-hover:opacity-100`}
+        className="
+          absolute inset-0
+          bg-gradient-to-t
+          from-black/70 via-black/30 to-transparent
+          flex flex-col justify-end
+          p-4
+        "
       >
-        <h4 className="text-white text-center text-sm md:text-lg lg:text-xl font-semibold px-2 max-w-[400px]">
-          {item.category}
-        </h4>
-        <button
-          className="text-blue-400 text-sm font-medium border-b-2 border-blue-500"
-          onClick={() => navigate(`/room-category/${item.category_id}`)}
-        >
-          View Rooms
-        </button>
+        {/* Content */}
+        <div className="space-y-1">
+          <h4
+            className="
+              text-white
+              text-sm sm:text-base lg:text-lg
+              font-semibold
+              leading-snug
+            "
+          >
+            {item.category}
+          </h4>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/room-category/${item.category_id}`);
+            }}
+            className="
+              inline-flex items-center gap-1
+              text-sm font-medium
+              text-blue-300 hover:text-blue-200
+              transition
+            "
+          >
+            View Rooms
+            <span className="text-lg leading-none">→</span>
+          </button>
+        </div>
       </div>
     </motion.article>
   );

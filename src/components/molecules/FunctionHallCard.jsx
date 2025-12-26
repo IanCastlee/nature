@@ -34,112 +34,125 @@ function FunctionHallCard({ item, index }) {
       )}
 
       <motion.article
-        className="w-full flex flex-col 
-        md:basis-[calc(50%-0.3rem)] lg:basis-[calc(50%-0.3rem)] 
-        overflow-hidden rounded-xl cursor-pointer
-        bg-white dark:bg-gray-950
-        shadow-sm hover:shadow-xl 
-        dark:border dark:border-gray-800
-        transition-all duration-300"
-        initial={{ opacity: 0, y: 40 }}
+        className="
+          w-full flex flex-col
+          md:basis-[calc(50%-0.5rem)] lg:basis-[calc(50%-0.5rem)]
+          rounded-xl overflow-hidden
+          bg-white dark:bg-gray-950
+          border border-gray-100 dark:border-gray-800
+          shadow-sm hover:shadow-lg
+          transition-all duration-300
+        "
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ amount: 0.2 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: index * 0.1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.6, ease: "easeOut", delay: index * 0.08 }}
       >
         {/* IMAGE */}
-        <div
-          className="relative w-full 
-        h-[180px] md:h-[230px] 
-        overflow-hidden group"
-        >
+        <div className="relative w-full h-[170px] sm:h-[200px] md:h-[220px] overflow-hidden group">
           <LazyLoadImage
             src={`${uploadUrl.uploadurl}function_hall/${item.image}`}
             alt={item.name}
             effect="blur"
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="
+              w-full h-full object-cover
+              transition-transform duration-700
+              group-hover:scale-105
+            "
           />
 
-          {/* 360 BUTTON */}
+          {/* GRADIENT OVERLAY */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+
+          {/* 360 VIEW */}
           <motion.button
             whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 200 }}
             onClick={() => navigate(`/room-view/${item.photosphere}`)}
-            className="absolute top-3 right-3 
-            text-blue-600 dark:text-blue-400
-            border border-blue-300 dark:border-blue-500
-            hover:border-blue-500 dark:hover:border-blue-300
-            hover:text-blue-700 dark:hover:text-blue-300
-            bg-white/70 dark:bg-gray-800/70
-            backdrop-blur-sm
-            px-3 py-1.5 rounded-md 
-            text-xs font-medium shadow-md
-            flex items-center gap-2"
+            className="
+    absolute top-3 right-3
+    flex items-center gap-2
+    px-3 py-1.5
+    text-xs font-medium
+    rounded-full
+    bg-black/70
+    backdrop-blur
+    text-white
+    border border-white/20
+    shadow-md
+    hover:bg-black/85
+    transition
+  "
           >
-            <icons.FaStreetView className="text-lg" />
-            View 360°
+            <icons.FaStreetView className="text-base shrink-0" />
+            360°
           </motion.button>
         </div>
 
-        {/* DETAILS */}
-        <div className="p-5">
-          <div className="flex flex-row justify-between items-start">
-            <div>
-              <h4
-                className="text-gray-900 dark:text-white 
-              text-lg lg:text-xl font-semibold leading-tight"
-              >
-                {item.name}
-              </h4>
-
-              <p
-                className="text-blue-600 dark:text-blue-400 
-              text-xl font-bold mt-1"
-              >
-                ₱ {item.price}
-              </p>
-            </div>
+        {/* CONTENT */}
+        <div className="p-5 flex flex-col gap-4">
+          {/* TITLE & PRICE */}
+          <div>
+            <h4 className="text-gray-900 dark:text-white text-lg font-semibold">
+              {item.name}
+            </h4>
+            <p className="text-blue-600 dark:text-blue-400 text-xl font-bold mt-1">
+              ₱ {item.price}
+            </p>
           </div>
 
           {/* INFO */}
-          <div
-            className="border-t dark:border-gray-800 mt-4 pt-4 
-          flex flex-wrap gap-4 lg:gap-6"
-          >
-            <span
-              className="inline-flex items-center text-sm 
-            text-gray-700 dark:text-gray-200"
-            >
-              <icons.LuUsers className="mr-2 text-blue-500 dark:text-blue-400 text-lg" />
-              Capacity: {item.capacity} Persons
+          <div className="flex flex-wrap gap-5 pt-4 border-t dark:border-gray-800">
+            <span className="flex items-center text-sm text-gray-700 dark:text-gray-300">
+              <icons.LuUsers className="mr-2 text-blue-500 text-lg" />
+
+              <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">
+                Capacity
+              </span>
+              <span>{item.capacity} persons</span>
             </span>
 
-            <span
-              className="inline-flex items-center text-sm 
-            text-gray-700 dark:text-gray-200"
-            >
-              <icons.IoIosTimer className="mr-2 text-blue-500 dark:text-blue-400 text-lg" />
-              Stay Duration: {item.duration} hrs
+            <span className="flex items-center text-sm text-gray-700 dark:text-gray-300">
+              <icons.IoIosTimer className="mr-2 text-blue-500 text-lg" />
+
+              <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">
+                Stay duration
+              </span>
+              <span>{item.duration} hours</span>
             </span>
           </div>
 
-          {/* BUTTON SECTION */}
-          <div className="mt-6 flex flex-row justify-between items-center w-full">
-            {/* RESERVE */}
+          {/* ACTIONS */}
+          <div className="mt-4 flex items-center justify-between">
             <Button
               onClick={handleReserveClick}
-              style="bg-green-600 h-[36px] text-white font-medium rounded-md 
-              px-4 py-2 text-sm transition hover:scale-105"
+              style="
+    bg-green-600 hover:bg-green-700
+
+    h-[32px] sm:h-[38px]
+    px-4 sm:px-5
+
+    text-xs sm:text-sm
+    text-white font-medium
+
+    rounded-full
+    transition
+    hover:scale-105
+  "
               label="Reserve Now"
             />
 
-            {/* MORE DETAILS */}
             <button
               onClick={() => navigate(`/funtionhall-deatails/${item.fh_id}`)}
-              className="flex items-center gap-1 text-blue-600 dark:text-blue-400 
-              text-sm font-medium hover:underline"
+              className="
+                flex items-center gap-1
+                text-sm font-medium
+                text-blue-600 dark:text-blue-400
+                hover:text-blue-800 dark:hover:text-blue-300
+                transition
+              "
             >
-              More Details
-              <icons.FiArrowUpRight className="text-lg" />
+              Details
+              <icons.FiArrowUpRight className="text-base" />
             </button>
           </div>
         </div>

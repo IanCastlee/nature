@@ -15,6 +15,8 @@ import ReadMoreButton from "../atoms/ReadMoreButton";
 import useGetData from "../../hooks/useGetData";
 import SearchBox from "../molecules/SearchBox";
 import { uploadUrl } from "../../utils/fileURL";
+import MessageUs from "../molecules/MessageUs";
+import Activities from "../organisms/Activities";
 
 const About = lazy(() => import("../organisms/About"));
 const ChatBot = lazy(() => import("../molecules/ChatBot"));
@@ -144,16 +146,30 @@ function HomePage() {
                     <a
                       href="#room-categories"
                       className="
-    bg-blue-600 text-white rounded-md inline-block
-    hover:bg-blue-700 transition
-    text-xs sm:text-sm md:text-base lg:text-sm xl:text-base
-    px-3 py-2 md:px-4 md:py-2
-    mt-0 lg:mt-4
-    ml-1 lg:ml-0 font-semibold border border-gray-400 shadow-md
+    inline-flex items-center justify-center
+
+    bg-blue-600 hover:bg-blue-700
+    text-white font-medium
+
+    h-[32px] sm:h-[38px]
+    px-4 sm:px-5
+
+    text-xs sm:text-sm
+    rounded-full
+
+    border border-blue-500
+    shadow-md
+
+    transition
+    hover:scale-105
+
+    mt-1 lg:mt-4
+    ml-1 lg:ml-0
   "
                     >
                       Show Rooms
                     </a>
+
                     <span className="lg:flex hidden text-xs text-gray-700 bg-yellow-400 px-2 py-1 rounded-full font-semibold">
                       Open 24 hours • Every day
                     </span>
@@ -173,7 +189,9 @@ function HomePage() {
             </div>
           }
         >
-          <About />
+          {/* <About /> */}
+
+          <Activities />
         </Suspense>
 
         {/* Room Categories Section */}
@@ -339,8 +357,10 @@ function HomePage() {
         title="Street View"
         src={images.location}
         alt="Street View Icon"
-        className="h-[40px] w-[40px] fixed bottom-4 right-4 z-30 cursor-pointer"
+        className="h-[40px] w-[40px] fixed lg:bottom-24 bottom-20 right-4 lg:right-8 z-30 cursor-pointer"
       />
+
+      <MessageUs />
     </>
   );
 }

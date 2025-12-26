@@ -20,6 +20,7 @@ import animationImg from "../assets/icons/beach.png";
 import location from "../../src/assets/icons/street-view.png";
 import empty from "../../src/assets/icons/empty.png";
 import announcement from "../../src/assets/icons/marketing.png";
+import messageus from "../../src/assets/icons/messageus.png";
 
 //offers
 import fish from "../assets/icons/fish.png";
@@ -58,7 +59,7 @@ export const images = {
   // hero1_m,
   // hero2_m,
   // hero3_m,
-
+  messageus,
   mission,
   promise,
   aboutbg,

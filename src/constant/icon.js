@@ -63,6 +63,7 @@ import { RiShakeHandsLine } from "react-icons/ri";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { TbBookmarkQuestion } from "react-icons/tb";
 import { FiUsers } from "react-icons/fi";
+import { RiCustomerService2Fill } from "react-icons/ri";
 
 import { IoMdNotifications } from "react-icons/io";
 import { IoIosInformationCircleOutline } from "react-icons/io";
@@ -74,6 +75,7 @@ import { MdOutlineFileDownload } from "react-icons/md";
 
 export const icons = {
   FaPhoneAlt,
+  RiCustomerService2Fill,
   TbBookmarkQuestion,
   IoIosCloseCircleOutline,
   RiShakeHandsLine,
