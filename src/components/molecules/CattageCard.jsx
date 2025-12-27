@@ -70,11 +70,11 @@ function CattageCard({ item }) {
       {/* MORE DETAILS */}
       <button
         onClick={() => navigate(`/cottage-details/${item.cottage_id}`)}
-        className="absolute right-12 bottom-3 
-        text-blue-400 text-sm font-medium
-        hover:text-blue-300 transition"
+        className="absolute right-5 bottom-3 
+        text-blue-700 text-sm font-medium
+        hover:text-blue-600 transition"
       >
-        More Details
+        More Details →
       </button>
 
       {/* 360 VIEW */}

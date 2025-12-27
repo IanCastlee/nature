@@ -99,12 +99,12 @@ const Dashboard = () => {
 
   const stats = [
     {
-      title: "Room Booking",
+      title: "Pending Room Bookings",
       value: data ? data.pendingRoomBookings : "-",
       color: "green",
     },
     {
-      title: "Function Hall Booking",
+      title: "Pending Function Hall Bookings",
       value: data ? data.functionHallBookings : "-",
       color: "red",
     },

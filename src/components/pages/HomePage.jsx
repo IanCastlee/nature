@@ -32,7 +32,7 @@ function HomePage() {
   const navigate = useNavigate();
 
   //==============//
-  //  DATA FETCH  //
+  //  DATA         //
   //==============//
 
   const {

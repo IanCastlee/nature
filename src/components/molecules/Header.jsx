@@ -93,16 +93,20 @@ function Header({ isHome }) {
               {["Home", "About Us", "Gallery"].map((item) => (
                 <li key={item} className="relative group">
                   <Link
-                    to={`/${item === "Home" ? "" : item.toLowerCase()}`}
-                    className={`text-sm transition-colors duration-300 group-hover:text-blue-400
-                    before:content-[''] before:absolute before:bottom-0 before:left-1/2
-                    before:translate-x-[-50%] before:h-[2px] before:w-0
-                    before:bg-blue-400 before:transition-all before:duration-300
-                    group-hover:before:w-full ${
-                      !scrolled && isHome
-                        ? "text-white"
-                        : "text-black dark:text-white"
+                    to={`/${
+                      item === "Home"
+                        ? ""
+                        : item === "About Us"
+                        ? "about"
+                        : item.toLowerCase()
                     }`}
+                    className={`text-sm transition-colors duration-300 group-hover:text-blue-400
+        before:content-[''] before:absolute before:bottom-0 before:left-1/2
+        before:translate-x-[-50%] before:h-[2px] before:w-0
+        before:bg-blue-400 before:transition-all before:duration-300
+        group-hover:before:w-full ${
+          !scrolled && isHome ? "text-white" : "text-black dark:text-white"
+        }`}
                   >
                     {item}
                   </Link>

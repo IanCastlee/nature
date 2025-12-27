@@ -151,7 +151,7 @@ function FunctionHallCard({ item, index }) {
                 transition
               "
             >
-              Details
+              More Details
               <icons.FiArrowUpRight className="text-base" />
             </button>
           </div>

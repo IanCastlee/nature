@@ -27,7 +27,7 @@ function ViewFunctionHallPage() {
 
   return (
     <>
-      <main className="min-h-screen w-full dark:bg-black pb-20">
+      <main className="min-h-screen w-full dark:bg-black pb-20 mt-[50px]">
         {/* IMAGE SECTION */}
         <section className="relative w-full h-[250px] sm:h-[300px] md:h-[350px] lg:h-[450px] overflow-hidden">
           {/* Image */}

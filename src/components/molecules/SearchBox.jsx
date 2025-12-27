@@ -87,7 +87,11 @@ function SearchBox() {
   const dayPickerClassNames = {
     caption: "text-gray-900 dark:text-gray-200",
     caption_label: "text-sm font-medium text-gray-900 dark:text-gray-200",
-    head_cell: "text-xs text-gray-600 dark:text-gray-400",
+
+    head_row: "text-gray-600 dark:text-gray-300",
+    head_cell:
+      "text-xs font-medium text-gray-600 dark:text-gray-300 !important",
+
     day: "text-sm text-gray-900 dark:text-gray-200",
     day_today: "border border-blue-500",
     day_selected: "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600",

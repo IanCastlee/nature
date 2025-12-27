@@ -46,8 +46,6 @@ function AdminBookingPage() {
   // DATA FILTERING //
   //===============//
 
-  console.log(data);
-
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;

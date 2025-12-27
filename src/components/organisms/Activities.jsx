@@ -1,201 +1,165 @@
-import React, { useEffect, useRef, useState } from "react";
-import { LazyLoadImage } from "react-lazy-load-image-component";
-import "react-lazy-load-image-component/src/effects/blur.css";
-import imageTest from "../../assets/images/hero1.webp";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 
+import image1 from "../../assets/images/hero1.webp";
+import image2 from "../../assets/images/hero4.jpg";
+import image3 from "../../assets/images/hero2.png";
+import image4 from "../../assets/images/hero3.png";
+import SubtTitle from "../molecules/SubtTitle";
+import Title from "../molecules/Title";
+
+/* 🔹 DATA */
 const activities = [
   {
-    id: 1,
     title: "Water Biking",
-    image: imageTest,
-    short: "Enjoy biking on water around the lagoon.",
-    full: "Water biking lets you explore the lagoon while enjoying a relaxing and fun ride on the water.",
+    short: "Enjoy riding over the water and feel the breeze.",
+    image: image1,
   },
   {
-    id: 2,
-    title: "Biking Around the Lagoon",
-    image: imageTest,
-    short: "Relaxing bike ride with a scenic view.",
-    full: "Bike around the lagoon and enjoy the peaceful environment surrounded by nature.",
+    title: "Fish Feeding",
+    short: "Feed the fishes and enjoy nature view.",
+    image: image1,
   },
   {
-    id: 3,
-    title: "Fish Feeding at the Lagoon",
-    image: imageTest,
-    short: "Feed the fishes and enjoy nature.",
-    full: "A calm and enjoyable activity where guests can feed the fishes in the lagoon.",
+    title: "Lagoon Walk",
+    short: "Relaxing walk around the peaceful lagoon.",
+    image: image2,
   },
   {
-    id: 4,
-    title: "Fish Feeding at the Lagoon",
-    image: imageTest,
-    short: "Feed the fishes and enjoy nature.",
-    full: "A calm and enjoyable activity where guests can feed the fishes in the lagoon.",
+    title: "Night View",
+    short: "Experience calm lights under the night sky.",
+    image: image3,
+  },
+  {
+    title: "Family Picnic",
+    short: "Perfect place for bonding and relaxation.",
+    image: image4,
   },
 ];
 
-function Activities() {
-  const sliderRef = useRef(null);
-  const [active, setActive] = useState(null);
+export default function Activities() {
+  const [active, setActive] = useState(0);
 
-  /* ---------- AUTO SCROLL (MOBILE: 1 IMAGE AT A TIME) ---------- */
   useEffect(() => {
-    const slider = sliderRef.current;
-    if (!slider) return;
-
-    let index = 0;
-
-    const interval = setInterval(() => {
-      const width = slider.offsetWidth;
-      index = (index + 1) % activities.length;
-
-      slider.scrollTo({
-        left: index * width,
-        behavior: "smooth",
-      });
-    }, 3500);
-
-    return () => clearInterval(interval);
+    const timer = setInterval(() => {
+      setActive((p) => (p + 1) % activities.length);
+    }, 4000);
+    return () => clearInterval(timer);
   }, []);
 
-  const scrollLeft = () => {
-    sliderRef.current.scrollBy({
-      left: -sliderRef.current.offsetWidth,
-      behavior: "smooth",
-    });
-  };
-
-  const scrollRight = () => {
-    sliderRef.current.scrollBy({
-      left: sliderRef.current.offsetWidth,
-      behavior: "smooth",
-    });
-  };
+  const getItem = (offset) =>
+    activities[(active + offset + activities.length) % activities.length];
 
   return (
-    <section className="py-10 relative lg:px-20 px-0">
-      {/* TITLE */}
-      <h2 className="text-xl font-bold mb-4 px-4 lg:px-12 text-gray-900 dark:text-white">
-        Lagoon Activities
-      </h2>
-
-      {/* SLIDER */}
-      <div className="relative">
-        {/* LEFT ARROW */}
-        <button
-          onClick={scrollLeft}
-          className="
-            absolute lg:left-14 left-4 top-1/2 -translate-y-1/2 z-10
-            w-10 h-10 rounded-full
-            bg-white/90 text-black
-            shadow-md
-            flex items-center justify-center
-            hover:scale-110 transition
-          "
-        >
-          <FaChevronLeft />
-        </button>
-
-        {/* RIGHT ARROW */}
-        <button
-          onClick={scrollRight}
-          className="
-            absolute lg:right-14  right-4 top-1/2 -translate-y-1/2 z-10
-            w-10 h-10 rounded-full
-            bg-white/90 text-black
-            shadow-md
-            flex items-center justify-center
-            hover:scale-110 transition
-          "
-        >
-          <FaChevronRight />
-        </button>
-
-        {/* TRACK */}
-        <div
-          ref={sliderRef}
-          className="
-            flex
-            overflow-x-auto overflow-y-hidden
-            snap-x snap-mandatory
-            scroll-smooth
-            no-scrollbar
-            px-4 lg:px-12
-            gap-4
-          "
-        >
-          {activities.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => setActive(item)}
-              className="
-                min-w-full sm:min-w-[300px]
-                snap-center
-                cursor-pointer
-              "
-            >
-              {/* IMAGE CARD */}
-              <div className="relative rounded-2xl overflow-hidden">
-                <LazyLoadImage
-                  src={item.image}
-                  effect="blur"
-                  className="w-full h-64 sm:h-48 object-cover"
-                />
-
-                {/* BADGE LEFT */}
-                <span className="absolute top-3 left-3 bg-white text-xs font-semibold px-3 py-1 rounded-full shadow">
-                  Activity
-                </span>
-
-                {/* BADGE RIGHT */}
-                <span className="absolute top-3 right-3 bg-yellow-400 text-xs font-semibold px-3 py-1 rounded-full">
-                  Featured
-                </span>
-              </div>
-
-              {/* TEXT (DESKTOP ONLY) */}
-              <div className="mt-3 hidden sm:block">
-                <h3 className="font-semibold text-sm text-gray-900 dark:text-white">
-                  {item.title}
-                </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                  {item.short}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+    <section className="relative w-full py-20 bg-white dark:bg-black overflow-hidden">
+      <div className="flex flex-col justify-center items-center">
+        <SubtTitle title="OUR ACTIVITIES" />
+        <Title title="ENJOY RELAXING AND FUN EXPERIENCES" />
       </div>
 
-      {/* MODAL */}
-      {active && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4">
-          <div className="bg-white dark:bg-gray-900 rounded-xl max-w-md w-full p-4 relative">
-            <button
-              onClick={() => setActive(null)}
-              className="absolute top-2 right-3 text-xl text-gray-600 dark:text-gray-300"
-            >
-              ✕
-            </button>
-
-            <LazyLoadImage
-              src={active.image}
-              effect="blur"
-              className="w-full h-52 object-cover rounded-lg"
-            />
-
-            <h3 className="text-lg font-bold mt-3 text-gray-900 dark:text-white">
-              {active.title}
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-              {active.full}
-            </p>
-          </div>
+      {/* ===== CAROUSEL WRAPPER ===== */}
+      <div className="relative">
+        {/* DESKTOP */}
+        <div className="hidden sm:block relative h-[320px] lg:px-[200px]">
+          {[-2, -1, 0, 1, 2].map((lvl) => (
+            <CarouselCard key={lvl} activity={getItem(lvl)} level={lvl} />
+          ))}
         </div>
-      )}
+
+        {/* MOBILE (with side padding ✅) */}
+        <div className="sm:hidden w-full px-4">
+          <CarouselCard activity={getItem(0)} level={0} isMobile />
+        </div>
+
+        {/* CONTROLS (2 ONLY ✅, centered on carousel) */}
+        <button
+          onClick={() =>
+            setActive((p) => (p === 0 ? activities.length - 1 : p - 1))
+          }
+          className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2
+                     bg-white/80 dark:bg-black/70 p-2 rounded-full z-[1000]"
+        >
+          <IoChevronBack className="text-black dark:text-white" />
+        </button>
+
+        <button
+          onClick={() => setActive((p) => (p + 1) % activities.length)}
+          className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2
+                     bg-white/80 dark:bg-black/70 p-2 rounded-full z-[1000]"
+        >
+          <IoChevronForward className="text-black dark:text-white" />
+        </button>
+      </div>
     </section>
   );
 }
 
-export default Activities;
+/* =====================================================
+   CARD
+===================================================== */
+
+function CarouselCard({ activity, level, isMobile = false }) {
+  /* MOBILE */
+  if (isMobile) {
+    return (
+      <div className="relative w-full aspect-[16/9] overflow-hidden rounded-lg">
+        <ImageFill src={activity.image} />
+        <Overlay activity={activity} showDesc />
+      </div>
+    );
+  }
+
+  /* DESKTOP */
+  const base =
+    "absolute top-1/2 -translate-y-1/2 rounded-2xl overflow-hidden " +
+    "aspect-[16/9] w-[360px] lg:w-[420px] " +
+    "transition-all duration-700 ease-in-out";
+
+  const positions = {
+    "-2": "left-[40px] lg:left-[140px] scale-75 opacity-30 z-10",
+    "-1": "left-[160px] lg:left-[300px] scale-90 opacity-40 z-20",
+    0: "left-1/2 -translate-x-1/2 scale-110 opacity-100 z-[999] shadow-2xl",
+    1: "right-[160px] lg:right-[300px] scale-90 opacity-40 z-20",
+    2: "right-[40px] lg:right-[140px] scale-75 opacity-30 z-10",
+  };
+
+  return (
+    <div className={`${base} ${positions[level]}`}>
+      <ImageFill src={activity.image} />
+      {level === 0 && <Overlay activity={activity} showDesc />}
+    </div>
+  );
+}
+
+/* =====================================================
+   IMAGE FILL
+===================================================== */
+
+function ImageFill({ src }) {
+  return (
+    <img
+      src={src}
+      alt=""
+      className="absolute inset-0 w-full h-full object-cover"
+    />
+  );
+}
+
+/* =====================================================
+   OVERLAY
+===================================================== */
+
+function Overlay({ activity, showDesc }) {
+  return (
+    <div
+      className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent
+                    p-5 flex flex-col justify-end"
+    >
+      <h3 className="text-white text-lg font-semibold">{activity.title}</h3>
+
+      {showDesc && (
+        <p className="text-gray-200 text-sm mt-1">{activity.short}</p>
+      )}
+    </div>
+  );
+}

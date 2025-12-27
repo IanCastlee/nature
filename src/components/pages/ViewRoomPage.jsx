@@ -58,7 +58,12 @@ function ViewRoomPage() {
     error,
   } = useGetData(`/admin/room.php?id=${roomId}`);
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center py-10">
+        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
   if (error)
     return (
       <p className="text-center text-red-500">Error loading room details.</p>
@@ -200,7 +205,7 @@ function ViewRoomPage() {
                   Good For
                 </span>
                 <span className="text-sm lg:text-lg font-semibold text-gray-800 dark:text-gray-100">
-                  {capacity} Person
+                  {capacity} Persons
                 </span>
               </div>
             </div>
@@ -245,7 +250,7 @@ function ViewRoomPage() {
                   .map((amenity, idx) => (
                     <li
                       key={idx}
-                      className="text-[10px] lg:text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
+                      className="text-xs lg:text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
                     >
                       {amenity}
                     </li>
@@ -265,7 +270,7 @@ function ViewRoomPage() {
                   .map((inclusion, idx) => (
                     <li
                       key={idx}
-                      className="text-[10px] lg:text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
+                      className="text-xs lg:text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
                     >
                       {inclusion}
                     </li>
@@ -284,7 +289,7 @@ function ViewRoomPage() {
                   .map((extra, idx) => (
                     <li
                       key={idx}
-                      className="text-[10px] lg:text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
+                      className="text-xs lg:text-sm text-gray-600 dark:text-gray-300 list-disc ml-4"
                     >
                       {extra}
                     </li>
@@ -301,7 +306,7 @@ function ViewRoomPage() {
               Description
             </h3>
 
-            <p className="dark:text-white text-sm lg:text-lg leading-relaxed">
+            <p className="dark:text-white text-xs lg:text-sm leading-relaxed">
               {description}
             </p>
           </div>
