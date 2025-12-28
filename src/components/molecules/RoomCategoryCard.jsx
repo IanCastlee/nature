@@ -54,7 +54,7 @@ function RoomCategoryCard({ item }) {
               text-white
               text-sm sm:text-base lg:text-lg
               font-semibold
-              leading-snug
+              leading-snug max-w-[75%]
             "
           >
             {item.category}

@@ -122,8 +122,8 @@ function HomePage() {
                   <div className="absolute inset-0 bg-black bg-opacity-40" />
 
                   {/* Caption (NO MORE absolute – will now push stuff down) */}
-                  <figcaption className="relative z-20 flex flex-col items-start text-white pl-4 lg:mt-16 mt-4 lg:pl-20 pt-40 space-y-4">
-                    <h1 className="lg:text-5xl md:text-[30px]  text-xl font-playfair max-w-2xl px-2 lg:px-0">
+                  <figcaption className="relative z-20 flex flex-col items-start text-white pl-4 lg:mt-20 mt-4 lg:pl-20 pt-40 space-y-4">
+                    <h1 className="lg:text-5xl md:text-[30px]  font-medium  text-xl font-playfair max-w-2xl px-2 lg:px-0">
                       Experience the Serenity of{" "}
                       <span className="text-blue-400 relative inline-block">
                         Nature Hot Spring{" "}

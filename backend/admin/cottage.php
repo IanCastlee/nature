@@ -152,35 +152,92 @@ if ($method === "POST") {
         exit;
     }
 
-    // 2. UPDATE
-    if ($action === "update" && $id) {
-        if ($filename && $filename_PS) {
-            $stmt = $conn->prepare("UPDATE cottages SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, image = ?, photosphere = ? WHERE cottage_id = ?");
-            $stmt->bind_param("sdiisssi", $name, $price, $capacity, $duration, $description, $filename, $filename_PS, $id);
-        } elseif ($filename) {
-            $stmt = $conn->prepare("UPDATE cottages SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, image = ? WHERE cottage_id = ?");
-            $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration, $description, $filename, $id);
-        } elseif ($filename_PS) {
-            $stmt = $conn->prepare("UPDATE cottages SET name = ?, price = ?, capacity = ?, duration = ?, description= ?, photosphere = ? WHERE cottage_id = ?");
-            $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration, $description, $filename_PS, $id);
-        } else {
-            $stmt = $conn->prepare("UPDATE cottages SET name = ?, price = ?, capacity = ?, duration = ?, description= ? WHERE cottage_id = ?");
-            $stmt->bind_param("sdiisi", $name, $price, $capacity, $duration, $description, $id);
+    //////////////////////////////////////////////////////////////////////////////////////
+
+
+// =======================================
+// UPDATE COTTAGE (WITH FILE CLEANUP)
+// =======================================
+if ($action === "update" && $id) {
+
+    //  Get OLD filenames
+    $oldStmt = $conn->prepare("SELECT image, photosphere FROM cottages WHERE cottage_id = ?");
+    $oldStmt->bind_param("i", $id);
+    $oldStmt->execute();
+    $oldResult = $oldStmt->get_result();
+    $oldData = $oldResult->fetch_assoc();
+
+    $oldImage = $oldData['image'];
+    $oldPS    = $oldData['photosphere'];
+
+    //  Prepare UPDATE
+    if ($filename && $filename_PS) {
+        $stmt = $conn->prepare("
+            UPDATE cottages
+            SET name = ?, price = ?, capacity = ?, duration = ?, description = ?, image = ?, photosphere = ?
+            WHERE cottage_id = ?
+        ");
+        $stmt->bind_param("sdiisssi", $name, $price, $capacity, $duration, $description, $filename, $filename_PS, $id);
+
+    } elseif ($filename) {
+        $stmt = $conn->prepare("
+            UPDATE cottages
+            SET name = ?, price = ?, capacity = ?, duration = ?, description = ?, image = ?
+            WHERE cottage_id = ?
+        ");
+        $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration, $description, $filename, $id);
+
+    } elseif ($filename_PS) {
+        $stmt = $conn->prepare("
+            UPDATE cottages
+            SET name = ?, price = ?, capacity = ?, duration = ?, description = ?, photosphere = ?
+            WHERE cottage_id = ?
+        ");
+        $stmt->bind_param("sdiissi", $name, $price, $capacity, $duration, $description, $filename_PS, $id);
+
+    } else {
+        $stmt = $conn->prepare("
+            UPDATE cottages
+            SET name = ?, price = ?, capacity = ?, duration = ?, description = ?
+            WHERE cottage_id = ?
+        ");
+        $stmt->bind_param("sdiisi", $name, $price, $capacity, $duration, $description, $id);
+    }
+
+    //  Execute UPDATE
+    if ($stmt->execute()) {
+
+        //  Delete OLD files ONLY if replaced
+        if ($filename && $oldImage && $oldImage !== $filename) {
+            $oldImagePath = $uploadDir . $oldImage;
+            if (file_exists($oldImagePath)) {
+                unlink($oldImagePath);
+            }
         }
 
-        if ($stmt->execute()) {
-            echo json_encode([
-                "success" => true,
-                "message" => "✅ Cottage updated successfully."
-            ]);
-        } else {
-            echo json_encode([
-                "success" => false,
-                "message" => "❌ Database error: " . $stmt->error
-            ]);
+        if ($filename_PS && $oldPS && $oldPS !== $filename_PS) {
+            $oldPSPath = $uploadDir_PS . $oldPS;
+            if (file_exists($oldPSPath)) {
+                unlink($oldPSPath);
+            }
         }
-        exit;
+
+        echo json_encode([
+            "success" => true,
+            "message" => " Cottage updated successfully."
+        ]);
+
+    } else {
+        echo json_encode([
+            "success" => false,
+            "message" => "❌ Database error: " . $stmt->error
+        ]);
     }
+
+    exit;
+}
+//////////////////////////////////////////////////////////////////////////////////////
+
 
     // 3. SET INACTIVE
     if ($action === "set_inactive" && $id) {

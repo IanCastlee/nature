@@ -73,13 +73,16 @@ if ($method === "POST" && isset($_FILES) && !empty($_FILES)) {
     exit;
 }
 
-//
-//  DELETE IMAGE
-//
-if ($method === "POST" && isset($_POST['action']) && $_POST['action'] === "set_delete") {
-    $id = intval($_POST['id']);
 
-    // Fetch image name
+// =======================================
+// DELETE GALLERY IMAGE (DB + FILE)
+// =======================================
+if ($method === "POST" && isset($_POST['action']) && $_POST['action'] === "set_delete") {
+
+    $id = intval($_POST['id']);
+    $uploadDir = "../uploads/gallery/";
+
+    //  Get image filename
     $stmt = $conn->prepare("SELECT image FROM gallery WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -87,22 +90,32 @@ if ($method === "POST" && isset($_POST['action']) && $_POST['action'] === "set_d
     $imageData = $result->fetch_assoc();
     $stmt->close();
 
-    if ($imageData) {
-        $imagePath = "../uploads/gallery/" . $imageData['image'];
-
-        if (file_exists($imagePath)) {
-            unlink($imagePath);
-        }
-
-        $stmt = $conn->prepare("DELETE FROM gallery WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-
-        echo json_encode(["success" => true, "message" => "Image deleted successfully."]);
+    if (!$imageData) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Image not found."
+        ]);
         exit;
     }
 
-    echo json_encode(["success" => false, "message" => "Image not found."]);
+    $fileName = $imageData['image']; // filename only
+    $filePath = $uploadDir . $fileName;
+
+    //  Delete actual file
+    if ($fileName && file_exists($filePath)) {
+        unlink($filePath);
+    }
+
+    //  Delete DB record
+    $stmt = $conn->prepare("DELETE FROM gallery WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+
+    echo json_encode([
+        "success" => true,
+        "message" => "Image deleted successfully."
+    ]);
+
     exit;
 }
 

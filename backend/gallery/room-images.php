@@ -121,35 +121,65 @@ if ($method === 'POST') {
         exit;
     }
 
-    // ================================
-    // DELETE ROOM IMAGE
-    // ================================
-    if ($action === "delete") {
-        if (!$id) {
-            echo json_encode([
-                "success" => false,
-                "message" => "Missing image id for deletion."
-            ]);
-            exit;
-        }
+    //////////////////////////////////////////////////////////////////////////////////////
 
-        $stmt = $conn->prepare("DELETE FROM room_images WHERE id = ?");
-        $stmt->bind_param("i", $id);
-
-        if ($stmt->execute()) {
-            echo json_encode([
-                "success" => true,
-                "message" => "Room image deleted successfully."
-            ]);
-        } else {
-            echo json_encode([
-                "success" => false,
-                "message" => "Database error: " . $stmt->error
-            ]);
-        }
-
+ 
+// ================================
+// DELETE ROOM IMAGE (DB + FILE)
+// ================================
+if ($action === "delete") {
+    if (!$id) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Missing image id for deletion."
+        ]);
         exit;
     }
+
+    //  Get filename from DB
+    $stmt = $conn->prepare("SELECT image_path FROM room_images WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if (!$row = $result->fetch_assoc()) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Image not found."
+        ]);
+        exit;
+    }
+
+    $fileName = $row['image_path']; // ex: room1_abc.jpg
+
+    //  Build full path
+    $filePath = "../uploads/rooms/" . $fileName;
+
+    //  Delete actual file
+    if (file_exists($filePath)) {
+        unlink($filePath);
+    }
+
+    //  Delete DB record
+    $deleteStmt = $conn->prepare("DELETE FROM room_images WHERE id = ?");
+    $deleteStmt->bind_param("i", $id);
+
+    if ($deleteStmt->execute()) {
+        echo json_encode([
+            "success" => true,
+            "message" => "Room image deleted successfully."
+        ]);
+    } else {
+        echo json_encode([
+            "success" => false,
+            "message" => "Database error: " . $deleteStmt->error
+        ]);
+    }
+
+    exit;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
 
     // ================================
     // INVALID ACTION
