@@ -15,11 +15,13 @@ import DeclineModal from "../admin_molecules/DeclineModal";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { icons } from "../../constant/icon";
+import ApproveBooking from "../admin_molecules/ApproveBooking";
 function AdminBookingPage() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
   const [approveItem, setApproveItem] = useState(null);
+  const [approveItemFullpayment, setApproveItemFullpayment] = useState(null);
   const [declinedItem, setDeclinedItem] = useState(null);
 
   const [viewDetailsId, setViewDetailsId] = useState(null);
@@ -28,7 +30,7 @@ function AdminBookingPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 25;
 
   //==============//
   //  DATA FETCH  //
@@ -98,7 +100,26 @@ function AdminBookingPage() {
   } = useSetInactive("/booking/booking.php", () => {
     refetch();
     setApproveItem(null);
-    setToast({ message: "Booking set as approved", type: "success" });
+    setToast({
+      message: "Booking set as approved with 50% payment",
+      type: "success",
+    });
+  });
+
+  //==========================//
+  //   HANDLE APPROVE/ACTIONS (FULL PAYMENT) //
+  //==========================//
+  const {
+    setInactive: setInactiveFP,
+    loading: approveFPLoading,
+    error: approveFPError,
+  } = useSetInactive("/booking/booking.php", () => {
+    refetch();
+    setApproveItemFullpayment(null);
+    setToast({
+      message: "Booking set as approved with full payment",
+      type: "success",
+    });
   });
 
   //==========================//
@@ -325,8 +346,16 @@ function AdminBookingPage() {
                 item,
                 setShowForm,
                 onSetApprove: (item) => setApproveItem(item),
+                // onSetApproveFullPayment: (item) =>
+                //   setApproveItemFullpayment(item),
                 onSetDeClined: (item) => setDeclinedItem(item),
                 onSetViewDetails: (item) => viewDetails(item),
+
+                // ✅ ADD THIS
+                onSetApprovedOptions: (item) => {
+                  setApproveItem(item); // save clicked row
+                  setShowForm("approved_options"); // show component
+                },
               })
             }
           />
@@ -342,7 +371,7 @@ function AdminBookingPage() {
       </div>
 
       {/* APPROVE MODAL */}
-      {approveItem?.booking_id && (
+      {/* {approveItem?.booking_id && (
         <DeleteModal
           item={approveItem}
           name={approveItem?.firstname}
@@ -350,7 +379,7 @@ function AdminBookingPage() {
           onCancel={() => setApproveItem(null)}
           label="Yes, Approve"
           label2="approve this booking"
-          label3="This booking will be moved and marked as Approved."
+          label3="Confirmation for half payment"
           onConfirm={() => {
             setInactive({
               id: approveItem?.booking_id,
@@ -358,7 +387,26 @@ function AdminBookingPage() {
             });
           }}
         />
-      )}
+      )} */}
+
+      {/* APPROVE MODAL FULL PAYMENT */}
+      {/* {approveItemFullpayment?.booking_id && (
+        <DeleteModal
+          item={approveItemFullpayment}
+          name={approveItemFullpayment?.firstname}
+          loading={approveFPLoading}
+          onCancel={() => setApproveItemFullpayment(null)}
+          label="Yes, Approve"
+          label2="approve this booking"
+          label3="Confirmation for full payment"
+          onConfirm={() => {
+            setInactiveFP({
+              id: approveItemFullpayment?.booking_id,
+              action: "set_approve_fp",
+            });
+          }}
+        />
+      )} */}
 
       {/* DECLINE MODAL */}
       {declinedItem?.booking_id && (
@@ -384,6 +432,10 @@ function AdminBookingPage() {
       )}
 
       {showForm === "view_details" && <ViewDetails data={viewDetailsId} />}
+
+      {showForm === "approved_options" && (
+        <ApproveBooking refetch={refetch} data={approveItem} />
+      )}
     </>
   );
 }

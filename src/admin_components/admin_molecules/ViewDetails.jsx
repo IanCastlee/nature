@@ -102,14 +102,14 @@ function ViewDetails({ active, data }) {
           {/* PAYMENT SUMMARY */}
           <Section title="Payment Summary">
             <Info label="Full Price" value={info.price} />
-            <Info label="Amount Paid" value={info.paid} />
+            <Info label="Amount Paid" value={info.down_payment} />
 
             {active !== "arrived" && (
               <Info
                 label={
                   active === "approved" ? "Balance to Pay" : "Required Payment"
                 }
-                value={info.half_price}
+                value={info.bal_topay}
               />
             )}
           </Section>

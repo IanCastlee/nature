@@ -16,12 +16,12 @@ if ($method === "GET") {
 
     $bookingId = $_GET['id'] ?? null;
     $userId    = $_GET['user_id'] ?? null;
-    $status    = $_GET['status'] ?? null; // Can be comma-separated
+    $status    = $_GET['status'] ?? null; 
 
     $baseSql = "
         SELECT 
             rb.booking_id, rb.user_id, rb.facility_id, rb.fullname, rb.phone, rb.start_date, rb.end_date,  rb.bookedDate, rb.updated_at,
-            rb.nights, rb.status, rb.price AS booking_price, rb.paid AS booking_paid,
+            rb.nights, rb.status, rb.price AS booking_price, rb.down_payment, rb.paid AS booking_paid, 
 
             u.firstname, u.lastname, u.email,
 
@@ -83,36 +83,51 @@ if ($method === "GET") {
     while ($row = $result->fetch_assoc()) {
         $id = $row['booking_id'];
 
-        if (!isset($bookings[$id])) {
-            $bookings[$id] = [
-                'booking_id' => $row['booking_id'],
-                'user_id' => $row['user_id'],
-                'facility_id' => $row['facility_id'],
-                'start_date' => $row['start_date'],
-                'end_date' => $row['end_date'],
-                'bookedDate' => $row['bookedDate'],
-                'nights' => $row['nights'],
-                'status' => $row['status'],
-                'price' => $row['booking_price'],
-                'paid' => $row['booking_paid'],
-                'half_price' => $row['booking_price'] / 2,
-                'fullname' => $row['fullname'],
-                'phone' => $row['phone'],
-                'email' => $row['email'],
+       if (!isset($bookings[$id])) {
 
-                'room' => [
-                    'room_id' => $row['room_id'],
-                    'room_name' => $row['room_name'],
-                    'price' => $row['room_price'],
-                    'capacity' => $row['capacity'],
-                    'duration' => $row['duration']
-                ],
+    $price = isset($row['booking_price']) ? (float)$row['booking_price'] : 0.0;
+    $paid  = isset($row['down_payment'])  ? (float)$row['down_payment']  : 0.0;
+    $downpayment = isset($row['down_payment']) ? (float)$row['down_payment'] : 0.0;
 
-                'note' => ($row['status'] === 'declined') ? ($row['note'] ?? null) : null,
+      //  amount still needed to pay
+     $toPay = max($price - $downpayment, 0.0);
 
-                'extras' => []
-            ];
-        }
+    //  ALWAYS a number
+    $halfPrice =  ($paid >= $price) ? 0.0 : ($price / 2);
+
+    $bookings[$id] = [
+        'booking_id' => $row['booking_id'],
+        'user_id' => $row['user_id'],
+        'facility_id' => $row['facility_id'],
+        'start_date' => $row['start_date'],
+        'end_date' => $row['end_date'],
+        'bookedDate' => $row['bookedDate'],
+        'nights' => $row['nights'],
+        'status' => $row['status'],
+
+        //  raw numbers only
+        'price' => $price,
+        'paid' => $price,
+        'half_price' => $halfPrice,
+        'bal_topay' => $toPay,
+        'down_payment' => $row['down_payment'],
+        'fullname' => $row['fullname'],
+        'phone' => $row['phone'],
+        'email' => $row['email'],
+
+        'room' => [
+            'room_id' => $row['room_id'],
+            'room_name' => $row['room_name'],
+            'price' => isset($row['room_price']) ? (float)$row['room_price'] : 0.0,
+            'capacity' => $row['capacity'],
+            'duration' => $row['duration']
+        ],
+
+        'note' => ($row['status'] === 'declined') ? ($row['note'] ?? null) : null,
+        'extras' => []
+    ];
+}
+
 
         if (!empty($row['extra_name'])) {
             $bookings[$id]['extras'][] = [

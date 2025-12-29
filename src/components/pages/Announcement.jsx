@@ -82,7 +82,7 @@ function Announcement({ close }) {
         {/* Footer */}
         <div className="w-full mt-6 flex justify-center">
           <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-            This Announcement is from Nature Host Spring.
+            This Announcement is from Nature Hot Spring.
           </p>
         </div>
       </motion.div>

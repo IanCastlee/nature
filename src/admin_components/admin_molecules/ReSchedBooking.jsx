@@ -242,7 +242,7 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
             </h2>
 
             {(() => {
-              const prevPaid = toNumber(booking.paid);
+              const prevPaid = toNumber(booking.down_payment);
               const newHalf = toNumber(newBooking.half_price);
               const newPrice = toNumber(newBooking.price);
               const difference = prevPaid - newHalf;
@@ -270,7 +270,7 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
                       </p>
                       <p>
                         <span className="text-gray-600">Paid:</span>{" "}
-                        <b>{booking.paid}</b>
+                        <b>{booking.down_payment}</b>
                       </p>
                     </div>
                   </div>

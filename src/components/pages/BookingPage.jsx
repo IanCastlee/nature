@@ -286,8 +286,6 @@ function BookingPage() {
   const isSubmitDisabled =
     formLoading || !selectedRange.from || !selectedRange.to || nights === 0;
 
-  console.log("EXTRAS: ", extrasData);
-
   return (
     <>
       {toast && (

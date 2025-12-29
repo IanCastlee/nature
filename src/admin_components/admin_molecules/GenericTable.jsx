@@ -17,7 +17,7 @@ function GenericTable({
             {columns.map((col, index) => (
               <th
                 key={index}
-                className={`px-2 py-3 dark:text-gray-100 text-left font-semibold text-[10px] border dark:border-gray-700 border-gray-300 ${
+                className={`px-2 py-3 dark:text-gray-100 text-left font-semibold text-[10px] border-2 dark:border-gray-700 border-gray-300 ${
                   col.className || ""
                 }`}
                 style={
@@ -28,7 +28,7 @@ function GenericTable({
               </th>
             ))}
             {renderActions && (
-              <th className="p-2 dark:text-gray-100 text-right font-medium text-xs border dark:border-gray-700 border-gray-300">
+              <th className="p-2 dark:text-gray-100 text-right font-medium text-xs border-2 dark:border-gray-700 border-gray-300">
                 Actions
               </th>
             )}
@@ -44,10 +44,16 @@ function GenericTable({
                 {columns.map((col, colIndex) => (
                   <td
                     key={colIndex}
-                    className={`px-2 border text-[10px] dark:border-gray-700 dark:text-gray-100 border-gray-300 ${
+                    className={`px-2 border-2 text-[10px] dark:border-gray-700 dark:text-gray-100 border-gray-300 ${
                       col.className || ""
                     } ${
-                      ["price", "paid", "half_price"].includes(col.key)
+                      [
+                        "price",
+                        "paid",
+                        "half_price",
+                        "down_payment",
+                        "bal_topay",
+                      ].includes(col.key)
                         ? "font-bold bg-yellow-50 dark:bg-yellow-900"
                         : "font-medium"
                     }`}
@@ -67,7 +73,7 @@ function GenericTable({
                   </td>
                 ))}
                 {renderActions && (
-                  <td className="p-2 border text-xs text-right font-medium dark:border-gray-700 border-gray-300">
+                  <td className="p-2 border-2 text-xs text-right font-medium dark:border-gray-700 border-gray-300">
                     {renderActions(item)}
                   </td>
                 )}

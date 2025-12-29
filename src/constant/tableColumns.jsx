@@ -192,8 +192,8 @@ export const bookingApproved = [
     width: "150px",
   },
   { title: "Total Amount", key: "price" },
-  { title: "Paid", key: "paid" },
-  { title: "Balance to Pay", key: "half_price" },
+  { title: "Paid", key: "down_payment" },
+  { title: "Balance to Pay", key: "bal_topay" },
 
   { title: "Status", key: "status" },
 ];
@@ -234,7 +234,7 @@ export const bookingDeclined = [
     width: "150px",
   },
   { title: "Total Amount", key: "price" },
-  { title: "Paid", key: "paid" },
+  { title: "Paid", key: "down_payment" },
 
   { title: "Status", key: "status" },
 ];
@@ -255,6 +255,27 @@ export const booking = [
     key: "extras",
     width: "200px",
   },
+  { title: "Status", key: "status" },
+];
+
+export const bookingNonAttended = [
+  { title: "No.", key: "booking_id" },
+
+  { title: "Guest", key: "fullname" },
+  { title: "Phone", key: "phone" },
+  { title: "Room Name", key: "room_name" },
+  { title: "Check-In", key: "start_date" },
+  { title: "Check-Out", key: "end_date" },
+  { title: "Night(s)", key: "nights" },
+  {
+    title: "Extras",
+    key: "extras",
+    width: "150px",
+  },
+  { title: "Total Amount", key: "price" },
+  { title: "Paid", key: "down_payment" },
+  // { title: "Balance to Pay", key: "half_price" },
+
   { title: "Status", key: "status" },
 ];
 

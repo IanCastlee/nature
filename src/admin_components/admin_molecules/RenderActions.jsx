@@ -216,28 +216,40 @@ export const renderActionsCottage = ({
 //render Action for booking
 export const renderActionsBooking = ({
   item,
-  showForm,
-  onSetInactive,
   isNotAvailablePage,
-  onSetViewCottageDetails,
   onSetApprove,
   onSetDeClined,
   onSetViewDetails,
+  onSetApproveFullPayment,
+  onSetApprovedOptions,
 }) => {
   return (
     <div className="flex items-center justify-end gap-2">
-      {!isNotAvailablePage && (
-        <button
-          onClick={() => onSetApprove(item)}
-          className="bg-yellow-600 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center items-center"
-          title="Approve"
-        >
-          Approve
-        </button>
-      )}
+      <button
+        onClick={() => onSetApprovedOptions(item)}
+        className="bg-yellow-600 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center items-center mr-6"
+        title="Approve (50% payment)"
+      >
+        Approve
+      </button>
+
+      {/* <button
+        onClick={() => onSetApproveFullPayment(item)}
+        className="bg-yellow-700 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center items-center mr-6"
+        title="Approve (Full payment)"
+      >
+        Full Payment
+      </button>
+      <button
+        onClick={() => onSetApprovedOptions(item)}
+        className="btn btn-primary"
+      >
+        Approved Options
+      </button> */}
+
       <button
         onClick={() => onSetDeClined(item)}
-        className="bg-red-500 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center items-center "
+        className="bg-red-600 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center items-center "
         title={isNotAvailablePage ? "Set as available" : "Set as not in-active"}
       >
         Decline

@@ -28,7 +28,7 @@ function AdminBookingHistory() {
   const [approveAction, setApproveAction] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 50;
 
   //==================//
   //     GET DATA     //
@@ -36,8 +36,6 @@ function AdminBookingHistory() {
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-booking.php?status=approved,rescheduled`
   );
-
-  console.log("DATA : ", data);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -100,23 +98,28 @@ function AdminBookingHistory() {
 
   const formattedData = currentData.map((item) => ({
     ...item,
+
     email: item.user_id === 12 ? "No Email Provided" : item.email,
     room_name: item.room?.room_name || "N/A",
+
     extras:
       item.extras && item.extras.length > 0
         ? item.extras
             .map((extra) => `${extra.name} (x${extra.quantity})`)
             .join(", ")
         : "None",
-    paid: `₱${Number(item.paid).toLocaleString("en-PH", {
+
+    down_payment: `₱${Number(item.down_payment).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`,
+
+    bal_topay: `₱${Number(item.bal_topay).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+
     price: `₱${Number(item.price).toLocaleString("en-PH", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`,
-    half_price: `₱${Number(item.price / 2).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`,

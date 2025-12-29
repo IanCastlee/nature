@@ -29,26 +29,99 @@ $id = $_POST['id'] ?? null;
  *  APPROVE BOOKING
  * ========================================================
  */
+// if ($action === "set_approve") {
+//     if (!$id) {
+//         http_response_code(400);
+//         echo json_encode(["error" => "Missing booking id"]);
+//         exit;
+//     }
+
+//     $stmt = $conn->prepare("
+//         UPDATE room_booking 
+//         SET status = 'approved', paid = price / 2, down_payment = price / 2
+//         WHERE booking_id = ?
+//     ");
+//     $stmt->bind_param("i", $id);
+
+//     echo $stmt->execute()
+//         ? json_encode(["success" => true, "message" => "Booking approved."])
+//         : json_encode(["success" => false, "message" => $stmt->error]);
+
+//     exit;
+// }
+
+
+/**
+ * ========================================================
+ *  APPROVE BOOKING (FULL / HALF / CUSTOM)
+ * ========================================================
+ */
 if ($action === "set_approve") {
-    if (!$id) {
+
+    $id = intval($_POST['booking_id'] ?? 0);
+    $paymentType = $_POST['payment_type'] ?? '';
+
+    if (!$id || !in_array($paymentType, ['half', 'full', 'custom'])) {
         http_response_code(400);
-        echo json_encode(["error" => "Missing booking id"]);
+        echo json_encode(["error" => "Invalid request"]);
         exit;
     }
 
+    // Get booking price from DB (source of truth)
+    $stmt = $conn->prepare("SELECT price FROM room_booking WHERE booking_id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $booking = $result->fetch_assoc();
+
+    if (!$booking) {
+        echo json_encode(["error" => "Booking not found"]);
+        exit;
+    }
+
+    $price = floatval($booking['price']);
+
+    // Decide payment
+    if ($paymentType === 'half') {
+        $paid = $price / 2;
+        $down = $price / 2;
+    }
+
+    if ($paymentType === 'full') {
+        $paid = $price;
+        $down = $price;
+    }
+
+    if ($paymentType === 'custom') {
+        $amount = floatval($_POST['amount'] ?? 0);
+
+        if ($amount <= 0 || $amount > $price) {
+            echo json_encode(["error" => "Invalid custom amount"]);
+            exit;
+        }
+
+        $paid = $amount;
+        $down = $amount;
+    }
+
+    // Update booking
     $stmt = $conn->prepare("
-        UPDATE room_booking 
-        SET status = 'approved', paid = price / 2 
+        UPDATE room_booking
+        SET 
+            status = 'approved',
+            paid = ?,
+            down_payment = ?
         WHERE booking_id = ?
     ");
-    $stmt->bind_param("i", $id);
+    $stmt->bind_param("ddi", $paid, $down, $id);
 
     echo $stmt->execute()
-        ? json_encode(["success" => true, "message" => "Booking approved."])
+        ? json_encode(["success" => true, "message" => "Booking approved"])
         : json_encode(["success" => false, "message" => $stmt->error]);
 
     exit;
 }
+
 
 /**
  * ========================================================
@@ -201,7 +274,7 @@ if ($action === "set_pending") {
     }
 
     $stmt = $conn->prepare("
-        UPDATE room_booking SET status = 'pending', paid = 0 WHERE booking_id = ?
+        UPDATE room_booking SET status = 'pending', paid = 0, down_payment = 0 WHERE booking_id = ?
     ");
     $stmt->bind_param("i", $id);
     if (!$stmt->execute()) {
