@@ -27,7 +27,7 @@ function AdminBookingHistoryLog() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 50;
 
   const [viewDetailsId, setViewDetailsId] = useState(null);
 
@@ -134,22 +134,22 @@ function AdminBookingHistoryLog() {
   const downloadMonthlyPDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
     const now = new Date();
-    const currentMonthName = now.toLocaleString("default", { month: "long" });
     const currentYear = now.getFullYear();
 
-    // Resort Name - Smaller + Bold + Center
+    // Resort Name
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.text(
-      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      "2JKLA NATURE HOT SPRING AND INN RESORT CORP.",
       pageWidth / 2,
       10,
       { align: "center" }
     );
 
-    // Address - Smaller
+    // Address
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.text("Monbon, Irosin, Sorsogon", pageWidth / 2, 15, {
@@ -160,31 +160,31 @@ function AdminBookingHistoryLog() {
     doc.setLineWidth(0.4);
     doc.line(14, 19, pageWidth - 14, 19);
 
-    // Booking Log Title - Smaller Bold
+    // Title
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.text("Arrived Room Booking Records", pageWidth / 2, 26, {
       align: "center",
     });
 
-    // Month & Year subtitle - Small
+    // Subtitle
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 31, {
+    doc.text("All Records", pageWidth / 2, 31, {
       align: "center",
     });
 
-    // Filter data for current month and year
-    const monthlyData = filteredData.filter((item) => {
-      const bookingDate = new Date(item.start_date);
-      return (
-        bookingDate.getMonth() === now.getMonth() &&
-        bookingDate.getFullYear() === currentYear
-      );
+    // Download date string
+    const downloadDate = new Date().toLocaleString("en-PH", {
+      dateStyle: "medium",
+      timeStyle: "short",
     });
 
-    if (monthlyData.length === 0) {
-      alert("No bookings found for the current month.");
+    // ✅ USE ALL DATA (NO MONTH FILTER)
+    const allData = filteredData;
+
+    if (allData.length === 0) {
+      alert("No bookings found.");
       return;
     }
 
@@ -203,16 +203,15 @@ function AdminBookingHistoryLog() {
       "Status",
     ];
 
-    // Format numerical values
     const formatNum = (num) =>
       Number(num).toLocaleString("en-PH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       });
 
-    const tableRows = monthlyData.map((item) => {
-      // Calculate total extras × nights
+    const tableRows = allData.map((item) => {
       let extrasTotal = 0;
+
       if (Array.isArray(item.extras) && item.extras.length > 0) {
         extrasTotal = item.extras.reduce((sum, extra) => {
           const priceNum =
@@ -220,6 +219,7 @@ function AdminBookingHistoryLog() {
           const quantity = Number(extra.quantity) || 1;
           return sum + priceNum * quantity;
         }, 0);
+
         extrasTotal = extrasTotal * (Number(item.nights) || 1);
       }
 
@@ -250,10 +250,25 @@ function AdminBookingHistoryLog() {
         textColor: 255,
         halign: "center",
       },
-      tableWidth: "auto",
     });
 
-    doc.save(`Booking_History_${currentMonthName}_${currentYear}.pdf`);
+    // Add download date on every page at bottom right (small, subtle)
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(120);
+      doc.text(
+        `Downloaded on: ${downloadDate}`,
+        pageWidth - 14,
+        pageHeight - 10,
+        { align: "right" }
+      );
+      doc.setTextColor(0);
+    }
+
+    doc.save(`Booking_History_ALL_${currentYear}.pdf`);
   };
 
   //=====================//

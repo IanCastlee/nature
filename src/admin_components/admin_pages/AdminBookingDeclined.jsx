@@ -93,6 +93,10 @@ function AdminBookingDeclined() {
     half_price: `₱${Number(item.price / 2).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
     })}`,
+    bal_topay: `₱${Number(item.bal_topay).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
   }));
 
   // VIEW DETAILS
@@ -109,14 +113,13 @@ function AdminBookingDeclined() {
     const pageWidth = doc.internal.pageSize.getWidth();
 
     const now = new Date();
-    const currentMonthName = now.toLocaleString("default", { month: "long" });
     const currentYear = now.getFullYear();
 
     // Resort Header
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.text(
-      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      "2JKLA NATURE HOT SPRING AND INN RESORT CORP.",
       pageWidth / 2,
       10,
       { align: "center" }
@@ -139,21 +142,15 @@ function AdminBookingDeclined() {
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 31, {
+    doc.text("All Records", pageWidth / 2, 31, {
       align: "center",
     });
 
-    // Filter by START DATE (monthly)
-    const monthlyData = filteredData.filter((item) => {
-      const bookingDate = new Date(item.start_date);
-      return (
-        bookingDate.getMonth() === now.getMonth() &&
-        bookingDate.getFullYear() === currentYear
-      );
-    });
+    // ✅ USE ALL DATA (NO MONTH FILTER)
+    const allData = filteredData;
 
-    if (monthlyData.length === 0) {
-      alert("No declined bookings found for this month.");
+    if (allData.length === 0) {
+      alert("No declined bookings found.");
       return;
     }
 
@@ -178,9 +175,9 @@ function AdminBookingDeclined() {
         maximumFractionDigits: 2,
       });
 
-    const tableRows = monthlyData.map((item) => {
-      // Calculate total extras × nights
+    const tableRows = allData.map((item) => {
       let extrasTotal = 0;
+
       if (Array.isArray(item.extras) && item.extras.length > 0) {
         extrasTotal = item.extras.reduce((sum, extra) => {
           const priceNum =
@@ -188,6 +185,7 @@ function AdminBookingDeclined() {
           const quantity = Number(extra.quantity) || 1;
           return sum + priceNum * quantity;
         }, 0);
+
         extrasTotal = extrasTotal * (Number(item.nights) || 1);
       }
 
@@ -218,10 +216,9 @@ function AdminBookingDeclined() {
         textColor: 255,
         halign: "center",
       },
-      tableWidth: "auto",
     });
 
-    doc.save(`Declined_Bookings_${currentMonthName}_${currentYear}.pdf`);
+    doc.save(`Declined_Bookings_ALL_${currentYear}.pdf`);
   };
 
   // -------------------------------------------

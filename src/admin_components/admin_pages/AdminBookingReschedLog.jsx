@@ -109,31 +109,28 @@ function AdminBookingReschedLog() {
   const downloadReschedPDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
     const now = new Date();
+    const currentYear = now.getFullYear();
 
-    // Filter data based on created_at month
-    const monthlyData = filteredData.filter((item) => {
-      if (!item.created_at) return false;
-      const createdDate = new Date(item.created_at);
-      return (
-        createdDate.getMonth() === now.getMonth() &&
-        createdDate.getFullYear() === now.getFullYear()
-      );
+    const downloadDate = new Date().toLocaleString("en-PH", {
+      dateStyle: "medium",
+      timeStyle: "short",
     });
 
-    if (monthlyData.length === 0) {
-      alert("No rescheduled bookings found for this month.");
+    // ✅ USE ALL DATA (NO MONTH FILTER)
+    const allData = filteredData.filter((item) => item.created_at);
+
+    if (allData.length === 0) {
+      alert("No rescheduled bookings found.");
       return;
     }
-
-    const monthName = now.toLocaleString("default", { month: "long" });
-    const year = now.getFullYear();
 
     // Header
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.text(
-      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      "2JKLA NATURE HOT SPRING AND INN RESORT CORP.",
       pageWidth / 2,
       12,
       { align: "center" }
@@ -148,16 +145,17 @@ function AdminBookingReschedLog() {
     doc.setLineWidth(0.5);
     doc.line(14, 22, pageWidth - 14, 22);
 
-    // Updated title for rescheduled bookings
+    // Title
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
     doc.text("Rescheduled Room Bookings Report", pageWidth / 2, 30, {
       align: "center",
     });
 
+    // Subtitle
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
-    doc.text(`${monthName} ${year}`, pageWidth / 2, 36, { align: "center" });
+    doc.text("All Records", pageWidth / 2, 36, { align: "center" });
 
     // Format numbers
     const formatNum = (num) =>
@@ -182,8 +180,8 @@ function AdminBookingReschedLog() {
       "Created At",
     ];
 
-    const tableRows = monthlyData.map((item) => [
-      item.id,
+    const tableRows = allData.map((item) => [
+      item.rescheduled_booking_id,
       item.fullname,
       item.phone,
       item.prev_room,
@@ -204,11 +202,30 @@ function AdminBookingReschedLog() {
       body: tableRows,
       theme: "grid",
       styles: { fontSize: 7, cellPadding: 2 },
-      headStyles: { fillColor: [40, 40, 40], textColor: 255, halign: "center" },
-      tableWidth: "auto",
+      headStyles: {
+        fillColor: [40, 40, 40],
+        textColor: 255,
+        halign: "center",
+      },
     });
 
-    doc.save(`Rescheduled_Bookings_${monthName}_${year}.pdf`);
+    // Add download date on every page at bottom right, subtle style
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFont("helvetica", "normal"); // normal, not italic
+      doc.setFontSize(7); // smaller font size
+      doc.setTextColor(120); // medium gray for subtle text
+      doc.text(
+        `Downloaded on: ${downloadDate}`,
+        pageWidth - 14, // 14 mm from right edge
+        pageHeight - 10, // 10 mm from bottom edge
+        { align: "right" }
+      );
+      doc.setTextColor(0); // reset color to black
+    }
+
+    doc.save(`Rescheduled_Bookings_ALL_${currentYear}.pdf`);
   };
 
   return (

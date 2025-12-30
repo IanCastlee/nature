@@ -30,7 +30,7 @@ function AdminBookingPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 25;
+  const itemsPerPage = 50;
 
   //==============//
   //  DATA FETCH  //
@@ -169,21 +169,19 @@ function AdminBookingPage() {
   const downloadDeclinedPDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
     const now = new Date();
-    const currentMonthName = now.toLocaleString("default", { month: "long" });
     const currentYear = now.getFullYear();
 
     // Resort Header
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.text(
-      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      "2JKLA NATURE HOT SPRING AND INN RESORT CORP.",
       pageWidth / 2,
       10,
-      {
-        align: "center",
-      }
+      { align: "center" }
     );
 
     doc.setFont("helvetica", "normal");
@@ -203,21 +201,21 @@ function AdminBookingPage() {
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 31, {
+    doc.text("All Records", pageWidth / 2, 31, {
       align: "center",
     });
 
-    // Filter by START DATE (monthly)
-    const monthlyData = filteredData.filter((item) => {
-      const bookingDate = new Date(item.start_date);
-      return (
-        bookingDate.getMonth() === now.getMonth() &&
-        bookingDate.getFullYear() === currentYear
-      );
+    // Download date string
+    const downloadDate = new Date().toLocaleString("en-PH", {
+      dateStyle: "medium",
+      timeStyle: "short",
     });
 
-    if (monthlyData.length === 0) {
-      alert("No pending bookings found for this month.");
+    // ✅ USE ALL FILTERED DATA (NO MONTH FILTER)
+    const allData = filteredData;
+
+    if (allData.length === 0) {
+      alert("No pending bookings found.");
       return;
     }
 
@@ -242,9 +240,9 @@ function AdminBookingPage() {
         maximumFractionDigits: 2,
       });
 
-    const tableRows = monthlyData.map((item) => {
-      // Calculate total price of extras multiplied by nights
+    const tableRows = allData.map((item) => {
       let extrasTotal = 0;
+
       if (Array.isArray(item.extras) && item.extras.length > 0) {
         extrasTotal = item.extras.reduce((sum, extra) => {
           const priceNum =
@@ -283,10 +281,25 @@ function AdminBookingPage() {
         textColor: 255,
         halign: "center",
       },
-      tableWidth: "auto",
     });
 
-    doc.save(`Pending_Bookings_${currentMonthName}_${currentYear}.pdf`);
+    // Add download date on every page at bottom right (small, subtle)
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(120);
+      doc.text(
+        `Downloaded on: ${downloadDate}`,
+        pageWidth - 14,
+        pageHeight - 10,
+        { align: "right" }
+      );
+      doc.setTextColor(0);
+    }
+
+    doc.save(`Pending_Bookings_ALL_${currentYear}.pdf`);
   };
 
   // -------------------------------------------
@@ -351,10 +364,10 @@ function AdminBookingPage() {
                 onSetDeClined: (item) => setDeclinedItem(item),
                 onSetViewDetails: (item) => viewDetails(item),
 
-                // ✅ ADD THIS
+                //show modal option
                 onSetApprovedOptions: (item) => {
-                  setApproveItem(item); // save clicked row
-                  setShowForm("approved_options"); // show component
+                  setApproveItem(item);
+                  setShowForm("approved_options");
                 },
               })
             }
@@ -369,44 +382,6 @@ function AdminBookingPage() {
           />
         )}
       </div>
-
-      {/* APPROVE MODAL */}
-      {/* {approveItem?.booking_id && (
-        <DeleteModal
-          item={approveItem}
-          name={approveItem?.firstname}
-          loading={approveLoading}
-          onCancel={() => setApproveItem(null)}
-          label="Yes, Approve"
-          label2="approve this booking"
-          label3="Confirmation for half payment"
-          onConfirm={() => {
-            setInactive({
-              id: approveItem?.booking_id,
-              action: "set_approve",
-            });
-          }}
-        />
-      )} */}
-
-      {/* APPROVE MODAL FULL PAYMENT */}
-      {/* {approveItemFullpayment?.booking_id && (
-        <DeleteModal
-          item={approveItemFullpayment}
-          name={approveItemFullpayment?.firstname}
-          loading={approveFPLoading}
-          onCancel={() => setApproveItemFullpayment(null)}
-          label="Yes, Approve"
-          label2="approve this booking"
-          label3="Confirmation for full payment"
-          onConfirm={() => {
-            setInactiveFP({
-              id: approveItemFullpayment?.booking_id,
-              action: "set_approve_fp",
-            });
-          }}
-        />
-      )} */}
 
       {/* DECLINE MODAL */}
       {declinedItem?.booking_id && (
@@ -431,7 +406,9 @@ function AdminBookingPage() {
         />
       )}
 
-      {showForm === "view_details" && <ViewDetails data={viewDetailsId} />}
+      {showForm === "view_details" && (
+        <ViewDetails data={viewDetailsId} active="pending" />
+      )}
 
       {showForm === "approved_options" && (
         <ApproveBooking refetch={refetch} data={approveItem} />

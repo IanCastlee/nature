@@ -125,6 +125,19 @@ function AdminBookingFhApproved() {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`,
+
+    bal_topay: `₱${Number(
+      item.bal_topay?.toString().replace(/[^\d.-]/g, "") || 0
+    ).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    down_payment: `₱${Number(
+      item.down_payment?.toString().replace(/[^\d.-]/g, "") || 0
+    ).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
   }));
 
   //=========================//
@@ -165,7 +178,7 @@ function AdminBookingFhApproved() {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.text(
-      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      "2JKLA NATURE HOT SPRING AND INN RESORT CORP.",
       pageWidth / 2,
       10,
       {

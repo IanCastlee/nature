@@ -26,7 +26,7 @@ function AdminBookingNotAttended() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 50;
 
   // FETCH BOOKING HISTORY
   const { data, loading, refetch, error } = useGetData(
@@ -99,6 +99,14 @@ function AdminBookingNotAttended() {
     half_price: `₱${Number(item.price / 2).toLocaleString("en-PH", {
       minimumFractionDigits: 2,
     })}`,
+    down_payment: `₱${Number(item.down_payment).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    bal_topay: `₱${Number(item.bal_topay).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
   }));
 
   // SET BACK TO APPROVED
@@ -121,16 +129,16 @@ function AdminBookingNotAttended() {
   const downloadNotAttendedPDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
     const now = new Date();
-    const currentMonthName = now.toLocaleString("default", { month: "long" });
     const currentYear = now.getFullYear();
 
     // Resort Header
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.text(
-      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      "2JKLA NATURE HOT SPRING AND INN RESORT CORP.",
       pageWidth / 2,
       10,
       { align: "center" }
@@ -153,21 +161,13 @@ function AdminBookingNotAttended() {
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 31, {
-      align: "center",
-    });
+    doc.text("All Records", pageWidth / 2, 31, { align: "center" });
 
-    // Filter by START DATE (monthly)
-    const monthlyData = filteredData.filter((item) => {
-      const bookingDate = new Date(item.start_date);
-      return (
-        bookingDate.getMonth() === now.getMonth() &&
-        bookingDate.getFullYear() === currentYear
-      );
-    });
+    // Use ALL filtered data (no month filter)
+    const allData = filteredData;
 
-    if (monthlyData.length === 0) {
-      alert("No declined bookings found for this month.");
+    if (allData.length === 0) {
+      alert("No declined bookings found.");
       return;
     }
 
@@ -192,7 +192,7 @@ function AdminBookingNotAttended() {
         maximumFractionDigits: 2,
       });
 
-    const tableRows = monthlyData.map((item) => {
+    const tableRows = allData.map((item) => {
       // Calculate total extras × nights
       let extrasTotal = 0;
       if (Array.isArray(item.extras) && item.extras.length > 0) {
@@ -235,7 +235,27 @@ function AdminBookingNotAttended() {
       tableWidth: "auto",
     });
 
-    doc.save(`Declined_Bookings_${currentMonthName}_${currentYear}.pdf`);
+    // Add download date on every page at bottom right (small, subtle)
+    const downloadDate = new Date().toLocaleString("en-PH", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(120);
+      doc.text(
+        `Downloaded on: ${downloadDate}`,
+        pageWidth - 14,
+        pageHeight - 10,
+        { align: "right" }
+      );
+      doc.setTextColor(0);
+    }
+
+    doc.save(`Declined_Bookings_ALL_${currentYear}.pdf`);
   };
 
   // -------------------------------------------

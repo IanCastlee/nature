@@ -30,6 +30,7 @@ $booking_id       = isset($_POST["booking_id"]) ? intval($_POST["booking_id"]) :
 $prev_booking_id  = isset($_POST["prev_booking_id"]) ? intval($_POST["prev_booking_id"]) : null;
 $status           = $_POST["status"] ?? null;
 $difference       = isset($_POST["difference"]) ? floatval($_POST["difference"]) : 0;
+$new_half       = isset($_POST["new_half"]) ? floatval($_POST["new_half"]) : 0;
 
 if (!$booking_id || !$status) {
     http_response_code(400);
@@ -62,11 +63,12 @@ try {
         $stmt = $conn->prepare("
             UPDATE room_booking
             SET status = 'rescheduled',
-                paid = price / 2,
+                paid = ?,
+                down_payment = ?,
                 refund_charge = ?
             WHERE booking_id = ?
         ");
-        $stmt->bind_param("di", $difference, $booking_id);
+        $stmt->bind_param("dddi", $new_half, $new_half, $difference, $booking_id);
 
     } else {
 

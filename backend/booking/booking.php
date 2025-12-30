@@ -24,31 +24,6 @@ if (
 $action = $_POST['action'] ?? 'create';
 $id = $_POST['id'] ?? null;
 
-/**
- * ========================================================
- *  APPROVE BOOKING
- * ========================================================
- */
-// if ($action === "set_approve") {
-//     if (!$id) {
-//         http_response_code(400);
-//         echo json_encode(["error" => "Missing booking id"]);
-//         exit;
-//     }
-
-//     $stmt = $conn->prepare("
-//         UPDATE room_booking 
-//         SET status = 'approved', paid = price / 2, down_payment = price / 2
-//         WHERE booking_id = ?
-//     ");
-//     $stmt->bind_param("i", $id);
-
-//     echo $stmt->execute()
-//         ? json_encode(["success" => true, "message" => "Booking approved."])
-//         : json_encode(["success" => false, "message" => $stmt->error]);
-
-//     exit;
-// }
 
 
 /**
@@ -325,7 +300,7 @@ if ($action === "set_backtoapproved") {
     $stmt = $conn->prepare("
         UPDATE room_booking 
         SET status = 'approved',
-            paid = price / 2
+            paid = down_payment
         WHERE booking_id = ?
     ");
     $stmt->bind_param("i", $id);

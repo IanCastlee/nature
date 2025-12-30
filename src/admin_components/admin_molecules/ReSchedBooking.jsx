@@ -122,7 +122,7 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
   const handleReschedule = async () => {
     if (!newBooking) return;
 
-    const prevPaid = toNumber(booking.paid);
+    const prevPaid = toNumber(booking.down_payment);
     const newHalf = toNumber(newBooking.half_price);
     const difference = prevPaid - newHalf;
 
@@ -138,6 +138,7 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
       await setInactive({
         booking_id: newBooking.booking_id,
         prev_booking_id: booking.booking_id,
+        new_half: newHalf,
         status: "rescheduled",
         difference,
       });

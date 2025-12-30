@@ -3,7 +3,7 @@ import { icons } from "../../constant/icon";
 import { useForm } from "../../store/useRoomStore";
 import useSetInactive from "../../hooks/useSetInactive";
 
-export default function ApproveBooking({ data, refetch }) {
+export default function ApproveBookingFh({ data, refetch }) {
   const setShowForm = useForm((state) => state.setShowForm);
 
   const [paymentType, setPaymentType] = useState("half");
@@ -13,7 +13,7 @@ export default function ApproveBooking({ data, refetch }) {
     setInactive: approveBooking,
     loading,
     error,
-  } = useSetInactive("/booking/booking.php", () => {
+  } = useSetInactive("/booking/fh-booking.php", () => {
     refetch?.();
     setShowForm(null);
   });
@@ -40,7 +40,7 @@ export default function ApproveBooking({ data, refetch }) {
 
     approveBooking({
       action: "set_approve",
-      booking_id: data.booking_id,
+      booking_id: data.id,
       payment_type: paymentType,
       amount: payAmount,
     });

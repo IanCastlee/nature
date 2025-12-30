@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 function ViewDetails({ active, data }) {
   const setShowForm = useForm((state) => state.setShowForm);
 
+  console.log("DATA : ", data);
   if (!data) return null;
 
   const info = data;
@@ -102,14 +103,17 @@ function ViewDetails({ active, data }) {
           {/* PAYMENT SUMMARY */}
           <Section title="Payment Summary">
             <Info label="Full Price" value={info.price} />
-            <Info label="Amount Paid" value={info.down_payment} />
+            <Info
+              label="Amount Paid"
+              value={active === "arrived" ? info.paid : info.down_payment}
+            />
 
             {active !== "arrived" && (
               <Info
                 label={
                   active === "approved" ? "Balance to Pay" : "Required Payment"
                 }
-                value={info.bal_topay}
+                value={active === "pending" ? info.half_price : info.bal_topay}
               />
             )}
           </Section>

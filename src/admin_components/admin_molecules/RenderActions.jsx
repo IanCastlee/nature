@@ -394,13 +394,14 @@ export const renderActionsFhBooking = ({
   onSetApprove,
   onSetDeClined,
   isNotAvailablePage,
+  onSetApprovedOptions,
 }) => {
   return (
     <div className="flex items-center justify-end gap-2">
       {!isNotAvailablePage && (
         <div className="flex flex-row items-center gap-2">
           <button
-            onClick={() => onSetApprove(item)}
+            onClick={() => onSetApprovedOptions(item)}
             className="bg-yellow-600 text-white px-2 text-xs h-[27px] rounded-sm flex justify-center  items-center"
             title="Approve"
           >

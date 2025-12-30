@@ -113,7 +113,7 @@ function AdminBookingReschedLogFh() {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.text(
-      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      "2JKLA NATURE HOT SPRING AND INN RESORT CORP.",
       pageWidth / 2,
       12,
       { align: "center" }

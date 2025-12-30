@@ -15,6 +15,7 @@ import { icons } from "../../constant/icon";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import ViewFhBookingDetails from "../admin_molecules/ViewFhBookingDetails";
+import ApproveBookingFh from "../admin_molecules/ApproveBookingFh";
 function AdminFhBooking() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
@@ -32,8 +33,6 @@ function AdminFhBooking() {
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-fhbooking.php?status=pending`
   );
-
-  console.log("DATA : ", data);
 
   // PAGINATION
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
@@ -91,6 +90,23 @@ function AdminFhBooking() {
     setToast({ message: "Booking approved successfully", type: "success" });
   });
 
+  //==========================//
+  //   HANDLE APPROVE/ACTIONS //
+  //==========================//
+
+  // const {
+  //   setInactive,
+  //   loading: approveLoading,
+  //   error: approveError,
+  // } = useSetInactive("/booking/booking.php", () => {
+  //   refetch();
+  //   setApproveItem(null);
+  //   setToast({
+  //     message: "Booking set as approved with 50% payment",
+  //     type: "success",
+  //   });
+  // });
+
   const {
     setInactive: setDeclined,
     loading: declinedLoading,
@@ -133,7 +149,7 @@ function AdminFhBooking() {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.text(
-      "2JKLA NATURE HOT SPRING AND INN RESORT COPR.",
+      "2JKLA NATURE HOT SPRING AND INN RESORT CORP.",
       pageWidth / 2,
       10,
       {
@@ -280,9 +296,14 @@ function AdminFhBooking() {
               renderActionsFhBooking({
                 item,
                 setShowForm,
-                onSetApprove: setApproveItem,
+                // onSetApprove: setApproveItem,
                 onSetDeClined: setDeclinedItem,
                 onViewDetails: () => viewFHDetails(item),
+
+                onSetApprovedOptions: (item) => {
+                  setApproveItem(item);
+                  setShowForm("approved_options");
+                },
               })
             }
           />
@@ -299,7 +320,7 @@ function AdminFhBooking() {
       </div>
 
       {/* APPROVE MODAL */}
-      {approveItem && (
+      {/* {approveItem && (
         <DeleteModal
           item={approveItem}
           name={approveItem?.firstname}
@@ -312,7 +333,7 @@ function AdminFhBooking() {
             setInactive({ id: approveItem.id, action: "set_approve" })
           }
         />
-      )}
+      )} */}
 
       {/* DECLINE MODAL */}
       {declinedItem && (
@@ -337,6 +358,10 @@ function AdminFhBooking() {
       {/* VIEW DETAILS MODAL */}
       {showForm === "view_fh_hall" && viewFHDetailsData && (
         <ViewFhBookingDetails booking={viewFHDetailsData} />
+      )}
+
+      {showForm === "approved_options" && (
+        <ApproveBookingFh refetch={refetch} data={approveItem} />
       )}
     </>
   );

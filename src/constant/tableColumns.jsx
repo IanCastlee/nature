@@ -279,22 +279,6 @@ export const bookingNonAttended = [
   { title: "Status", key: "status" },
 ];
 
-// export const bookingRescheduled = [
-//   { title: "No.", key: "rescheduled_booking_id" },
-//   { title: "Guest", key: "fullname" },
-//   { title: "Phone", key: "phone" },
-//   { title: "Previous Room", key: "prev_room" },
-//   { title: "New Room", key: "new_room" },
-//   { title: "Original Stay", key: "sched_date" }, // start & end of previous booking
-//   { title: "Rescheduled Stay", key: "resched_to" }, // start & end of new booking
-//   { title: "Original Price", key: "sched_total_price" },
-//   { title: "Rescheduled Price", key: "resched_total_price" },
-//   { title: "Paid (Original)", key: "sched_paid_payment" },
-//   { title: "Paid (Rescheduled)", key: "resched_paid_payment" },
-//   { title: "Refund / Charge", key: "refund_charge" },
-//   { title: "Created At", key: "created_at" },
-// ];
-
 export const bookingRescheduled = [
   { title: "No.", key: "rescheduled_booking_id" },
   { title: "Guest Name", key: "fullname" },
@@ -435,8 +419,8 @@ export const fhbookingApproved = [
   },
 
   { title: "Total Amount", key: "price" },
-  { title: "Paid", key: "paid" },
-  { title: "Balance to Pay", key: "half_price" },
+  { title: "Paid", key: "down_payment" },
+  { title: "Balance to Pay", key: "bal_topay" },
   {
     title: "Status",
     key: "status",
