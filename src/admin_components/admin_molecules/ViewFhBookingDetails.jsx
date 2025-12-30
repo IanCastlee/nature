@@ -2,6 +2,7 @@ import React from "react";
 import { useForm } from "../../store/useRoomStore";
 
 function ViewFhBookingDetails({ booking, status }) {
+  console.log(booking);
   if (!booking) return null;
   const setShowForm = useForm((state) => state.setShowForm);
 
@@ -62,15 +63,44 @@ function ViewFhBookingDetails({ booking, status }) {
           {/* Payment Info */}
           <Section title="Payment Summary">
             <Detail label="Full Price" value={booking.price} />
-            {status !== "arrived" && status !== "not_attended" && (
+            {status !== "arrived" &&
+              status !== "not_attended" &&
+              status !== "declined" && (
+                <Detail
+                  label={
+                    status === "approved"
+                      ? "Balance to Pay"
+                      : "Required Payment"
+                  }
+                  value={
+                    status === "pending"
+                      ? booking.half_price
+                      : status === "declined"
+                      ? booking.half_price
+                      : status === "approved"
+                      ? booking.bal_topay
+                      : null
+                  }
+                />
+              )}
+            {status !== "pending" && (
               <Detail
-                label={
-                  status === "approved" ? "Balance to Pay" : "Required Payment"
+                label="Amount Paid"
+                value={
+                  status === "arrived"
+                    ? booking.paid
+                    : status === "declined"
+                    ? booking.paid
+                    : status === "pending"
+                    ? booking.paid
+                    : status === "approved"
+                    ? booking.down_payment
+                    : status === "not_attended"
+                    ? booking.paid
+                    : null
                 }
-                value={booking.half_price}
               />
             )}
-            <Detail label="Amount Paid" value={booking.paid} />
           </Section>
 
           {/* Decline Reason */}

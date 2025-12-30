@@ -97,6 +97,10 @@ function AdminBookingDeclined() {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`,
+    down_payment: `₱${Number(item.down_payment).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
   }));
 
   // VIEW DETAILS
@@ -292,7 +296,7 @@ function AdminBookingDeclined() {
       </div>
 
       {showForm === "view_details" && (
-        <ViewDetails data={viewDetailsId} action="declined" />
+        <ViewDetails data={viewDetailsId} active="declined" />
       )}
     </>
   );

@@ -44,10 +44,13 @@ if ($action === "set_approve") {
     $price = floatval($booking['price']);
 
     // Decide payment
-    if ($paymentType === 'half') {
-        $paid = $price / 2;
-        $down = $price / 2;
-    }
+
+
+ if ($paymentType === 'half') {
+    $paid = round($price / 2, 2); // 1499.50
+    $down = $paid;
+}
+
 
     if ($paymentType === 'full') {
         $paid = $price;
@@ -126,7 +129,7 @@ if ($action === "set_pending") {
     }
 
     $stmt = $conn->prepare("
-        UPDATE other_facilities_booking SET status = 'pending', paid = 0 WHERE id = ?
+        UPDATE other_facilities_booking SET status = 'pending', paid = 0, down_payment = 0 WHERE id = ?
     ");
     $stmt->bind_param("i", $id);
     if (!$stmt->execute()) {

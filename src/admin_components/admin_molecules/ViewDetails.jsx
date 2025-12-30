@@ -103,19 +103,41 @@ function ViewDetails({ active, data }) {
           {/* PAYMENT SUMMARY */}
           <Section title="Payment Summary">
             <Info label="Full Price" value={info.price} />
-            <Info
-              label="Amount Paid"
-              value={active === "arrived" ? info.paid : info.down_payment}
-            />
-
-            {active !== "arrived" && (
+            {active !== "pending" && (
               <Info
-                label={
-                  active === "approved" ? "Balance to Pay" : "Required Payment"
+                label="Amount Paid"
+                value={
+                  active === "approved"
+                    ? info.down_payment
+                    : active === "declined"
+                    ? info.down_payment
+                    : active === "arrived"
+                    ? info.paid
+                    : active === "not_attended"
+                    ? info.down_payment
+                    : null
                 }
-                value={active === "pending" ? info.half_price : info.bal_topay}
               />
             )}
+
+            {active !== "arrived" &&
+              active !== "not_attended" &&
+              active !== "declined" && (
+                <Info
+                  label={
+                    active === "approved"
+                      ? "Balance to Pay"
+                      : "Required Payment"
+                  }
+                  value={
+                    active === "pending"
+                      ? info.half_price
+                      : active === "approved"
+                      ? info.bal_topay
+                      : null
+                  }
+                />
+              )}
           </Section>
 
           {/* DECLINE NOTE */}

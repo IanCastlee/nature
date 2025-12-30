@@ -30,7 +30,7 @@ function AdminFhBookingArrived() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 50;
 
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-fhbooking.php?status=arrived`
@@ -113,10 +113,14 @@ function AdminFhBookingArrived() {
   const downloadDeclinedPDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    const now = new Date();
-    const currentMonthName = now.toLocaleString("default", { month: "long" });
-    const currentYear = now.getFullYear();
+    const currentYear = new Date().getFullYear();
+
+    const downloadDate = new Date().toLocaleString("en-PH", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
 
     // Resort Header
     doc.setFont("helvetica", "bold");
@@ -125,9 +129,7 @@ function AdminFhBookingArrived() {
       "2JKLA NATURE HOT SPRING AND INN RESORT CORP.",
       pageWidth / 2,
       10,
-      {
-        align: "center",
-      }
+      { align: "center" }
     );
 
     doc.setFont("helvetica", "normal");
@@ -147,21 +149,13 @@ function AdminFhBookingArrived() {
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 31, {
-      align: "center",
-    });
+    doc.text("All Records", pageWidth / 2, 31, { align: "center" });
 
-    // Filter by START DATE (monthly)
-    const monthlyData = filteredData.filter((item) => {
-      const bookingDate = new Date(item.date);
-      return (
-        bookingDate.getMonth() === now.getMonth() &&
-        bookingDate.getFullYear() === currentYear
-      );
-    });
+    // ✅ ALL DATA (NO MONTH FILTER)
+    const allData = filteredData;
 
-    if (monthlyData.length === 0) {
-      alert("No arrived bookings found for this month.");
+    if (allData.length === 0) {
+      alert("No arrived bookings found.");
       return;
     }
 
@@ -183,7 +177,7 @@ function AdminFhBookingArrived() {
         maximumFractionDigits: 2,
       });
 
-    const tableRows = monthlyData.map((item) => [
+    const tableRows = allData.map((item) => [
       item.id,
       item.fullname,
       item.phone,
@@ -209,12 +203,27 @@ function AdminFhBookingArrived() {
       tableWidth: "auto",
     });
 
-    doc.save(`Arrived_Bookings_${currentMonthName}_${currentYear}.pdf`);
+    // ✅ Footer on EVERY page (small, thin, not highlighted)
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(120); // light gray
+      doc.text(
+        `Downloaded on: ${downloadDate}`,
+        pageWidth - 14,
+        pageHeight - 10,
+        { align: "right" }
+      );
+      doc.setTextColor(0);
+    }
+
+    doc.save(`Arrived_FunctionHall_Bookings_ALL_${currentYear}.pdf`);
   };
 
   // -------------------------------------------
 
-  console.log(" viewFHDetailsId:", viewFHDetailsId);
   return (
     <>
       {toast && (

@@ -6,7 +6,6 @@ import NoData from "../../components/molecules/NoData";
 import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
 import { fhbookingDeclined } from "../../constant/tableColumns";
-import ViewFHDetails from "../admin_molecules/ViewFHDetails";
 import { renderActionsFhBookingDeclined } from "../admin_molecules/RenderActions";
 
 import { icons } from "../../constant/icon";
@@ -26,12 +25,11 @@ function AdminBookingFhDeclined() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 50;
 
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
-
       const s = String(searchTerm).toLowerCase();
 
       return (
@@ -73,26 +71,53 @@ function AdminBookingFhDeclined() {
   };
 
   // -------------------------------------------
-  // 📌 PDF EXPORT FOR APPROVED FUNCTION HALL BOOKINGS
+  // ✅ FORMATTED DATA FOR TABLE DISPLAY ONLY
+  // -------------------------------------------
+  const formattedData = currentData.map((item) => {
+    const price = Number(item.price || 0);
+    const paid = Number(item.paid || 0);
+
+    return {
+      ...item,
+      price: `₱${price.toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      paid: `₱${paid.toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+
+      bal_topay: `₱${(price / 2).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+    };
+  });
+
+  // -------------------------------------------
+  // 📌 PDF EXPORT (USES RAW DATA – CORRECT)
   // -------------------------------------------
   const downloadDeclinedPDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    const now = new Date();
-    const currentMonthName = now.toLocaleString("default", { month: "long" });
-    const currentYear = now.getFullYear();
+    const currentYear = new Date().getFullYear();
 
-    // Resort Header
+    const downloadDate = new Date().toLocaleString("en-PH", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+
+    // Header
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.text(
       "2JKLA NATURE HOT SPRING AND INN RESORT CORP.",
       pageWidth / 2,
       10,
-      {
-        align: "center",
-      }
+      { align: "center" }
     );
 
     doc.setFont("helvetica", "normal");
@@ -112,35 +137,15 @@ function AdminBookingFhDeclined() {
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text(`${currentMonthName} ${currentYear}`, pageWidth / 2, 31, {
-      align: "center",
-    });
+    doc.text("All Records", pageWidth / 2, 31, { align: "center" });
 
-    // Filter by START DATE (monthly)
-    const monthlyData = filteredData.filter((item) => {
-      const bookingDate = new Date(item.date);
-      return (
-        bookingDate.getMonth() === now.getMonth() &&
-        bookingDate.getFullYear() === currentYear
-      );
-    });
+    // ✅ ALL DATA (NO MONTH FILTER)
+    const allData = filteredData;
 
-    if (monthlyData.length === 0) {
-      alert("No approved bookings found for this month.");
+    if (!allData.length) {
+      alert("No declined bookings found.");
       return;
     }
-
-    const tableColumn = [
-      "Booking ID",
-      "Guest Name",
-      "Phone",
-      "Reserved Date",
-      "Price",
-      "Paid",
-      "Facility",
-      "Created At",
-      "Status",
-    ];
 
     const formatNum = (num) =>
       Number(num).toLocaleString("en-PH", {
@@ -148,7 +153,7 @@ function AdminBookingFhDeclined() {
         maximumFractionDigits: 2,
       });
 
-    const tableRows = monthlyData.map((item) => [
+    const tableRows = allData.map((item) => [
       item.id,
       item.fullname,
       item.phone,
@@ -162,7 +167,19 @@ function AdminBookingFhDeclined() {
 
     autoTable(doc, {
       startY: 36,
-      head: [tableColumn],
+      head: [
+        [
+          "Booking ID",
+          "Guest Name",
+          "Phone",
+          "Reserved Date",
+          "Price",
+          "Paid",
+          "Facility",
+          "Created At",
+          "Status",
+        ],
+      ],
       body: tableRows,
       theme: "grid",
       styles: { fontSize: 7, cellPadding: 1.8 },
@@ -171,13 +188,26 @@ function AdminBookingFhDeclined() {
         textColor: 255,
         halign: "center",
       },
-      tableWidth: "auto",
     });
 
-    doc.save(`Declined_Bookings_${currentMonthName}_${currentYear}.pdf`);
-  };
+    // ✅ Footer on EVERY page (small & subtle)
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(120);
+      doc.text(
+        `Downloaded on: ${downloadDate}`,
+        pageWidth - 14,
+        pageHeight - 10,
+        { align: "right" }
+      );
+      doc.setTextColor(0);
+    }
 
-  // -------------------------------------------
+    doc.save(`Declined_FunctionHall_Bookings_ALL_${currentYear}.pdf`);
+  };
 
   return (
     <>
@@ -186,7 +216,7 @@ function AdminBookingFhDeclined() {
           Declined Function Hall Booking
         </h1>
 
-        <div className="w-full flex flex-row justify-between items-center mb-2">
+        <div className="w-full flex justify-between items-center mb-2">
           <span className="dark:text-gray-100 text-xs font-medium">
             Showing {filteredData.length} Booking
           </span>
@@ -194,8 +224,7 @@ function AdminBookingFhDeclined() {
           <div className="flex gap-2">
             <button
               onClick={downloadDeclinedPDF}
-              title="Download PDF for Current Month"
-              className="bg-green-600 text-white px-3 py-1 rounded text-xs whitespace-nowrap flex items-center gap-1"
+              className="bg-green-600 text-white px-3 py-1 rounded text-xs flex items-center gap-1"
             >
               <icons.MdOutlineFileDownload /> PDF
             </button>
@@ -212,7 +241,7 @@ function AdminBookingFhDeclined() {
         <div className="overflow-x-auto">
           <GenericTable
             columns={fhbookingDeclined}
-            data={currentData}
+            data={formattedData}
             loading={loading}
             noDataComponent={<NoData />}
             renderActions={(item) =>

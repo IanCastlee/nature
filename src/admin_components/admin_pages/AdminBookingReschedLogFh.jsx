@@ -19,7 +19,7 @@ function AdminBookingReschedLogFh() {
   const [toast, setToast] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 50;
 
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-resched-fh.php`
@@ -89,25 +89,22 @@ function AdminBookingReschedLogFh() {
   const downloadReschedPDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
-    const now = new Date();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    // Filter data based on the current month/year of resched_date
-    const monthlyData = filteredData.filter((item) => {
-      if (!item.created_at) return false;
-      const reschedDate = new Date(item.created_at);
-      return (
-        reschedDate.getMonth() === now.getMonth() &&
-        reschedDate.getFullYear() === now.getFullYear()
-      );
+    const currentYear = new Date().getFullYear();
+
+    const downloadDate = new Date().toLocaleString("en-PH", {
+      dateStyle: "medium",
+      timeStyle: "short",
     });
 
-    if (monthlyData.length === 0) {
-      alert("No rescheduled bookings found for this month.");
+    // ✅ ALL DATA (NO MONTH FILTER)
+    const allData = filteredData;
+
+    if (!allData.length) {
+      alert("No rescheduled bookings found.");
       return;
     }
-
-    const monthName = now.toLocaleString("default", { month: "long" });
-    const year = now.getFullYear();
 
     // Header
     doc.setFont("helvetica", "bold");
@@ -130,15 +127,15 @@ function AdminBookingReschedLogFh() {
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.text("Rescheduled Function Hall Bookings", pageWidth / 2, 30, {
+    doc.text("Rescheduled Function Hall Booking Records", pageWidth / 2, 30, {
       align: "center",
     });
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
-    doc.text(`${monthName} ${year}`, pageWidth / 2, 36, { align: "center" });
+    doc.text("All Records", pageWidth / 2, 36, { align: "center" });
 
-    // Format number
+    // Format numbers
     const formatNum = (num) =>
       Number(num).toLocaleString("en-PH", {
         minimumFractionDigits: 2,
@@ -161,8 +158,8 @@ function AdminBookingReschedLogFh() {
       "Created At",
     ];
 
-    const tableRows = monthlyData.map((item) => [
-      item.id,
+    const tableRows = allData.map((item) => [
+      item.rescheduled_booking_id,
       item.fullname,
       item.phone,
       item.prev_facility,
@@ -183,11 +180,31 @@ function AdminBookingReschedLogFh() {
       body: tableRows,
       theme: "grid",
       styles: { fontSize: 7, cellPadding: 2 },
-      headStyles: { fillColor: [40, 40, 40], textColor: 255, halign: "center" },
+      headStyles: {
+        fillColor: [40, 40, 40],
+        textColor: 255,
+        halign: "center",
+      },
       tableWidth: "auto",
     });
 
-    doc.save(`FH_Rescheduled_Bookings_${monthName}_${year}.pdf`);
+    // ✅ Footer on EVERY page (small & subtle)
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(120);
+      doc.text(
+        `Downloaded on: ${downloadDate}`,
+        pageWidth - 14,
+        pageHeight - 10,
+        { align: "right" }
+      );
+      doc.setTextColor(0);
+    }
+
+    doc.save(`FH_Rescheduled_Bookings_ALL_${currentYear}.pdf`);
   };
 
   return (

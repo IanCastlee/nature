@@ -107,7 +107,7 @@ if ($method === "GET") {
 
         //  raw numbers only
         'price' => $price,
-        'paid' => $price,
+        'paid' => $row['booking_paid'],
         'half_price' => $halfPrice,
         'bal_topay' => $toPay,
         'down_payment' => $row['down_payment'],

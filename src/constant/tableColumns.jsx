@@ -213,7 +213,7 @@ export const bookingHistory = [
     width: "150px",
   },
   { title: "Total Amount", key: "price" },
-  { title: "Paid", key: "paid" },
+  { title: "Paidss", key: "paid" },
   // { title: "Balance to Pay", key: "half_price" },
 
   { title: "Status", key: "status" },
