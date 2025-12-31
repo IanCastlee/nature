@@ -7,8 +7,11 @@ include("../dbConn.php");
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Accept raw JSON if sent
-if ($method === "POST" && isset($_SERVER["CONTENT_TYPE"]) 
-    && strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false) {
+if (
+    $method === "POST" &&
+    isset($_SERVER["CONTENT_TYPE"]) &&
+    strpos($_SERVER["CONTENT_TYPE"], "application/json") !== false
+) {
     $input = json_decode(file_get_contents("php://input"), true);
     $_POST = $input;
 }
@@ -30,10 +33,10 @@ if ($facilityId <= 0) {
  * end_date   = check-out (NOT blocked)
  */
 $sql = "
-SELECT start_date, end_date
-FROM room_booking
-WHERE facility_id = ?
-  AND status NOT IN ('declined', 'resched')
+    SELECT start_date, end_date
+    FROM room_booking
+    WHERE facility_id = ?
+      AND status NOT IN ('declined', 'resched')
 ";
 
 $stmt = $conn->prepare($sql);
@@ -42,13 +45,24 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 $bookedDates = [];
+$today = date('Y-m-d');
 
 while ($row = $result->fetch_assoc()) {
 
     $startDate = $row['start_date'];
     $endDate   = date('Y-m-d', strtotime($row['end_date'] . ' -1 day'));
 
-    // Prevent invalid or zero-length ranges
+    // ❌ Skip bookings completely in the past
+    if ($endDate < $today) {
+        continue;
+    }
+
+    // ✅ Clamp past start dates to today
+    if ($startDate < $today) {
+        $startDate = $today;
+    }
+
+    // Final safety check
     if ($startDate <= $endDate) {
         $bookedDates[] = [
             'start' => $startDate,

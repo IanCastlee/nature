@@ -6,7 +6,7 @@ import { uploadUrl } from "../../utils/fileURL";
 import Button from "../atoms/Button";
 import CustomDropDownn from "../atoms/CustomDropDownn";
 import Input from "../atoms/Input";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import useFormSubmit from "../../hooks/useFormSubmit";
 import Toaster from "../molecules/Toaster";
 import { DayPicker } from "react-day-picker";
@@ -82,6 +82,8 @@ function BookWithoutSigningIn() {
   // Add local state to track selected extra
   const [selectedExtraId, setSelectedExtraId] = useState("");
 
+  ///////////////////////////
+
   // fetch not available date
   const {
     data: notAvailableDates,
@@ -90,60 +92,97 @@ function BookWithoutSigningIn() {
     error: errorFh,
   } = useGetData(`/booking/get-notavailable-date.php?facility_id=${roomId}`);
 
+  // extract booked check-in dates
+  const bookedCheckIns = useMemo(() => {
+    return notAvailableDates?.booked_dates?.map((d) => new Date(d.start)) || [];
+  }, [notAvailableDates]);
+
+  function findNearestBookedAfter(fromDate, bookedCheckIns) {
+    if (!fromDate) return null;
+
+    const fromTime = fromDate.getTime();
+
+    return (
+      bookedCheckIns
+        .filter((d) => d.getTime() > fromTime)
+        .sort((a, b) => a - b)[0] || null
+    );
+  }
+
+  const nearestBookedCheckIn = useMemo(() => {
+    return findNearestBookedAfter(selectedRange?.from, bookedCheckIns);
+  }, [selectedRange?.from, bookedCheckIns]);
+
+  console.log("NEAREST BOOKED CHECK-IN:", nearestBookedCheckIn);
+
   useEffect(() => {
-    if (notAvailableDates && notAvailableDates.booked_dates) {
-      const normalizeDate = (d) => {
-        const nd = new Date(d);
-        nd.setHours(0, 0, 0, 0);
-        return nd;
-      };
+    if (!notAvailableDates?.booked_dates) return;
 
-      const today = normalizeDate(new Date());
-      let disabledDates = [];
+    const normalizeDate = (d) => {
+      const nd = new Date(d);
+      nd.setHours(0, 0, 0, 0);
+      return nd;
+    };
 
-      // 1. Expand all booked ranges into flat disabled days
-      notAvailableDates.booked_dates.forEach(({ start, end }) => {
-        const from = normalizeDate(start);
-        const to = normalizeDate(end);
+    const today = normalizeDate(new Date());
+    let disabledDates = [];
 
-        for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
-          disabledDates.push(normalizeDate(d));
-        }
-      });
+    // 1. Expand booked ranges
+    notAvailableDates.booked_dates.forEach(({ start, end }) => {
+      const from = normalizeDate(start);
+      const to = normalizeDate(end);
 
-      // 2. Sort and store as Set
-      disabledDates.sort((a, b) => a - b);
-      let disabledSet = new Set(disabledDates.map((d) => d.getTime()));
-      const extendedDisabled = [...disabledDates];
+      for (let d = new Date(from); d <= to; d.setDate(d.getDate() + 1)) {
+        disabledDates.push(normalizeDate(d));
+      }
+    });
 
-      // 3. Add all 1-day gaps
-      for (let i = 1; i < disabledDates.length; i++) {
-        const prev = disabledDates[i - 1];
-        const curr = disabledDates[i];
-        const diff = (curr - prev) / (1000 * 60 * 60 * 24);
+    // 2. Sort + gap blocking
+    disabledDates.sort((a, b) => a - b);
 
-        if (diff === 2) {
-          const middle = new Date(prev);
-          middle.setDate(middle.getDate() + 1);
-          const normalizedMiddle = normalizeDate(middle);
+    const extended = [...disabledDates];
+    const set = new Set(disabledDates.map((d) => d.getTime()));
 
-          if (!disabledSet.has(normalizedMiddle.getTime())) {
-            extendedDisabled.push(normalizedMiddle);
-            disabledSet.add(normalizedMiddle.getTime());
-          }
+    for (let i = 1; i < disabledDates.length; i++) {
+      const prev = disabledDates[i - 1];
+      const curr = disabledDates[i];
+      const diff = (curr - prev) / 86400000;
+
+      if (diff === 2) {
+        const middle = new Date(prev);
+        middle.setDate(middle.getDate() + 1);
+        const mid = normalizeDate(middle);
+
+        if (!set.has(mid.getTime())) {
+          extended.push(mid);
+          set.add(mid.getTime());
         }
       }
-
-      // 5. Remove duplicates
-      const finalDisabled = Array.from(
-        new Set(extendedDisabled.map((d) => d.getTime()))
-      ).map((t) => new Date(t));
-
-      // 6. Add dates before today
-      const pastDates = { before: today };
-      setDisabledRanges([pastDates, ...finalDisabled]);
     }
-  }, [notAvailableDates]);
+
+    // 3. Deduplicate
+    let finalDisabled = Array.from(
+      new Set(extended.map((d) => d.getTime()))
+    ).map((t) => new Date(t));
+
+    // 🔥 4. TEMPORARILY ENABLE nearest booked check-in
+    if (selectedRange?.from && nearestBookedCheckIn) {
+      const enableTime = normalizeDate(nearestBookedCheckIn).getTime();
+      finalDisabled = finalDisabled.filter((d) => d.getTime() !== enableTime);
+    }
+
+    // 5. Past dates
+    let rules = [{ before: today }, ...finalDisabled];
+
+    // 🔒 limit selection to nearest booked date only
+    if (selectedRange?.from && nearestBookedCheckIn) {
+      rules.push({
+        after: normalizeDate(nearestBookedCheckIn),
+      });
+    }
+
+    setDisabledRanges(rules);
+  }, [notAvailableDates, selectedRange?.from, nearestBookedCheckIn]);
 
   const {
     submit,
@@ -429,6 +468,8 @@ function BookWithoutSigningIn() {
     return false;
   };
 
+  console.log("NOT AVAILABLE DATE:", notAvailableDates);
+  console.log("CHECK IN PICKED : ", selectedRange.from);
   return (
     <>
       {toast && (
