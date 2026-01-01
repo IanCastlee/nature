@@ -16,6 +16,35 @@ import html2canvas from "html2canvas";
 import natureLogo from "../../assets/icons/naturelogo2.png";
 
 function BookWithoutSigningIn() {
+  ////////////////////////////////////////////
+  const { data: holidaysData, refetch } = useGetData("/admin/holidays.php");
+  const holidays = holidaysData || [];
+
+  const countHolidayNights = (from, to, holidays) => {
+    if (!from || !to || !holidays?.length) return 0;
+
+    const holidaySet = new Set(holidays.map((h) => h.date)); // "MM/DD"
+    let count = 0;
+
+    const current = new Date(from);
+
+    while (current < to) {
+      const mmdd = `${String(current.getMonth() + 1).padStart(2, "0")}/${String(
+        current.getDate()
+      ).padStart(2, "0")}`;
+
+      if (holidaySet.has(mmdd)) {
+        count++;
+      }
+
+      current.setDate(current.getDate() + 1);
+    }
+
+    return count;
+  };
+
+  ////////////////////////////////////////////
+
   const setShowForm = useForm((state) => state.setShowForm);
   const showForm = useForm((state) => state.showForm);
 
@@ -113,8 +142,6 @@ function BookWithoutSigningIn() {
     return findNearestBookedAfter(selectedRange?.from, bookedCheckIns);
   }, [selectedRange?.from, bookedCheckIns]);
 
-  console.log("NEAREST BOOKED CHECK-IN:", nearestBookedCheckIn);
-
   useEffect(() => {
     if (!notAvailableDates?.booked_dates) return;
 
@@ -127,7 +154,7 @@ function BookWithoutSigningIn() {
     const today = normalizeDate(new Date());
     let disabledDates = [];
 
-    // 1. Expand booked ranges
+    // 1️⃣ Expand booked ranges only
     notAvailableDates.booked_dates.forEach(({ start, end }) => {
       const from = normalizeDate(start);
       const to = normalizeDate(end);
@@ -137,48 +164,24 @@ function BookWithoutSigningIn() {
       }
     });
 
-    // 2. Sort + gap blocking
+    // 2️⃣ Sort + dedupe
     disabledDates.sort((a, b) => a - b);
 
-    const extended = [...disabledDates];
-    const set = new Set(disabledDates.map((d) => d.getTime()));
-
-    for (let i = 1; i < disabledDates.length; i++) {
-      const prev = disabledDates[i - 1];
-      const curr = disabledDates[i];
-      const diff = (curr - prev) / 86400000;
-
-      if (diff === 2) {
-        const middle = new Date(prev);
-        middle.setDate(middle.getDate() + 1);
-        const mid = normalizeDate(middle);
-
-        if (!set.has(mid.getTime())) {
-          extended.push(mid);
-          set.add(mid.getTime());
-        }
-      }
-    }
-
-    // 3. Deduplicate
     let finalDisabled = Array.from(
-      new Set(extended.map((d) => d.getTime()))
+      new Set(disabledDates.map((d) => d.getTime()))
     ).map((t) => new Date(t));
 
-    // 🔥 4. TEMPORARILY ENABLE nearest booked check-in
+    // 🔥 3️⃣ TEMPORARY ENABLE nearest booked check-in
     if (selectedRange?.from && nearestBookedCheckIn) {
       const enableTime = normalizeDate(nearestBookedCheckIn).getTime();
       finalDisabled = finalDisabled.filter((d) => d.getTime() !== enableTime);
     }
 
-    // 5. Past dates
+    // 🔒 4️⃣ Hard stop after nearest booking
     let rules = [{ before: today }, ...finalDisabled];
 
-    // 🔒 limit selection to nearest booked date only
     if (selectedRange?.from && nearestBookedCheckIn) {
-      rules.push({
-        after: normalizeDate(nearestBookedCheckIn),
-      });
+      rules.push({ after: normalizeDate(nearestBookedCheckIn) });
     }
 
     setDisabledRanges(rules);
@@ -196,9 +199,9 @@ function BookWithoutSigningIn() {
       });
       setShowForm(null);
       // Save booking summary for modal display
+      console.log("RESSSS: ", response);
       setBookingSummary(response);
       setShowSummaryModal(true);
-
       // Reset form fields etc.
       setSelectedRange({ from: undefined, to: undefined });
       setAddedExtras([]);
@@ -219,7 +222,7 @@ function BookWithoutSigningIn() {
     setIsSubmitting(true);
 
     try {
-      // Validation with toast messages instead of alert
+      // Validation
       if (!form.firstname?.trim()) {
         setToast({ message: "Please enter your first name.", type: "error" });
         setIsSubmitting(false);
@@ -251,7 +254,7 @@ function BookWithoutSigningIn() {
         0
       );
 
-      // REMEMBER ME — Save or Remove Local Storage
+      // REMEMBER ME
       if (form.remember) {
         localStorage.setItem("firstname", form.firstname);
         localStorage.setItem("lastname", form.lastname);
@@ -264,6 +267,7 @@ function BookWithoutSigningIn() {
         localStorage.removeItem("remember_info");
       }
 
+      // Payload — send only what backend needs; backend calculates holiday surcharge
       const payload = {
         fullname: `${form.firstname} ${form.lastname}`,
         phone: form.phone,
@@ -281,10 +285,20 @@ function BookWithoutSigningIn() {
           quantity: extra.quantity,
           price: extra.price,
         })),
-        total_price: nights * Number(price) + extrasTotal,
       };
 
-      await submit(payload);
+      const response = await submit(payload);
+
+      // Optional: display the response from backend, which now includes holiday info
+      if (response.success) {
+        setToast({
+          message: "Reservation submitted successfully!",
+          type: "success",
+        });
+        console.log("Holiday nights:", response.holiday_nights);
+        console.log("Holiday surcharge:", response.holiday_surcharge);
+        console.log("Total price:", response.total_price);
+      }
     } catch (error) {
       setToast({
         message: error.message || "Failed to submit booking",
@@ -359,22 +373,6 @@ function BookWithoutSigningIn() {
 
     navigate(`/reserve/${nextRoomId}`);
   };
-  //handle PreviousRoom
-  const handlePreviousRoom = () => {
-    if (!dataCategoryIds || dataCategoryIds.length === 0) return;
-
-    const currentIndex = dataCategoryIds.findIndex(
-      (room) => String(room.room_id) === roomId
-    );
-
-    if (currentIndex === -1) return;
-
-    const prevIndex =
-      (currentIndex - 1 + dataCategoryIds.length) % dataCategoryIds.length;
-    const prevRoomId = dataCategoryIds[prevIndex].room_id;
-
-    navigate(`/reserve/${prevRoomId}`);
-  };
 
   const {
     data: extrasData,
@@ -391,32 +389,47 @@ function BookWithoutSigningIn() {
   if (error) return <div>Error fetching room details.</div>;
   if (!roomDetails) return <div>No room found.</div>;
 
-  const {
-    room_id,
-    images,
-    room_name,
-    price,
-    capacity,
-    time_in_out,
-    description,
-    category,
-    amenities,
-    inclusion,
-    extras,
-    withExtras,
-  } = roomDetails;
+  const { images, room_name, price, capacity, time_in_out, extras } =
+    roomDetails;
 
   const nights = getNumberOfNights();
-  const roomTotal = nights * Number(price);
+  const pricePerNight = Number(price);
+
+  // ROOM TOTAL
+  const roomTotal = nights * pricePerNight;
+
+  // EXTRAS TOTAL (ALL NIGHTS)
   const extrasTotal = addedExtras.reduce(
     (total, item) => total + item.price * item.quantity * nights,
     0
   );
 
-  const grandTotal = roomTotal + extrasTotal;
+  // HOLIDAY NIGHTS ONLY
+  const holidayNights = countHolidayNights(
+    selectedRange?.from,
+    selectedRange?.to,
+    holidays
+  );
+
+  // DAILY TOTAL (ROOM + EXTRAS PER NIGHT)
+  const dailyTotal = nights > 0 ? pricePerNight + extrasTotal / nights : 0;
+
+  // 10% SURCHARGE PER HOLIDAY NIGHT (ROOM + EXTRAS)
+  // const holidaySurcharge = dailyTotal * 0.1 * holidayNights;
+
+  // Example: dynamic surcharge percentage
+  let chargePercent = 20; // can change to 20, 15, etc.
+  const holidaySurcharge = dailyTotal * (chargePercent / 100) * holidayNights;
+
+  // GRAND TOTAL
+  const grandTotal = roomTotal + extrasTotal + holidaySurcharge;
 
   const isSubmitDisabled =
     formLoading || !selectedRange.from || !selectedRange.to || nights === 0;
+
+  console.log("HOLIDAY NIGHTS:", holidayNights);
+  console.log("HOLIDAY SURCHARGE:", holidaySurcharge);
+  console.log("GRAND TOTAL:", grandTotal);
 
   const removeExtra = (index) => {
     setAddedExtras((prev) => prev.filter((_, i) => i !== index));
@@ -468,8 +481,10 @@ function BookWithoutSigningIn() {
     return false;
   };
 
-  console.log("NOT AVAILABLE DATE:", notAvailableDates);
-  console.log("CHECK IN PICKED : ", selectedRange.from);
+  console.log("HOLIDAYS WITH ADDITIONALC !10% : ", holidaysData);
+  console.log("CHECK IN : ", selectedRange.from);
+  console.log("CHECK OUT : ", selectedRange.to);
+
   return (
     <>
       {toast && (
@@ -730,25 +745,47 @@ function BookWithoutSigningIn() {
                 <div className="flex flex-row gap-1">
                   {/* Total Price */}
                   <div className="w-full flex flex-col justify-between items-center  p-4 rounded-lg dark:bg-gray-900 bg-white   border">
-                    <div className="w-full items-center flex flex-row justify-between">
-                      <div className="flex lg:flex-row flex-col lg:text-lg md:text-sm text-sm font-bold text-gray-800 dark:text-gray-100 ">
-                        <span className="dark:text-gray-200 text-gray-700 mr-2">
-                          Total Price:
+                    <div className="w-full flex justify-start mb-2">
+                      {/* HOLIDAY SURCHARGE — small only */}
+                      {holidayNights > 0 && (
+                        <span
+                          className="
+        inline-block
+        text-[11px]
+        text-red-600 dark:text-red-400
+        bg-red-50 dark:bg-red-900/30
+        px-2 py-0.5
+        rounded
+        leading-tight
+      "
+                        >
+                          Holiday +{chargePercent}% × {holidayNights} day (₱
+                          {holidaySurcharge.toLocaleString("en-PH", {
+                            minimumFractionDigits: 2,
+                          })}
+                          )
                         </span>
-                        <strong className="dark:text-gray-200 text-gray-700">
-                          ₱
+                      )}
+                    </div>
+
+                    <div className="w-full flex flex-row items-center justify-between gap-3">
+                      <div className="flex flex-col">
+                        {/* TOTAL PRICE — BIG & CLEAR */}
+                        <span className="text-base md:text-lg font-bold text-gray-800 dark:text-gray-100">
+                          Total: ₱
                           {grandTotal.toLocaleString("en-PH", {
                             minimumFractionDigits: 2,
                           })}
-                        </strong>
+                        </span>
                       </div>
+
                       <Button
                         label={formLoading ? "Submitting..." : "Reserve Now"}
                         style={`${
                           isSubmitDisabled
                             ? "bg-gray-400 cursor-not-allowed"
                             : "bg-green-600"
-                        } text-white font-normal px-4 py-1 h-[35px] rounded lg:text-sm md:text-sm text-xs`}
+                        } text-white px-4 py-1.5 h-[34px] rounded text-sm`}
                         onClick={() => setShowForm("add_user_details")}
                         disabled={isSubmitDisabled}
                       />
@@ -850,11 +887,42 @@ function BookWithoutSigningIn() {
                 )}
 
                 {/* TOTAL PRICE */}
-                <div className="p-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-center font-bold text-xl">
-                  Total Price: ₱
-                  {grandTotal.toLocaleString("en-PH", {
-                    minimumFractionDigits: 2,
-                  })}
+                <div className="p-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-center">
+                  {/* HOLIDAY SURCHARGE */}
+                  {holidayNights > 0 && (
+                    <div
+                      className="
+      inline-block
+      text-[10px] 
+      text-red-600 dark:text-red-400 
+      bg-red-50 dark:bg-red-900/30 
+      px-2 py-1 
+      rounded 
+      font-semibold 
+      mb-2
+    "
+                    >
+                      Holiday Surcharge (+{chargePercent}%) × {holidayNights}{" "}
+                      day
+                      <div>
+                        ₱{" "}
+                        {holidaySurcharge.toLocaleString("en-PH", {
+                          minimumFractionDigits: 2,
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* TOTAL */}
+                  <div className=" font-normal text-sm text-gray-800 dark:text-white">
+                    Total Price:
+                    <div className="font-bold lg:text-xl text-lg">
+                      ₱{" "}
+                      {grandTotal.toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                      })}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1044,16 +1112,36 @@ function BookWithoutSigningIn() {
 
                 {/* Prices */}
                 <div className="border-b border-gray-200 pb-4 space-y-1">
+                  {/* Base Price */}
                   <p>
                     <span className="font-semibold">Base Price:</span> ₱
                     {Number(bookingSummary.base_price).toLocaleString()}
                   </p>
+
+                  {/* Extras Total */}
                   {bookingSummary.extras_total > 0 && (
                     <p>
                       <span className="font-semibold">Extras Total:</span> ₱
                       {Number(bookingSummary.extras_total).toLocaleString()}
                     </p>
                   )}
+
+                  {/* Holiday Surcharge (if any) */}
+                  {bookingSummary.holiday_surcharge > 0 && (
+                    <p className="inline-block px-2 py-1 text-[11px] text-red-600 dark:text-red-400 font-medium bg-red-100 dark:bg-red-900 rounded">
+                      Holiday +10% × {bookingSummary.holiday_nights}{" "}
+                      {bookingSummary.holiday_nights === 1 ? "night" : "nights"}
+                      : ₱
+                      {Number(bookingSummary.holiday_surcharge).toLocaleString(
+                        undefined,
+                        {
+                          minimumFractionDigits: 2,
+                        }
+                      )}
+                    </p>
+                  )}
+
+                  {/* Grand Total */}
                   <p className="font-extrabold text-lg md:text-xl text-blue-700">
                     Total Price: ₱
                     {Number(bookingSummary.total_price).toLocaleString()}
@@ -1131,48 +1219,6 @@ function BookWithoutSigningIn() {
           </div>
 
           {/* SCREENSHOT OVERLAY */}
-          <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-auto">
-            <div className="bg-black bg-opacity-50 flex items-center justify-center w-full h-full p-4">
-              <div className="bg-white rounded-xl p-5 text-center shadow-xl max-w-md w-full space-y-3 border border-gray-200">
-                {/* Pending Booking Note with Contact */}
-                <p className="text-gray-900 text-sm">
-                  Your booking is currently <strong>pending</strong>. To make it
-                  approved, kindly contact{" "}
-                  <a
-                    href="/contacts"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline font-semibold"
-                  >
-                    Nature Hot Spring
-                  </a>{" "}
-                  for the <strong>50% advance payment</strong>.
-                </p>
-
-                {/* Booking Confirmation Note */}
-
-                {/* Business Hours */}
-                <p className="text-gray-500 text-xs mt-1">
-                  <span className="font-semibold">Business Hours:</span>{" "}
-                  <span className="px-2 py-1 rounded-md bg-gray-100 text-black dark:bg-gray-200 dark:text-black text-[0.7rem]">
-                    Open 24 hours • Every day
-                  </span>
-                </p>
-
-                {/* Screenshot Button */}
-                <button
-                  onClick={handleScreenshot}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-5 rounded-lg transition-shadow shadow-md"
-                >
-                  📸 Save Reservation Details
-                </button>
-
-                <p className=" text-gray-800 text-xs">
-                  Please save your reservation details.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       )}
     </>

@@ -49,6 +49,7 @@ try {
         $smart_no       = $_POST['smart_no'] ?? '';
         $fb             = $_POST['fb'] ?? '';
         $ig             = $_POST['ig'] ?? '';
+        $holiday_charge             = $_POST['holiday_charge'] ?? '';
 
         // ------------------- Logo Upload -------------------
         $logoPath = null;
@@ -66,15 +67,15 @@ try {
         }
 
         // ------------------- Update Settings -------------------
-        $sql = "UPDATE `setting` SET hero_heading=?, hero_subheading=?, email=?, globe_no=?, smart_no=?, fb=?, ig=?";
+        $sql = "UPDATE `setting` SET hero_heading=?, hero_subheading=?, email=?, globe_no=?, smart_no=?, fb=?, ig=?, holiday_charge = ?";
         if ($logoPath) $sql .= ", logo=?";
         $sql .= " WHERE id=1";
 
         $stmt = $conn->prepare($sql);
         if ($logoPath) {
-            $stmt->bind_param("ssssssss", $hero_heading, $hero_subheading, $email, $globe_no, $smart_no, $fb, $ig, $logoPath);
+            $stmt->bind_param("sssssssis", $hero_heading, $hero_subheading, $email, $globe_no, $smart_no, $fb, $ig, $holiday_charge, $logoPath);
         } else {
-            $stmt->bind_param("sssssss", $hero_heading, $hero_subheading, $email, $globe_no, $smart_no, $fb, $ig);
+            $stmt->bind_param("sssssssi", $hero_heading, $hero_subheading, $email, $globe_no, $smart_no, $fb, $ig, $holiday_charge);
         }
         $stmt->execute();
 

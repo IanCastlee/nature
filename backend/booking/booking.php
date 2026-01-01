@@ -369,9 +369,11 @@ if ($action === "set_not_attended") {
 
 /**
  * ========================================================
- * CREATE BOOKING (GUEST MODE, NO USER ID)
+ * CREATE BOOKING (GUEST MODE)
  * ========================================================
  */
+
+// Required fields
 $requiredFields = ["facility_id", "check_in", "check_out", "fullname", "phone"];
 foreach ($requiredFields as $field) {
     if (empty($_POST[$field])) {
@@ -383,53 +385,44 @@ foreach ($requiredFields as $field) {
 
 $fullname = $_POST['fullname'];
 $phone = $_POST['phone'];
-
 $facilityId = intval($_POST['facility_id']);
-$checkIn = $_POST['check_in'];
-$checkOut = $_POST['check_out'];
+$checkIn = date("Y-m-d", strtotime($_POST['check_in']));
+$checkOut = date("Y-m-d", strtotime($_POST['check_out']));
 $nights = intval($_POST['nights'] ?? 1);
-
-$frontendTotalPrice = floatval($_POST['total_price'] ?? 0);
 $extras = $_POST['extras'] ?? [];
 
-// Convert date format if needed (ensures valid MySQL date)
-$checkIn = date("Y-m-d", strtotime($checkIn));
-$checkOut = date("Y-m-d", strtotime($checkOut));
-
+// -------------------
 // Get base room price
+// -------------------
 $facilityQuery = $conn->prepare("SELECT price FROM rooms WHERE room_id = ?");
 $facilityQuery->bind_param("i", $facilityId);
 $facilityQuery->execute();
-
 $facilityResult = $facilityQuery->get_result();
 if ($facilityResult->num_rows === 0) {
     http_response_code(404);
     echo json_encode(["error" => "Room not found"]);
     exit;
 }
+$baseRoomPrice = floatval($facilityResult->fetch_assoc()['price']);
 
-$basePrice = floatval($facilityResult->fetch_assoc()['price']) * $nights;
-
+// -------------------
 // Calculate extras
+// -------------------
 $extrasTotal = 0;
 $sanitizedExtras = [];
-
 foreach ($extras as $extra) {
     $eid = intval($extra['id']);
     $qty = intval($extra['quantity']);
-
     if ($qty <= 0) continue;
 
     $extraQuery = $conn->prepare("SELECT price, extras FROM extras WHERE extra_id = ?");
     $extraQuery->bind_param("i", $eid);
     $extraQuery->execute();
     $extraResult = $extraQuery->get_result();
-
     if ($extraResult->num_rows === 0) continue;
 
     $extraRow = $extraResult->fetch_assoc();
     $line = floatval($extraRow['price']) * $qty * $nights;
-
     $extrasTotal += $line;
 
     $sanitizedExtras[] = [
@@ -440,15 +433,38 @@ foreach ($extras as $extra) {
     ];
 }
 
-$totalPrice = $basePrice + $extrasTotal;
+// -------------------
+// Calculate holiday surcharge (backend only)
+// -------------------
+$holidayQuery = $conn->query("SELECT date FROM holidays"); // date format: 'MM/DD'
+$holidays = [];
+while ($row = $holidayQuery->fetch_assoc()) {
+    $holidays[] = $row['date'];
+}
 
+$checkInDate = new DateTime($checkIn);
+$checkOutDate = new DateTime($checkOut);
+$holidayNights = 0;
 
+for ($date = clone $checkInDate; $date < $checkOutDate; $date->modify('+1 day')) {
+    $mmdd = $date->format('m/d');
+    if (in_array($mmdd, $holidays)) {
+        $holidayNights++;
+    }
+}
 
-/**
- * ========================================================
- * CHECK AVAILABILITY (CRITICAL)
- * ========================================================
- */
+// Surcharge = 10% of (room + extras per night) × holiday nights
+$pricePerNightWithExtras = $baseRoomPrice + ($extrasTotal / max($nights,1));
+$holidaySurcharge = $pricePerNightWithExtras * 0.1 * $holidayNights;
+
+// -------------------
+// Compute final totals (database stores only room + extras)
+// -------------------
+$totalPrice = ($baseRoomPrice * $nights) + $extrasTotal;
+
+// -------------------
+// Availability check
+// -------------------
 $availabilityCheck = $conn->prepare("
     SELECT 1
     FROM room_booking
@@ -458,36 +474,26 @@ $availabilityCheck = $conn->prepare("
       AND end_date > ?
     LIMIT 1
 ");
-
-$availabilityCheck->bind_param(
-    "iss",
-    $facilityId,
-    $checkOut, // existing start < new end
-    $checkIn   // existing end > new start
-);
-
+$availabilityCheck->bind_param("iss", $facilityId, $checkOut, $checkIn);
 $availabilityCheck->execute();
 $availabilityResult = $availabilityCheck->get_result();
-
 if ($availabilityResult->num_rows > 0) {
     http_response_code(409);
-  echo json_encode([
-    "success" => false,
-   "message" => "Dates unavailable. Please refresh the page to get the latest updates."
-
-]);
-exit;
-
+    echo json_encode([
+        "success" => false,
+        "message" => "Dates unavailable. Please refresh the page to get the latest updates."
+    ]);
+    exit;
 }
 
-
-// INSERT MAIN BOOKING
+// -------------------
+// Insert booking (without holiday surcharge)
+// -------------------
 $insertBooking = $conn->prepare("
     INSERT INTO room_booking 
     (fullname, phone, facility_id, start_date, end_date, nights, status, price)
     VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)
 ");
-
 $insertBooking->bind_param(
     "ssissid",
     $fullname,
@@ -498,39 +504,43 @@ $insertBooking->bind_param(
     $nights,
     $totalPrice
 );
-
 if (!$insertBooking->execute()) {
     http_response_code(500);
     echo json_encode(["error" => "Booking failed"]);
     exit;
 }
-
 $bookingId = $insertBooking->insert_id;
 
-// INSERT EXTRAS
+// -------------------
+// Insert extras
+// -------------------
 if (!empty($sanitizedExtras)) {
     $ins = $conn->prepare("
         INSERT INTO booking_extras (booking_id, extra_id, name, quantity, price)
         VALUES (?, ?, ?, ?, ?)
     ");
-
     foreach ($sanitizedExtras as $ex) {
         $ins->bind_param("iisid", $bookingId, $ex['id'], $ex['name'], $ex['quantity'], $ex['price']);
         $ins->execute();
     }
 }
 
+// -------------------
+// Return JSON (include holiday surcharge but NOT stored in DB)
+// -------------------
 echo json_encode([
     "success" => true,
     "booking_id" => $bookingId,
-    'fullname' => $fullname,
-    'phone' => $phone,
+    "fullname" => $fullname,
+    "phone" => $phone,
     "start_date" => $checkIn,
     "end_date" => $checkOut,
     "nights" => $nights,
-    "base_price" => $basePrice,
+    "base_price" => $baseRoomPrice * $nights,
     "extras_total" => $extrasTotal,
-    "total_price" => $totalPrice,
+    "holiday_surcharge" => $holidaySurcharge,   // FRONTEND DISPLAY ONLY
+    "total_price" => $totalPrice + $holidaySurcharge, // For receipt display
+    "holiday_nights" => $holidayNights,
     "extras" => $sanitizedExtras
 ]);
 exit;
