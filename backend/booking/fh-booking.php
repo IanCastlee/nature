@@ -323,7 +323,9 @@ if (!$fullname || !$phone || !$fhId || !$date || !$startTime || !$endTime) {
     exit;
 }
 
-// Check facility info
+// -------------------
+// Get facility info
+// -------------------
 $stmt = $conn->prepare("SELECT name, price FROM function_hall WHERE fh_id = ?");
 $stmt->bind_param("i", $fhId);
 $stmt->execute();
@@ -339,13 +341,16 @@ if ($result->num_rows === 0) {
 
 $facility = $result->fetch_assoc();
 $facilityType = $facility['name'];
-$price        = $facility['price'];
+$basePrice    = floatval($facility['price']);
 
-//  DATE-ONLY CONFLICT CHECK (NO TIME)
+// -------------------
+// DATE-ONLY CONFLICT CHECK
+// -------------------
 $conflict = $conn->prepare("
     SELECT 1
     FROM other_facilities_booking
     WHERE facility_id = ?
+    AND status IN ('pending', 'approved', 'arrived', 'rescheduled')
       AND date = ?
     LIMIT 1
 ");
@@ -355,17 +360,57 @@ $conflict->execute();
 $conflictRes = $conflict->get_result();
 
 if ($conflictRes->num_rows > 0) {
-   http_response_code(409);
-echo json_encode([
-  "success" => false,
-  "message" => "This date is already booked. Please refresh the page to see the latest availability."
-]);
-exit;
-
+    http_response_code(409);
+    echo json_encode([
+        "success" => false,
+        "message" => "This date is already booked. Please refresh the page to see the latest availability."
+    ]);
+    exit;
 }
 
+// -------------------
+// 🔹 GET HOLIDAY CHARGE PERCENT (DYNAMIC)
+// -------------------
+$settingQuery = $conn->query("SELECT holiday_charge FROM setting LIMIT 1");
+$holidayChargePercent = 0.0;
 
-// Insert booking
+if ($settingQuery && $row = $settingQuery->fetch_assoc()) {
+    $holidayChargePercent = floatval($row['holiday_charge']) / 100;
+}
+
+// -------------------
+// 🔹 CHECK IF DATE IS HOLIDAY
+// -------------------
+$holidayQuery = $conn->query("SELECT date FROM holidays");
+$holidays = [];
+
+while ($row = $holidayQuery->fetch_assoc()) {
+    $holidays[] = $row['date']; // MM/DD
+}
+
+$isHoliday = false;
+$bookingDate = DateTime::createFromFormat("Y-m-d", $date);
+$mmdd = $bookingDate->format("m/d");
+
+if (in_array($mmdd, $holidays)) {
+    $isHoliday = true;
+}
+
+// -------------------
+// 🔹 CALCULATE HOLIDAY SURCHARGE
+// -------------------
+$holidaySurcharge = $isHoliday
+    ? $basePrice * $holidayChargePercent
+    : 0;
+
+// -------------------
+// FINAL TOTAL (NOT STORED IN DB)
+// -------------------
+$totalPrice = $basePrice + $holidaySurcharge;
+
+// -------------------
+// INSERT BOOKING (WITHOUT SURCHARGE)
+// -------------------
 $insert = $conn->prepare("
     INSERT INTO other_facilities_booking 
     (fullname, phone, facility_id, facility_type, date, start_time, end_time, price, created_at)
@@ -381,7 +426,7 @@ $insert->bind_param(
     $date,
     $startTime,
     $endTime,
-    $price,
+    $basePrice,
     $createdAt
 );
 
@@ -399,8 +444,14 @@ if ($insert->execute()) {
         "date" => $date,
         "start_time" => $startTime,
         "end_time" => $endTime,
-        "base_price" => $price,
-        "total_price" => $price,
+
+        // 🔹 PRICE BREAKDOWN
+        "base_price" => $basePrice,
+        "holiday_applied" => $isHoliday,
+        "holiday_charge_percent" => $holidayChargePercent * 100,
+        "holiday_surcharge" => $holidaySurcharge,
+        "total_price" => $totalPrice,
+
         "extras_total" => 0,
         "extras" => [],
         "created_at" => $createdAt

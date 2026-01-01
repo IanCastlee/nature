@@ -434,12 +434,21 @@ foreach ($extras as $extra) {
 }
 
 // -------------------
+// Get dynamic holiday charge from settings
+// -------------------
+$settingQuery = $conn->query("SELECT holiday_charge FROM setting LIMIT 1");
+$holidayChargePercent = 0.1; // default 10%
+if ($settingQuery && $row = $settingQuery->fetch_assoc()) {
+    $holidayChargePercent = floatval($row['holiday_charge']) / 100;
+}
+
+// -------------------
 // Calculate holiday surcharge (backend only)
 // -------------------
-$holidayQuery = $conn->query("SELECT date FROM holidays"); // date format: 'MM/DD'
+$holidayQuery = $conn->query("SELECT date FROM holidays");
 $holidays = [];
 while ($row = $holidayQuery->fetch_assoc()) {
-    $holidays[] = $row['date'];
+    $holidays[] = $row['date']; // format: MM/DD
 }
 
 $checkInDate = new DateTime($checkIn);
@@ -453,9 +462,9 @@ for ($date = clone $checkInDate; $date < $checkOutDate; $date->modify('+1 day'))
     }
 }
 
-// Surcharge = 10% of (room + extras per night) × holiday nights
+// Surcharge = dynamic % of (room + extras per night) × holiday nights
 $pricePerNightWithExtras = $baseRoomPrice + ($extrasTotal / max($nights,1));
-$holidaySurcharge = $pricePerNightWithExtras * 0.1 * $holidayNights;
+$holidaySurcharge = $pricePerNightWithExtras * $holidayChargePercent * $holidayNights;
 
 // -------------------
 // Compute final totals (database stores only room + extras)
@@ -487,7 +496,7 @@ if ($availabilityResult->num_rows > 0) {
 }
 
 // -------------------
-// Insert booking (without holiday surcharge)
+// Insert booking (without holiday surcharge in DB)
 // -------------------
 $insertBooking = $conn->prepare("
     INSERT INTO room_booking 
@@ -538,9 +547,10 @@ echo json_encode([
     "nights" => $nights,
     "base_price" => $baseRoomPrice * $nights,
     "extras_total" => $extrasTotal,
-    "holiday_surcharge" => $holidaySurcharge,   // FRONTEND DISPLAY ONLY
-    "total_price" => $totalPrice + $holidaySurcharge, // For receipt display
+    "holiday_surcharge" => $holidaySurcharge,
+    "holiday_charge_percent" => $holidayChargePercent * 100, // e.g., 10, 15
     "holiday_nights" => $holidayNights,
+    "total_price" => $totalPrice + $holidaySurcharge,
     "extras" => $sanitizedExtras
 ]);
 exit;

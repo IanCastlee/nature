@@ -5,7 +5,6 @@ import useGetData from "../../hooks/useGetData";
 import useFormSubmit from "../../hooks/useFormSubmit";
 import { uploadUrl } from "../../utils/fileURL";
 import React, { useEffect, useRef, useState } from "react";
-import useAuthStore from "../../store/authStore";
 import Toaster from "../molecules/Toaster";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
@@ -16,7 +15,26 @@ import natureLogo from "../../assets/icons/naturelogo2.png";
 import html2canvas from "html2canvas";
 
 function OtherFacilitiesBookingPage() {
-  const { user } = useAuthStore();
+  // holidays
+  const { data: holidaysData } = useGetData("/admin/holidays.php");
+  const holidays = holidaysData || [];
+
+  // holiday charge %
+  const { data: holiday_charge } = useGetData("/admin/admin_setting.php");
+
+  const isHoliday = (date, holidays) => {
+    if (!date || !holidays?.length) return false;
+
+    const d = new Date(date);
+    const mmdd = `${String(d.getMonth() + 1).padStart(2, "0")}/${String(
+      d.getDate()
+    ).padStart(2, "0")}`;
+
+    return holidays.some((h) => h.date === mmdd);
+  };
+
+  //////////////////////////////////
+
   const navigate = useNavigate();
   const { facilityId } = useParams();
 
@@ -57,7 +75,7 @@ function OtherFacilitiesBookingPage() {
     error: formError,
   } = useFormSubmit("/booking/fh-booking.php", (response) => {
     if (!response?.success) return;
-
+    console.log("DATA : ", response);
     setToast({
       message: "Reservation submitted successfully!",
       type: "success",
@@ -97,22 +115,6 @@ function OtherFacilitiesBookingPage() {
     navigate(`/other-facilities-booking/${nextFacilityId}`);
   };
 
-  //handlePreviousRoom
-  const handlePreviousRoom = () => {
-    if (!fhIds || fhIds.length === 0) return;
-
-    const currentIndex = fhIds.findIndex(
-      (fh) => String(fh.fh_id) === facilityId
-    );
-
-    if (currentIndex === -1) return;
-
-    const prevIndex = (currentIndex - 1 + fhIds.length) % fhIds.length;
-    const prevFacilityId = fhIds[prevIndex].fh_id;
-
-    navigate(`/other-facilities-booking/${prevFacilityId}`);
-  };
-
   useEffect(() => {
     if (notAvailableDatesTime?.booked_dates?.length > 0) {
       const dates = notAvailableDatesTime.booked_dates.map(
@@ -138,6 +140,22 @@ function OtherFacilitiesBookingPage() {
   if (!fhDetails) return <div>No facility found.</div>;
 
   const { image, name, price, capacity, duration } = fhDetails;
+
+  const basePrice = Number(price);
+
+  // check if selected date is holiday
+  const holidayApplied = isHoliday(selectedDate, holidays);
+
+  // holiday surcharge
+  const chargePercent = holiday_charge?.holiday_charge ?? 0;
+  const holidaySurcharge = holidayApplied
+    ? basePrice * (chargePercent / 100)
+    : 0;
+
+  // grand total
+  const grandTotal = basePrice + holidaySurcharge;
+
+  /////////////////////////////////////////////////
 
   const handleBooking = async () => {
     if (isSubmitting) return;
@@ -437,9 +455,29 @@ function OtherFacilitiesBookingPage() {
                 </div>
 
                 {/* Total Price */}
-                <div className="p-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-center font-bold text-xl">
-                  Total Price: ₱
-                  {price.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
+                <div className="p-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-center">
+                  <div className="text-lg font-semibold">
+                    Base Price: ₱
+                    {basePrice.toLocaleString("en-PH", {
+                      minimumFractionDigits: 2,
+                    })}
+                  </div>
+
+                  {holidayApplied && (
+                    <div className="text-sm text-red-500 mt-1">
+                      Holiday Surcharge ({chargePercent}%): ₱
+                      {holidaySurcharge.toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                      })}
+                    </div>
+                  )}
+
+                  <div className="mt-2 font-bold text-xl">
+                    Total Price: ₱
+                    {grandTotal.toLocaleString("en-PH", {
+                      minimumFractionDigits: 2,
+                    })}
+                  </div>
                 </div>
               </div>
 
@@ -564,7 +602,7 @@ function OtherFacilitiesBookingPage() {
             }}
           >
             {/* Semi-transparent overlay for readability */}
-            <div className="absolute inset-0 bg-white/90 rounded-2xl"></div>
+            <div className="absolute inset-0 bg-white rounded-2xl"></div>
 
             {/* Content */}
             <div className="relative p-8 space-y-4 text-gray-900">
@@ -614,11 +652,38 @@ function OtherFacilitiesBookingPage() {
                 <div className="border-b border-gray-200 pb-4 space-y-1">
                   <p>
                     <span className="font-semibold">Base Price:</span> ₱
-                    {Number(bookingSummary.base_price).toLocaleString()}
+                    {Number(bookingSummary.base_price).toLocaleString("en-PH", {
+                      minimumFractionDigits: 2,
+                    })}
                   </p>
+
+                  {/* Holiday Surcharge (if applied) */}
+                  {bookingSummary.holiday_surcharge > 0 && (
+                    <p
+                      className="inline-block px-3 py-1 text-[11px] text-amber-700 
+             bg-amber-50 
+             border border-amber-200 
+             rounded"
+                    >
+                      Holiday Surcharge (+
+                      {bookingSummary.holiday_charge_percent}%): ₱
+                      {Number(bookingSummary.holiday_surcharge).toLocaleString(
+                        "en-PH",
+                        {
+                          minimumFractionDigits: 2,
+                        }
+                      )}
+                    </p>
+                  )}
+
                   <p className="font-extrabold text-lg md:text-xl text-blue-700">
                     Total Price: ₱
-                    {Number(bookingSummary.total_price).toLocaleString()}
+                    {Number(bookingSummary.total_price).toLocaleString(
+                      "en-PH",
+                      {
+                        minimumFractionDigits: 2,
+                      }
+                    )}
                   </p>
                 </div>
 
@@ -638,14 +703,6 @@ function OtherFacilitiesBookingPage() {
                   </span>
                 </div>
               </div>
-
-              {/* Close Button */}
-              <button
-                className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 transition text-3xl font-bold"
-                onClick={() => setShowSummaryModal(false)}
-              >
-                &times;
-              </button>
             </div>
           </div>
 

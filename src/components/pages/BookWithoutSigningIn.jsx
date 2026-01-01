@@ -17,8 +17,10 @@ import natureLogo from "../../assets/icons/naturelogo2.png";
 
 function BookWithoutSigningIn() {
   ////////////////////////////////////////////
-  const { data: holidaysData, refetch } = useGetData("/admin/holidays.php");
+  const { data: holidaysData } = useGetData("/admin/holidays.php");
   const holidays = holidaysData || [];
+
+  const { data: holiday_charge } = useGetData(`/admin/admin_setting.php`);
 
   const countHolidayNights = (from, to, holidays) => {
     if (!from || !to || !holidays?.length) return 0;
@@ -418,7 +420,7 @@ function BookWithoutSigningIn() {
   // const holidaySurcharge = dailyTotal * 0.1 * holidayNights;
 
   // Example: dynamic surcharge percentage
-  let chargePercent = 20; // can change to 20, 15, etc.
+  let chargePercent = holiday_charge?.holiday_charge; // can change to 20, 15, etc.
   const holidaySurcharge = dailyTotal * (chargePercent / 100) * holidayNights;
 
   // GRAND TOTAL
@@ -426,10 +428,6 @@ function BookWithoutSigningIn() {
 
   const isSubmitDisabled =
     formLoading || !selectedRange.from || !selectedRange.to || nights === 0;
-
-  console.log("HOLIDAY NIGHTS:", holidayNights);
-  console.log("HOLIDAY SURCHARGE:", holidaySurcharge);
-  console.log("GRAND TOTAL:", grandTotal);
 
   const removeExtra = (index) => {
     setAddedExtras((prev) => prev.filter((_, i) => i !== index));
@@ -481,10 +479,6 @@ function BookWithoutSigningIn() {
     return false;
   };
 
-  console.log("HOLIDAYS WITH ADDITIONALC !10% : ", holidaysData);
-  console.log("CHECK IN : ", selectedRange.from);
-  console.log("CHECK OUT : ", selectedRange.to);
-
   return (
     <>
       {toast && (
@@ -531,9 +525,19 @@ function BookWithoutSigningIn() {
 
             {/*  Extras Dropdown */}
             <div className=" mt-4 border-t pt-4 dark:border-gray-600 border-gray-300 pb-4">
-              <h3 className="font-normal mb-2 text-gray-800 dark:text-gray-50 text-sm">
-                Select your prepared date
-              </h3>
+              <div className="w-full flex flex-row justify-between items-center mb-2">
+                <h3 className="font-normal mb-2 text-gray-800 dark:text-gray-50 text-sm">
+                  Select your prepared date
+                </h3>
+
+                <button onClick={() => handleCloseFormModal()}>
+                  <icons.TbRefresh
+                    title="Refresh"
+                    className="dark:text-green-700 lg:text-2xl text-lg"
+                  />
+                </button>
+              </div>
+
               <div className="flex lg:flex-row md:flex-col flex-col gap-6 items-center">
                 <div className="lg:scale-90   md:scale-100 scale-100  w-fit border dark:border-gray-700 border-gray-300 p-2 rounded-lg text-black dark:text-white bg-white dark:bg-gray-900">
                   <DayPicker
@@ -589,7 +593,7 @@ function BookWithoutSigningIn() {
                 {selectedRange?.from && (
                   <div
                     className="w-full flex flex-col lg:justify-center md:justify-start justify-start items-center 
-               bg-gray-50 dark:bg-gray-800 p-4 rounded-xl 
+               bg-gray-50 dark:bg-gray-900 p-4 rounded-xl 
                shadow-md md:shadow-md lg:shadow-none"
                   >
                     <p className="text-xs text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 py-1 px-3 rounded-full text-center">
@@ -744,7 +748,7 @@ function BookWithoutSigningIn() {
 
                 <div className="flex flex-row gap-1">
                   {/* Total Price */}
-                  <div className="w-full flex flex-col justify-between items-center  p-4 rounded-lg dark:bg-gray-900 bg-white   border">
+                  <div className="w-full flex flex-col justify-between items-center  p-4 rounded-lg dark:bg-gray-900 bg-white   border dark:border-gray-700 border-gray-300">
                     <div className="w-full flex justify-start mb-2">
                       {/* HOLIDAY SURCHARGE — small only */}
                       {holidayNights > 0 && (
@@ -785,7 +789,7 @@ function BookWithoutSigningIn() {
                           isSubmitDisabled
                             ? "bg-gray-400 cursor-not-allowed"
                             : "bg-green-600"
-                        } text-white px-4 py-1.5 h-[34px] rounded text-sm`}
+                        } text-white lg:px-4 lg:px-4 px-2 py-1.5 h-[34px] rounded lg:text-sm md:text-sm text-xs font-semibold`}
                         onClick={() => setShowForm("add_user_details")}
                         disabled={isSubmitDisabled}
                       />
@@ -1128,8 +1132,14 @@ function BookWithoutSigningIn() {
 
                   {/* Holiday Surcharge (if any) */}
                   {bookingSummary.holiday_surcharge > 0 && (
-                    <p className="inline-block px-2 py-1 text-[11px] text-red-600 dark:text-red-400 font-medium bg-red-100 dark:bg-red-900 rounded">
-                      Holiday +10% × {bookingSummary.holiday_nights}{" "}
+                    <p
+                      className="inline-block px-3 py-1 text-[11px] text-amber-700 
+             bg-amber-50 
+             border border-amber-200 
+             rounded"
+                    >
+                      Holiday +{bookingSummary.holiday_charge_percent}% ×{" "}
+                      {bookingSummary.holiday_nights}{" "}
                       {bookingSummary.holiday_nights === 1 ? "night" : "nights"}
                       : ₱
                       {Number(bookingSummary.holiday_surcharge).toLocaleString(
@@ -1219,6 +1229,48 @@ function BookWithoutSigningIn() {
           </div>
 
           {/* SCREENSHOT OVERLAY */}
+          <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-auto">
+            <div className="bg-black bg-opacity-50 flex items-center justify-center w-full h-full p-4">
+              <div className="bg-white rounded-xl p-5 text-center shadow-xl max-w-md w-full space-y-3 border border-gray-200">
+                {/* Pending Booking Note with Contact */}
+                <p className="text-gray-900 text-sm">
+                  Your booking is currently <strong>pending</strong>. To make it
+                  approved, kindly contact{" "}
+                  <a
+                    href="/contacts"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline font-semibold"
+                  >
+                    Nature Hot Spring
+                  </a>{" "}
+                  for the <strong>50% advance payment</strong>.
+                </p>
+
+                {/* Booking Confirmation Note */}
+
+                {/* Business Hours */}
+                <p className="text-gray-500 text-xs mt-1">
+                  <span className="font-semibold">Business Hours:</span>{" "}
+                  <span className="px-2 py-1 rounded-md bg-gray-100 text-black dark:bg-gray-200 dark:text-black text-[0.7rem]">
+                    Open 24 hours • Every day
+                  </span>
+                </p>
+
+                {/* Screenshot Button */}
+                <button
+                  onClick={handleScreenshot}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-5 rounded-lg transition-shadow shadow-md"
+                >
+                  📸 Save Reservation Details
+                </button>
+
+                <p className=" text-gray-800 text-xs">
+                  Please save your reservation details.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </>
