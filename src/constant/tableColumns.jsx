@@ -612,3 +612,26 @@ export const termsColumn = [
     key: "content_tl",
   },
 ];
+
+//activities column
+export const availableActivitiesColumns = [
+  {
+    title: "No.",
+    key: "id",
+  },
+  {
+    title: "Image",
+    key: "image",
+    render: (item) => (
+      <img
+        src={`${uploadUrl.uploadurl}/activities/${item.image}`}
+        alt={item.room_name}
+        className="w-10 h-10 rounded shadow-sm"
+      />
+    ),
+  },
+  {
+    title: "Title",
+    key: "title",
+  },
+];

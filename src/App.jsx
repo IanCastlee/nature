@@ -70,6 +70,7 @@ import AdminBookingReschedLogFh from "./admin_components/admin_pages/AdminBookin
 import FAQ from "./components/pages/FAQ";
 import AdminFAQs from "./admin_components/admin_pages/AdminFAQs";
 import AdminTerms from "./admin_components/admin_pages/AdminTerms";
+import AdminActivities from "./admin_components/admin_pages/AdminActivities";
 const UserLayout = () => {
   const location = useLocation();
 
@@ -242,6 +243,7 @@ const AdminLayout = () => {
           <Route path="/terms" element={<AdminTerms />} />
           {/* <Route path="/terms" element={<AdminTermsAndConditions />} /> */}
           <Route path="/why-choose-us" element={<AdminWhyChooseUs />} />
+          <Route path="/activities" element={<AdminActivities />} />
           <Route path="/faqs" element={<AdminFAQs />} />
         </Routes>
       </main>

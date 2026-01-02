@@ -119,7 +119,11 @@ export const menuItems = [
       },
     ],
   },
-
+  {
+    name: "Activities",
+    to: "/admin/activities",
+    icon: icons.GoImage,
+  },
   {
     name: "Gallery",
     to: "/admin/pending-post",
