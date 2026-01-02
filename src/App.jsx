@@ -153,7 +153,7 @@ const UserLayout = () => {
 };
 
 const AdminLayout = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
     <div>

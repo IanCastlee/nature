@@ -426,7 +426,7 @@ $insert->bind_param(
     $date,
     $startTime,
     $endTime,
-    $basePrice,
+    $totalPrice,
     $createdAt
 );
 

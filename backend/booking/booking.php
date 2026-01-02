@@ -469,7 +469,9 @@ $holidaySurcharge = $pricePerNightWithExtras * $holidayChargePercent * $holidayN
 // -------------------
 // Compute final totals (database stores only room + extras)
 // -------------------
-$totalPrice = ($baseRoomPrice * $nights) + $extrasTotal;
+ $totalPrice = ($baseRoomPrice * $nights) + $extrasTotal;
+$totalPriceWithHoliday = $totalPrice + $holidaySurcharge;
+
 
 // -------------------
 // Availability check
@@ -511,7 +513,7 @@ $insertBooking->bind_param(
     $checkIn,
     $checkOut,
     $nights,
-    $totalPrice
+    $totalPriceWithHoliday
 );
 if (!$insertBooking->execute()) {
     http_response_code(500);

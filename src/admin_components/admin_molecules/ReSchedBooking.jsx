@@ -22,7 +22,7 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
   const [paymentType, setPaymentType] = useState("half");
   const [customAmount, setCustomAmount] = useState("");
 
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(50);
 
   // Fetch pending booking data
   const { data, loading, error, refetch } = useGetData(
@@ -200,17 +200,35 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
             />
           </div>
 
-          {loading && (
-            <div className="flex justify-center items-center py-10">
-              <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          )}
           {error && <p className="text-red-500">{error.message}</p>}
 
           <div className="flex justify-between mb-2">
-            <span className="dark:text-gray-100 text-xs">
-              Showing {filteredData.length} Booking
-            </span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="dark:text-gray-100 text-xs font-medium">
+                Showing {filteredData.length} Booking
+              </span>
+
+              <div className="flex items-center gap-1 text-xs">
+                <span className="dark:text-gray-300">Rows:</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1); // reset to first page
+                  }}
+                  className="border border-gray-300 dark:border-gray-700 rounded px-2 py-1
+                 bg-white dark:bg-gray-800 dark:text-gray-100"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                  <option value={100}>250</option>
+                  <option value={100}>500</option>
+                </select>
+              </div>
+            </div>
 
             <SearchInput
               placeholder="Search..."
@@ -243,7 +261,11 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
               renderActions={(item) => item.actions}
             />
           </div>
-
+          {loading && (
+            <div className="flex justify-center items-center py-10">
+              <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
           {!loading && totalPages > 1 && (
             <Pagination
               currentPage={currentPage}
@@ -257,7 +279,10 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
       {/* Computation Modal */}
       {showComputationModal && newBooking && (
         <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-[60] flex items-center justify-center">
-          <div className="bg-white rounded-xl shadow-2xl w-[520px] p-6 border border-gray-200">
+          <div
+            className="bg-white rounded-xl shadow-2xl w-[520px] p-6 border border-gray-200
+                max-h-[95vh] overflow-y-auto"
+          >
             {/* Header */}
             <h2 className="text-xl font-semibold text-gray-800 mb-5 tracking-tight">
               Re-Scheduling Computation
@@ -295,64 +320,61 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
               return (
                 <div className="space-y-5 text-sm text-gray-700">
                   {/* Previous Booking */}
-                  <div className="border border-gray-200 p-4 rounded-lg bg-gray-50 shadow-sm">
-                    <h3 className="font-semibold text-gray-800 mb-3 text-sm tracking-tight">
+                  <div className="border border-gray-200 p-3 rounded-md bg-gray-50 shadow-sm text-xs">
+                    <h3 className="font-semibold text-gray-800 mb-2 tracking-tight text-xs">
                       Previous Booking
                     </h3>
 
-                    <div className="space-y-1.5">
-                      {/* <p>
-                        <span className="text-gray-600">Date:</span>{" "}
-                        <b>{booking.start_date}</b> to <b>{booking.end_date}</b>
+                    <div className="space-y-1">
+                      <p>
+                        <span className="text-gray-500">Room:</span>{" "}
+                        <span className="font-medium">{booking.room_name}</span>
                       </p>
                       <p>
-                        <span className="text-gray-600">Room:</span>{" "}
-                        <b>{booking.room_name}</b>
-                      </p> */}
-                      <p>
-                        <span className="text-gray-600">Price:</span>{" "}
-                        <b>{booking.price}</b>
+                        <span className="text-gray-500">Price:</span>{" "}
+                        <span className="font-medium">{booking.price}</span>
                       </p>
                       <p>
-                        <span className="text-gray-600">Paid:</span>{" "}
-                        <b>{booking.down_payment}</b>
+                        <span className="text-gray-500">Previous Paid:</span>
+                        <span className="font-medium">
+                          {booking.down_payment}
+                        </span>
                       </p>
                     </div>
                   </div>
 
                   {/* New Booking */}
-                  <div className="border border-gray-200 p-4 rounded-lg bg-gray-50 shadow-sm">
-                    <h3 className="font-semibold text-gray-800 mb-3 text-sm tracking-tight">
-                      Rescheduled Booking
+                  <div className="border border-gray-200 p-3 rounded-md bg-gray-50 shadow-sm text-xs">
+                    <h3 className="font-semibold text-gray-800 mb-2 tracking-tight text-xs">
+                      Reschedule To
                     </h3>
 
-                    <div className="space-y-1.5">
-                      {/* <p>
-                        <span className="text-gray-600">Date:</span>{" "}
-                        <b>{newBooking.start_date}</b> to{" "}
-                        <b>{newBooking.end_date}</b>
+                    <div className="space-y-1">
+                      <p>
+                        <span className="text-gray-500">Room:</span>{" "}
+                        <span className="font-medium">
+                          {newBooking.room?.room_name}
+                        </span>
                       </p>
                       <p>
-                        <span className="text-gray-600">Room:</span>{" "}
-                        <b>{newBooking.room?.room_name}</b>
-                      </p> */}
-                      <p>
-                        <span className="text-gray-600">Price:</span>{" "}
-                        <b>
+                        <span className="text-gray-500">Price:</span>{" "}
+                        <span className="font-medium">
                           ₱
                           {newPrice.toLocaleString("en-PH", {
                             minimumFractionDigits: 2,
                           })}
-                        </b>
+                        </span>
                       </p>
                       <p>
-                        <span className="text-gray-600">Half Price:</span>{" "}
-                        <b>
+                        <span className="text-gray-500">
+                          Required Down Payment:
+                        </span>{" "}
+                        <span className="font-medium">
                           ₱
                           {newHalf.toLocaleString("en-PH", {
                             minimumFractionDigits: 2,
                           })}
-                        </b>
+                        </span>
                       </p>
                     </div>
                   </div>

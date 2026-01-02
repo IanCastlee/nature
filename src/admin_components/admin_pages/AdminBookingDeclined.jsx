@@ -20,7 +20,10 @@ function AdminBookingDeclined() {
   const [toast, setToast] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(50);
+
+  const [sortField, setSortField] = useState(""); // "" means no sorting
+  const [sortOrder, setSortOrder] = useState("asc"); // asc or desc
 
   // FETCH DECLINED BOOKINGS
   const { data, loading, refetch, error } = useGetData(
@@ -48,7 +51,7 @@ function AdminBookingDeclined() {
         String(item?.phone || "")
           .toLowerCase()
           .includes(q) ||
-        String(item?.room_name || "")
+        String(item?.room.room_name || "")
           .toLowerCase()
           .includes(q) ||
         String(item?.start_date || "")
@@ -66,12 +69,36 @@ function AdminBookingDeclined() {
       );
     }) || [];
 
+  ////////////////////////////////////////////////////////////////////////////////
+  const sortedData = [...filteredData];
+
+  if (sortField) {
+    sortedData.sort((a, b) => {
+      let valA = a[sortField];
+      let valB = b[sortField];
+
+      // Convert to comparable values
+      if (sortField === "booking_id") {
+        valA = Number(valA);
+        valB = Number(valB);
+      } else {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
+
   const indexOfLastData = currentPage * itemsPerPage;
-  const currentData = filteredData.slice(
+  const currentData = sortedData.slice(
     indexOfLastData - itemsPerPage,
     indexOfLastData
   );
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  //////////////////////////////////////////////////////////////////////////////////
 
   // FORMAT TABLE DATA
   const formattedData = currentData.map((item) => ({
@@ -242,11 +269,6 @@ function AdminBookingDeclined() {
           Declined Booking
         </h1>
 
-        {loading && (
-          <div className="flex justify-center items-center py-10">
-            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
         {error && (
           <p className="text-red-500 text-sm">
             {error.message || "Something went wrong."}
@@ -254,11 +276,70 @@ function AdminBookingDeclined() {
         )}
 
         <div className="w-full flex justify-between items-center mb-2">
-          <span className="dark:text-gray-100 text-xs font-medium">
-            Showing {filteredData.length} Booking
-          </span>
+          <div className="flex items-center justify-between gap-2">
+            <span className="dark:text-gray-100 text-xs font-medium">
+              Showing {filteredData.length} Booking
+            </span>
+
+            <div className="flex items-center gap-1 text-xs">
+              <span className="dark:text-gray-300">Rows:</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value));
+                  setCurrentPage(1); // reset to first page
+                }}
+                className="border border-gray-300 dark:border-gray-700 rounded px-2 py-1
+                 bg-white dark:bg-gray-800 dark:text-gray-100"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value={100}>250</option>
+                <option value={100}>500</option>
+              </select>
+            </div>
+          </div>
 
           <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <select
+                className="border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-xs dark:bg-gray-800 dark:text-gray-100"
+                value={sortField} // displays the selected option
+                onChange={(e) => {
+                  const val = e.target.value;
+
+                  if (val === "earliest") {
+                    setSortField("start_date");
+                    setSortOrder("asc"); // earliest first
+                  } else if (val === "latest") {
+                    setSortField("start_date");
+                    setSortOrder("desc"); // latest first
+                  } else if (val === "updated_at") {
+                    setSortField("updated_at");
+                    setSortOrder("desc"); // latest updated first
+                  } else if (val === "booking_id_desc") {
+                    setSortField("booking_id");
+                    setSortOrder("desc"); // Booking ID descending
+                  } else if (val === "booking_id_asc") {
+                    setSortField("booking_id");
+                    setSortOrder("asc"); // Booking ID ascending
+                  } else {
+                    setSortField(val);
+                    setSortOrder("asc"); // fallback
+                  }
+                }}
+              >
+                <option value="">Sort By</option>
+                <option value="earliest">Earliest Booking</option>
+                <option value="latest">Latest Booking</option>
+                <option value="updated_at">Latest Added</option>
+                <option value="booking_id_desc">Booking ID Desc</option>
+                <option value="booking_id_asc">Booking ID Asc</option>
+              </select>
+            </div>
             {/* ✔ PDF BUTTON */}
             <button
               onClick={downloadDeclinedPDF}
@@ -289,7 +370,11 @@ function AdminBookingDeclined() {
             }
           />
         </div>
-
+        {loading && (
+          <div className="flex justify-center items-center py-10">
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
         {!loading && totalPages > 1 && (
           <Pagination
             currentPage={currentPage}

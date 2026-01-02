@@ -27,7 +27,7 @@ function NotAvailableRoomPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(50);
 
   //==============//
   //  DATA FETCH  //
@@ -110,7 +110,7 @@ function NotAvailableRoomPage() {
             }
           />
         </div>
-        {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
+
         {error && (
           <p className="text-red-500 text-sm mb-4">
             {error.message || "Something went wrong."}
@@ -118,10 +118,33 @@ function NotAvailableRoomPage() {
         )}
 
         <div className="w-full flex flex-row justify-between items-center mb-2">
-          <span className="dark:text-gray-100 text-xs font-medium">
-            Showing {filteredData.length} room
-            {filteredData.length > 1 ? "s" : ""}
-          </span>
+          <div className="flex items-center justify-between gap-2">
+            <span className="dark:text-gray-100 text-xs font-medium">
+              Showing {filteredData.length} categor
+              {filteredData.length !== 1 ? "ies" : "y"}
+            </span>
+
+            <div className="flex items-center gap-1 text-xs">
+              <span className="dark:text-gray-300">Rows:</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value));
+                  setCurrentPage(1); // reset to first page
+                }}
+                className="border border-gray-300 dark:border-gray-700 rounded px-2 py-1
+                 bg-white dark:bg-gray-800 dark:text-gray-100"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value={100}>250</option>
+                <option value={100}>500</option>
+              </select>
+            </div>
+          </div>
 
           <div className="flex flex-row items-center gap-2">
             <SearchInput
@@ -150,7 +173,11 @@ function NotAvailableRoomPage() {
             }}
           />
         </div>
-
+        {loading && (
+          <div className="flex justify-center items-center py-10">
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
         {!loading && totalPages > 1 && (
           <Pagination
             currentPage={currentPage}

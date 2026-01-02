@@ -94,7 +94,12 @@ function AdminSetting() {
     submitForm(payload);
   };
 
-  if (loading) return <div className="text-center py-10">Loading...</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center py-10">
+        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
   if (error)
     return (
       <div className="text-red-500 text-center py-10">
@@ -112,6 +117,7 @@ function AdminSetting() {
               <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
                 Admin Settings
               </h1>
+
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Manage website content and contact information
               </p>

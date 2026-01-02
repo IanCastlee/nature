@@ -301,7 +301,7 @@ const Dashboard = () => {
               {/* Yearly Income */}
               <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
                 <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                  Yearly Income ({selectedYear})
+                  Yearly Income (Arrived {selectedYear})
                 </span>
                 <span className="text-lg font-bold text-green-600 dark:text-green-400">
                   ₱{Number(chartInfo?.totalPaid || 0).toLocaleString()}

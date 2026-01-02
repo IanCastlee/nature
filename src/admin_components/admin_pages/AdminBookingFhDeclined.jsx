@@ -17,6 +17,9 @@ function AdminBookingFhDeclined() {
   const showForm = useForm((state) => state.showForm);
   const setShowForm = useForm((state) => state.setShowForm);
 
+  const [sortField, setSortField] = useState(""); // "" means no sorting
+  const [sortOrder, setSortOrder] = useState("asc"); // asc or desc
+
   const [viewFHDetailsData, setViewFHDetailsData] = useState(null);
 
   const { data, loading } = useGetData(
@@ -25,7 +28,7 @@ function AdminBookingFhDeclined() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 50;
+  const [itemsPerPage, setItemsPerPage] = useState(50);
 
   const filteredData =
     data?.filter((item) => {
@@ -60,10 +63,49 @@ function AdminBookingFhDeclined() {
       );
     }) || [];
 
+  ////////////////////////////////////////////////////////////////////////////////
+  const sortedData = [...filteredData];
+
+  if (sortField) {
+    sortedData.sort((a, b) => {
+      let valA = a[sortField];
+      let valB = b[sortField];
+
+      // Handle null / undefined
+      if (valA == null) return 1;
+      if (valB == null) return -1;
+
+      // Booking ID (number)
+      if (sortField === "id") {
+        valA = Number(valA);
+        valB = Number(valB);
+      }
+      // Date / DateTime fields
+      else if (
+        ["date", "bookedDate", "created_at", "updated_at"].includes(sortField)
+      ) {
+        valA = new Date(valA).getTime();
+        valB = new Date(valB).getTime();
+      }
+      // Fallback (string compare)
+      else {
+        valA = String(valA).toLowerCase();
+        valB = String(valB).toLowerCase();
+      }
+
+      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
+
   const indexOfLastData = currentPage * itemsPerPage;
-  const indexOfFirstData = indexOfLastData - itemsPerPage;
-  const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const currentData = sortedData.slice(
+    indexOfLastData - itemsPerPage,
+    indexOfLastData
+  );
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  ////////////////////////////////////////////////////////////////////////////////
 
   const viewFHDetails = (item) => {
     setViewFHDetailsData(item);
@@ -217,11 +259,87 @@ function AdminBookingFhDeclined() {
         </h1>
 
         <div className="w-full flex justify-between items-center mb-2">
-          <span className="dark:text-gray-100 text-xs font-medium">
-            Showing {filteredData.length} Booking
-          </span>
+          <div className="flex items-center justify-between gap-2">
+            <span className="dark:text-gray-100 text-xs font-medium">
+              Showing {filteredData.length} Booking
+            </span>
+
+            <div className="flex items-center gap-1 text-xs">
+              <span className="dark:text-gray-300">Rows:</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value));
+                  setCurrentPage(1); // reset to first page
+                }}
+                className="border border-gray-300 dark:border-gray-700 rounded px-2 py-1
+                 bg-white dark:bg-gray-800 dark:text-gray-100"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value={100}>250</option>
+                <option value={100}>500</option>
+              </select>
+            </div>
+          </div>
 
           <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              <select
+                className="border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-xs dark:bg-gray-800 dark:text-gray-100"
+                value={sortField}
+                onChange={(e) => {
+                  const val = e.target.value;
+
+                  switch (val) {
+                    case "earliest":
+                      setSortField("date"); // or bookedDate
+                      setSortOrder("asc"); // earliest date first
+                      break;
+
+                    case "latest":
+                      setSortField("date"); // or bookedDate
+                      setSortOrder("desc"); // latest date first
+                      break;
+
+                    case "created_at":
+                      setSortField("created_at");
+                      setSortOrder("desc"); // latest added on top
+                      break;
+
+                    case "updated_at":
+                      setSortField("updated_at");
+                      setSortOrder("desc"); // latest update on top
+                      break;
+
+                    case "booking_id_desc":
+                      setSortField("id");
+                      setSortOrder("desc"); // newest booking ID first
+                      break;
+
+                    case "booking_id_asc":
+                      setSortField("id");
+                      setSortOrder("asc"); // oldest booking ID first
+                      break;
+
+                    default:
+                      setSortField("");
+                      setSortOrder("asc");
+                  }
+                }}
+              >
+                <option value="">Sort By</option>
+                <option value="earliest">Earliest Booking</option>
+                <option value="latest">Latest Booking</option>
+                <option value="created_at">Latest Added</option>
+                <option value="updated_at">Latest Updated</option>
+                <option value="booking_id_desc">Booking ID (Desc)</option>
+                <option value="booking_id_asc">Booking ID (Asc)</option>
+              </select>
+            </div>
             <button
               onClick={downloadDeclinedPDF}
               className="bg-green-600 text-white px-3 py-1 rounded text-xs flex items-center gap-1"
@@ -252,7 +370,11 @@ function AdminBookingFhDeclined() {
             }
           />
         </div>
-
+        {loading && (
+          <div className="flex justify-center items-center py-10">
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
         {totalPages > 1 && (
           <Pagination
             currentPage={currentPage}

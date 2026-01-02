@@ -280,43 +280,41 @@ export const bookingNonAttended = [
 ];
 
 export const bookingRescheduled = [
-  { title: "No.", key: "rescheduled_booking_id" },
-  { title: "Guest Name", key: "fullname" },
-  { title: "Phone Number", key: "phone" },
-  { title: "Previous Room", key: "prev_room" },
+  { title: "No.", key: "id" },
+
+  { title: "Full Name", key: "guest" },
+  { title: "Phone", key: "phone" },
+
+  { title: "Previous Room", key: "previous_room" },
+  { title: "Previous DP", key: "previous_paid" },
+  { title: "Previous Check-in / Out", key: "prev_check_in_out" },
+
   { title: "New Room", key: "new_room" },
-  { title: "Original Stay Dates", key: "sched_date" }, // start & end of previous booking
-  { title: "Rescheduled Stay Dates", key: "resched_to" }, // start & end of new booking
-  { title: "Original Total Price", key: "sched_total_price" },
-  { title: "Rescheduled Total Price", key: "resched_total_price" },
-  { title: "Paid (Original Booking)", key: "sched_paid_payment" },
-  { title: "Paid (Rescheduled Booking)", key: "resched_paid_payment" },
-  { title: "Refund / Additional Charge", key: "refund_charge" },
-  { title: "Date Rescheduled", key: "created_at" },
+  { title: "New DP", key: "new_paid" },
+  { title: "New Check-in / Out", key: "new_check_in_out" },
+
+  { title: "Refund / Charge", key: "refund_recharge" },
+
+  { title: "Created At", key: "inserted_at" },
 ];
 
 export const bookingRescheduledFh = [
-  { title: "No.", key: "rescheduled_booking_id" },
+  { title: "No.", key: "id" },
 
-  { title: "Full Name", key: "fullname" },
+  { title: "Full Name", key: "guest" },
   { title: "Phone", key: "phone" },
-  { title: "Previous Facility", key: "prev_facility" },
+  { title: "Previous Facility", key: "previous_facility" },
   { title: "New Facility", key: "new_facility" },
-  { title: "Original Date", key: "sched_date" },
-  { title: "Original Time", key: "sched_time" },
+  { title: "Original Date", key: "prev_date" },
 
-  { title: "Rescheduled Date", key: "resched_date" },
-  { title: "Rescheduled Time", key: "resched_time" },
+  { title: "Rescheduled Date", key: "new_date" },
 
-  { title: "Original Price", key: "sched_total_price" },
-  { title: "Rescheduled Price", key: "resched_total_price" },
+  { title: "Previous DP", key: "previous_paid" },
+  { title: "New Booking DP", key: "new_paid" },
 
-  { title: "Paid (Original)", key: "sched_paid_payment" },
-  { title: "Paid (Rescheduled)", key: "resched_paid_payment" },
+  { title: "Refund / Charge", key: "refund_recharge" },
 
-  { title: "Refund / Charge", key: "refund_charge" },
-
-  { title: "Created At", key: "created_at" },
+  { title: "Created At", key: "inserted_at" },
 ];
 
 //users

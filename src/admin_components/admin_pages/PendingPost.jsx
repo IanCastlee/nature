@@ -101,7 +101,11 @@ function PendingPost() {
   return (
     <div className="scroll-smooth">
       <h1 className="text-lg font-bold mb-6 dark:text-gray-100">Gallery</h1>
-
+      {loading && (
+        <div className="flex justify-center items-center py-10">
+          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
       {/* Search + Add Button */}
       <div className="w-full flex flex-row justify-between items-center mb-4">
         <span className="dark:text-gray-100 text-xs font-medium">

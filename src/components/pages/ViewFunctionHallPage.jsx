@@ -17,7 +17,12 @@ function ViewFunctionHallPage() {
     error,
   } = useGetData(`/admin/functionhall.php?id=${fhId}`);
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
+  if (!loading)
+    return (
+      <div className="flex justify-center items-center py-10 mt-11">
+        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
   if (error)
     return <p className="text-center text-red-500">Error loading details.</p>;
   if (!fhDetails) return null;

@@ -20,7 +20,7 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
   const [paymentType, setPaymentType] = useState("half");
   const [customAmount, setCustomAmount] = useState("");
 
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(50);
 
   // Fetch pending FH bookings
   const { data, loading, error, refetch } = useGetData(
@@ -44,16 +44,38 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
   };
 
   // Filtering
+  // FILTERING
   const filteredData =
     data?.filter((item) => {
       if (!searchTerm) return true;
-      const s = searchTerm.toLowerCase();
+
+      const s = String(searchTerm).toLowerCase();
+
       return (
-        (item?.fullname || "").toLowerCase().includes(s) ||
-        (item?.name || "").toLowerCase().includes(s) ||
-        (item?.start_time || "").toLowerCase().includes(s) ||
-        (item?.end_time || "").toLowerCase().includes(s) ||
-        (item?.date?.toString() || "").includes(s)
+        String(item?.id || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.fullname || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.phone || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.name || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.start_time || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.end_time || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.date || "")
+          .toLowerCase()
+          .includes(s) ||
+        String(item?.status || "")
+          .toLowerCase()
+          .includes(s)
       );
     }) || [];
 
@@ -104,15 +126,6 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
     const oldStatus = "resched";
     const newStatus = "rescheduled";
 
-    console.log("Reschedule Data:", {
-      booking_id: booking.id,
-      new_booking_id: newBooking.id,
-      paid: paymentAmount,
-      difference,
-      old_status: oldStatus,
-      new_status: newStatus,
-    });
-
     try {
       await setInactive({
         booking_id: booking.id,
@@ -154,15 +167,38 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
 
             <icons.IoIosCloseCircleOutline
               onClick={() => setShowForm(null)}
-              className="text-2xl cursor-pointer"
+              className="text-2xl cursor-pointer dark:text-gray-200 text-gray-800"
             />
           </div>
 
           {/* SEARCH + COUNT */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
-            <span className="text-xs dark:text-gray-100 font-medium">
-              Showing {filteredData.length} Booking
-            </span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="dark:text-gray-100 text-xs font-medium">
+                Showing {filteredData.length} Booking
+              </span>
+
+              <div className="flex items-center gap-1 text-xs">
+                <span className="dark:text-gray-300">Rows:</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1); // reset to first page
+                  }}
+                  className="border border-gray-300 dark:border-gray-700 rounded px-2 py-1
+                 bg-white dark:bg-gray-800 dark:text-gray-100"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                  <option value={100}>250</option>
+                  <option value={100}>500</option>
+                </select>
+              </div>
+            </div>
 
             <SearchInput
               placeholder="Search..."
@@ -211,7 +247,10 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
       {/* Computation Modal */}
       {showComputationModal && newBooking && (
         <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-[60] flex items-center justify-center">
-          <div className="bg-white rounded-xl shadow-2xl w-[520px] p-6 border border-gray-200">
+          <div
+            className="bg-white rounded-xl shadow-2xl w-[520px] p-6 border border-gray-200
+                max-h-[95vh] overflow-y-auto"
+          >
             <h2 className="text-xl font-semibold text-gray-800 mb-5 tracking-tight">
               Re-Scheduling Computation
             </h2>
@@ -228,43 +267,52 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
               return (
                 <div className="space-y-5 text-sm text-gray-700">
                   {/* Previous Booking */}
-                  <div className="border border-gray-200 p-4 rounded-lg bg-gray-50 shadow-sm">
-                    <h3 className="font-semibold text-gray-800 mb-3 text-sm tracking-tight">
+                  <div className="border border-gray-200 p-3 rounded-md bg-gray-50 shadow-sm text-xs">
+                    <h3 className="font-semibold text-gray-800 mb-2 tracking-tight text-xs">
                       Previous Booking
                     </h3>
-                    <p>
-                      <span className="text-gray-600">Price:</span>{" "}
-                      <b>{booking.price}</b>
-                    </p>
-                    <p>
-                      <span className="text-gray-600">Paid:</span>{" "}
-                      <b>{booking.paid}</b>
-                    </p>
+
+                    <div className="space-y-1">
+                      <p>
+                        <span className="text-gray-500">Price:</span>{" "}
+                        <span className="font-medium">{booking.price}</span>
+                      </p>
+                      <p>
+                        <span className="text-gray-500">Previous Paid:</span>
+
+                        <span className="font-medium">{booking.paid}</span>
+                      </p>
+                    </div>
                   </div>
 
                   {/* Rescheduled Booking */}
-                  <div className="border border-gray-200 p-4 rounded-lg bg-gray-50 shadow-sm">
-                    <h3 className="font-semibold text-gray-800 mb-3 text-sm tracking-tight">
-                      Rescheduled Booking
+                  <div className="border border-gray-200 p-3 rounded-md bg-gray-50 shadow-sm text-xs">
+                    <h3 className="font-semibold text-gray-800 mb-2 tracking-tight text-xs">
+                      Reschedule To
                     </h3>
-                    <p>
-                      <span className="text-gray-600">Price:</span>{" "}
-                      <b>
-                        ₱
-                        {newPrice.toLocaleString("en-PH", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </b>
-                    </p>
-                    <p>
-                      <span className="text-gray-600">Half Price:</span>{" "}
-                      <b>
-                        ₱
-                        {newHalf.toLocaleString("en-PH", {
-                          minimumFractionDigits: 2,
-                        })}
-                      </b>
-                    </p>
+
+                    <div className="space-y-1">
+                      <p>
+                        <span className="text-gray-500">Price:</span>{" "}
+                        <span className="font-medium">
+                          ₱
+                          {newPrice.toLocaleString("en-PH", {
+                            minimumFractionDigits: 2,
+                          })}
+                        </span>
+                      </p>
+                      <p>
+                        <span className="text-gray-500">
+                          Required Down Payment
+                        </span>
+                        <span className="font-medium">
+                          ₱
+                          {newHalf.toLocaleString("en-PH", {
+                            minimumFractionDigits: 2,
+                          })}
+                        </span>
+                      </p>
+                    </div>
                   </div>
 
                   {/* Payment Amount Selector */}

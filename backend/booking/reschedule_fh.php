@@ -114,7 +114,7 @@ try {
     ");
     if (!$stmtLog) throw new Exception($conn->error);
     $stmtLog->bind_param(
-        "sssdssdssd",
+        "sssdssdsss",
         $oldBooking['fullname'],
         $oldBooking['phone'],
         $oldBooking['facility_name'],

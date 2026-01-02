@@ -10,27 +10,26 @@ import { images } from "../../constant/image";
 function AdminSideBar({ isCollapsed, toggleCollapse }) {
   const { darkMode, toggleDarkMode } = useThemeStore();
   const navigate = useNavigate();
-  const [openDropdowns, setOpenDropdowns] = useState({});
   const location = useLocation();
 
+  const [openDropdowns, setOpenDropdowns] = useState({});
+
   useEffect(() => {
-    const newOpen = {};
+    const open = {};
     menuItems.forEach((item) => {
       if (item.children) {
-        const shouldOpen = item.children.some((child) =>
+        open[item.name] = item.children.some((child) =>
           location.pathname.startsWith(child.to)
         );
-        newOpen[item.name] = shouldOpen;
       }
     });
-    setOpenDropdowns(newOpen);
+    setOpenDropdowns(open);
   }, [location.pathname]);
 
-  const currentYear = new Date().getFullYear();
-  const toggleItem = (itemName) => {
+  const toggleItem = (name) => {
     setOpenDropdowns((prev) => ({
       ...prev,
-      [itemName]: !prev[itemName],
+      [name]: !prev[name],
     }));
   };
 
@@ -39,79 +38,61 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
     navigate("/signin");
   };
 
+  const currentYear = new Date().getFullYear();
+
   return (
     <nav
-      className={`${
-        isCollapsed ? "w-20" : "w-64"
-      } fixed top-0 left-0 h-screen bg-white dark:bg-gray-900 text-gray-100 flex flex-col transition-all duration-300 z-40 overflow-y-auto hide-scrollbar`}
+      onMouseEnter={() => toggleCollapse(false)}
+      onMouseLeave={() => toggleCollapse(true)}
+      className={`${isCollapsed ? "w-20" : "w-64"} fixed top-0 left-0 h-screen
+      bg-white dark:bg-gray-900
+      transition-all duration-300 ease-in-out
+      z-40 flex flex-col overflow-y-auto hide-scrollbar`}
     >
-      {/* Top controls */}
-      <div className="flex flex-row items-center gap-1 justify-between dark:bg-gray-800 mb-4 p-1">
+      {/* Top */}
+      <div className="flex items-center justify-between p-2 dark:bg-gray-800">
         <button onClick={toggleDarkMode}>
           {darkMode ? (
-            <icons.IoSunnySharp className="text-yellow-500 text-lg" />
+            <icons.IoSunnySharp className="text-yellow-400 text-lg" />
           ) : (
-            <icons.IoMoonSharp className="text-gray-500 text-lg" />
-          )}
-        </button>
-        <button
-          onClick={toggleCollapse}
-          className="text-white p-1 dark:hover:bg-gray-700 hover:bg-gray-200 rounded self-end"
-          aria-label="Toggle Sidebar"
-        >
-          {isCollapsed ? (
-            <FiChevronRight
-              size={20}
-              className="dark:text-white text-gray-700"
-            />
-          ) : (
-            <FiChevronLeft
-              size={20}
-              className="dark:text-white text-gray-700"
-            />
+            <icons.IoMoonSharp className="text-gray-600 text-lg" />
           )}
         </button>
       </div>
 
       {/* Logo */}
-      <div className="w-full flex flex-row justify-center mb-4">
-        {!isCollapsed ? (
-          <h3 className="text-lg font-semibold dark:text-gray-100 text-gray-800">
-            <span className="text-blue-400 font-semibold">NATURE</span> HOT
+      <div className="flex justify-center my-4">
+        {isCollapsed ? (
+          <img src={images.logo} alt="logo" className="w-10 h-10" />
+        ) : (
+          <h3 className="text-lg font-bold tracking-wide text-gray-900 dark:text-white">
+            <span className="text-blue-500 dark:text-blue-400">NATURE</span> HOT
             SPRING
           </h3>
-        ) : (
-          <img
-            src={images.logo}
-            alt="logo"
-            className="w-10 h-10 object-contain"
-          />
         )}
       </div>
 
-      {/* Menu items */}
-      <ul className="flex flex-col gap-4 p-2">
+      {/* Menu */}
+      <ul className="flex flex-col gap-2 px-2">
         {menuItems.map((item) => {
-          const hasChildren =
-            Array.isArray(item.children) && item.children.length > 0;
+          const hasChildren = item.children?.length > 0;
 
           const parentIsActive =
             (item.to && location.pathname.startsWith(item.to)) ||
             (hasChildren &&
-              item.children.some((child) =>
-                location.pathname.startsWith(child.to)
-              ));
+              item.children.some((c) => location.pathname.startsWith(c.to)));
 
-          // Handle Logout
           if (item.action === "logout") {
             return (
               <li key={item.name}>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 w-full h-[35px] px-2 rounded-md text-left text-sm font-semibold transition-colors dark:text-gray-400 text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  className="flex items-center gap-2 h-[36px] px-2 w-full
+                  text-sm font-medium text-gray-700 dark:text-gray-300
+                  hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
                 >
-                  <item.icon className="text-blue-700 text-lg" />
-                  {!isCollapsed && <span>{item.name}</span>}
+                  <item.icon className="text-blue-600 dark:text-blue-400 text-lg" />
+                  {!isCollapsed && item.name}
                 </button>
               </li>
             );
@@ -120,50 +101,51 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
           return (
             <li key={item.name}>
               <div
-                className={`flex items-center justify-between h-[35px] px-2 rounded-md cursor-pointer transition-colors ${
+                className={`flex items-center justify-between h-[36px] px-2 rounded-md cursor-pointer
+                ${
                   parentIsActive
-                    ? "bg-gray-200 dark:bg-gray-800 font-semibold"
-                    : "dark:hover:bg-gray-800 hover:bg-gray-100"
+                    ? "bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold"
+                    : "hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
-                onClick={() => hasChildren && toggleItem(item.name)}
+                onClick={() =>
+                  !isCollapsed && hasChildren && toggleItem(item.name)
+                }
               >
                 <NavLink
                   to={item.to || "#"}
-                  className={({ isActive }) =>
-                    `flex items-center gap-2 w-full h-full dark:text-gray-400 text-gray-700 text-sm font-semibold`
-                  }
+                  className="flex items-center gap-2 w-full text-sm font-medium
+                  text-gray-700 dark:text-gray-300"
                 >
-                  <item.icon className="text-blue-700 text-lg" />
-                  {!isCollapsed && <span>{item.name}</span>}
+                  <item.icon className="text-blue-600 dark:text-blue-400 text-lg" />
+                  {!isCollapsed && item.name}
                 </NavLink>
 
-                {hasChildren && !isCollapsed && (
-                  <span>
-                    {openDropdowns[item.name] ? (
-                      <FiChevronLeft size={16} className="text-blue-400" />
-                    ) : (
-                      <FiChevronRight size={16} className="text-blue-400" />
-                    )}
-                  </span>
-                )}
+                {hasChildren &&
+                  !isCollapsed &&
+                  (openDropdowns[item.name] ? (
+                    <FiChevronLeft size={14} className="text-blue-400" />
+                  ) : (
+                    <FiChevronRight size={14} className="text-blue-400" />
+                  ))}
               </div>
 
               {/* Submenu */}
               {hasChildren && openDropdowns[item.name] && !isCollapsed && (
                 <ul className="ml-6 mt-1 flex flex-col gap-1">
-                  {item.children.map((subItem) => (
-                    <li key={subItem.name}>
+                  {item.children.map((sub) => (
+                    <li key={sub.name}>
                       <NavLink
-                        to={subItem.to}
+                        to={sub.to}
                         className={({ isActive }) =>
-                          `flex items-center gap-2 h-[28px] text-xs px-2 rounded-md transition-colors ${
+                          `h-[28px] px-2 flex items-center rounded-md text-xs
+                          ${
                             isActive
-                              ? "bg-gray-200 dark:bg-gray-800 font-semibold text-gray-800 dark:text-gray-100"
-                              : "bg-transparent text-gray-700 dark:text-gray-400 font-medium hover:bg-gray-100 dark:hover:bg-gray-800"
+                              ? "bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold"
+                              : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                           }`
                         }
                       >
-                        {subItem.name}
+                        {sub.name}
                       </NavLink>
                     </li>
                   ))}
@@ -176,8 +158,8 @@ function AdminSideBar({ isCollapsed, toggleCollapse }) {
 
       {/* Footer */}
       {!isCollapsed && (
-        <footer className="mt-auto p-2 border-t dark:border-gray-700 border-gray-300 text-sm text-gray-600 text-center flex flex-col items-center justify-center">
-          © {currentYear} Nature Hot Spring. All rights reserved.
+        <footer className="mt-auto p-2 text-xs text-center text-gray-500 dark:text-gray-400 border-t dark:border-gray-700">
+          © {currentYear} Nature Hot Spring
         </footer>
       )}
     </nav>

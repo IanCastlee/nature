@@ -204,7 +204,6 @@ function AvailableFunctionHall() {
           Available Function Hall
         </h1>
 
-        {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
         {error && (
           <p className="text-red-500 text-sm mb-4">
             {error.message || "Something went wrong."}
@@ -256,6 +255,11 @@ function AvailableFunctionHall() {
           />
         </div>
 
+        {loading && (
+          <div className="flex justify-center items-center py-10">
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
         {!loading && totalPages > 1 && (
           <Pagination
             currentPage={currentPage}

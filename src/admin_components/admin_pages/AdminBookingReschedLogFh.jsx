@@ -19,7 +19,10 @@ function AdminBookingReschedLogFh() {
   const [toast, setToast] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 50;
+  const [itemsPerPage, setItemsPerPage] = useState(50);
+
+  const [sortField, setSortField] = useState(""); // "" means no sorting
+  const [sortOrder, setSortOrder] = useState("asc"); // asc or desc
 
   const { data, loading, refetch, error } = useGetData(
     `/booking/get-resched-fh.php`
@@ -42,7 +45,7 @@ function AdminBookingReschedLogFh() {
         String(item?.rescheduled_booking_id || "")
           .toLowerCase()
           .includes(s) ||
-        String(item?.fullname || "")
+        String(item?.guest || "")
           .toLowerCase()
           .includes(s) ||
         String(item?.phone || "")
@@ -57,12 +60,36 @@ function AdminBookingReschedLogFh() {
       );
     }) || [];
 
+  ////////////////////////////////////////////////////////////////////////////////
+  const sortedData = [...filteredData];
+
+  if (sortField) {
+    sortedData.sort((a, b) => {
+      let valA = a[sortField];
+      let valB = b[sortField];
+
+      // Convert to comparable values
+      if (sortField === "id") {
+        valA = Number(valA);
+        valB = Number(valB);
+      } else {
+        valA = new Date(valA);
+        valB = new Date(valB);
+      }
+
+      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
+
   const indexOfLastData = currentPage * itemsPerPage;
-  const currentData = filteredData.slice(
+  const currentData = sortedData.slice(
     indexOfLastData - itemsPerPage,
     indexOfLastData
   );
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  //////////////////////////////////////////////////////////////////////////////////
 
   // FORMAT TABLE DATA
   const formattedData = currentData.map((item) => ({
@@ -84,7 +111,7 @@ function AdminBookingReschedLogFh() {
   };
 
   // -------------------------------
-  // PDF EXPORT FUNCTION
+  // PDF EXPORT FUNCTION (FH RESCHEDULE LOG)
   // -------------------------------
   const downloadReschedPDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
@@ -98,15 +125,14 @@ function AdminBookingReschedLogFh() {
       timeStyle: "short",
     });
 
-    // ✅ ALL DATA (NO MONTH FILTER)
     const allData = filteredData;
 
     if (!allData.length) {
-      alert("No rescheduled bookings found.");
+      alert("No rescheduled function hall records found.");
       return;
     }
 
-    // Header
+    // ---------- HEADER ----------
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.text(
@@ -127,7 +153,7 @@ function AdminBookingReschedLogFh() {
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.text("Rescheduled Function Hall Booking Records", pageWidth / 2, 30, {
+    doc.text("Rescheduled Function Hall Records", pageWidth / 2, 30, {
       align: "center",
     });
 
@@ -135,43 +161,40 @@ function AdminBookingReschedLogFh() {
     doc.setFontSize(12);
     doc.text("All Records", pageWidth / 2, 36, { align: "center" });
 
-    // Format numbers
+    // ---------- FORMATTERS ----------
     const formatNum = (num) =>
-      Number(num).toLocaleString("en-PH", {
+      Number(num || 0).toLocaleString("en-PH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       });
 
+    // ---------- TABLE ----------
     const tableColumn = [
-      "ID",
-      "Fullname",
+      "No.",
+      "Full Name",
       "Phone",
-      "Prev Facility",
+      "Previous Facility",
       "New Facility",
-      "Sched Date",
-      "Resched Date",
-      "Sched Total",
-      "Sched Paid",
-      "Resched Total",
-      "Resched Paid",
-      "Refund/Charge",
+      "Original Date",
+      "Rescheduled Date",
+      "Previous DP",
+      "New Booking DP",
+      "Refund / Charge",
       "Created At",
     ];
 
     const tableRows = allData.map((item) => [
-      item.rescheduled_booking_id,
-      item.fullname,
+      item.id,
+      item.guest,
       item.phone,
-      item.prev_facility,
+      item.previous_facility,
       item.new_facility,
-      item.sched_date,
-      item.resched_date,
-      formatNum(item.sched_total_price),
-      formatNum(item.sched_paid_payment),
-      formatNum(item.resched_total_price),
-      formatNum(item.resched_paid_payment),
-      formatNum(item.refund_charge),
-      item.created_at,
+      item.prev_date,
+      item.new_date,
+      formatNum(item.previous_paid),
+      formatNum(item.new_paid),
+      formatNum(item.refund_recharge),
+      item.inserted_at,
     ]);
 
     autoTable(doc, {
@@ -179,16 +202,24 @@ function AdminBookingReschedLogFh() {
       head: [tableColumn],
       body: tableRows,
       theme: "grid",
-      styles: { fontSize: 7, cellPadding: 2 },
+      styles: {
+        fontSize: 7,
+        cellPadding: 2,
+        halign: "center",
+      },
       headStyles: {
         fillColor: [40, 40, 40],
         textColor: 255,
         halign: "center",
       },
-      tableWidth: "auto",
+      columnStyles: {
+        1: { halign: "left" },
+        3: { halign: "left" },
+        4: { halign: "left" },
+      },
     });
 
-    // ✅ Footer on EVERY page (small & subtle)
+    // ---------- FOOTER ----------
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -204,7 +235,7 @@ function AdminBookingReschedLogFh() {
       doc.setTextColor(0);
     }
 
-    doc.save(`FH_Rescheduled_Bookings_ALL_${currentYear}.pdf`);
+    doc.save(`FH_Reschedule_Log_${currentYear}.pdf`);
   };
 
   return (
@@ -223,11 +254,59 @@ function AdminBookingReschedLogFh() {
         </h1>
 
         <div className="w-full flex justify-between items-center mb-2">
-          <span className="dark:text-gray-100 text-xs font-medium">
-            Showing {filteredData.length} Booking
-          </span>
+          <div className="flex items-center justify-between gap-2">
+            <span className="dark:text-gray-100 text-xs font-medium">
+              Showing {filteredData.length} Booking
+            </span>
+
+            <div className="flex items-center gap-1 text-xs">
+              <span className="dark:text-gray-300">Rows:</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value));
+                  setCurrentPage(1); // reset to first page
+                }}
+                className="border border-gray-300 dark:border-gray-700 rounded px-2 py-1
+                 bg-white dark:bg-gray-800 dark:text-gray-100"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value={100}>250</option>
+                <option value={100}>500</option>
+              </select>
+            </div>
+          </div>
 
           <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <select
+                className="border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-xs dark:bg-gray-800 dark:text-gray-100"
+                value={sortField} // displays the selected option
+                onChange={(e) => {
+                  const val = e.target.value;
+
+                  if (val === "booking_id_desc") {
+                    setSortField("id");
+                    setSortOrder("desc"); // Booking ID descending
+                  } else if (val === "booking_id_asc") {
+                    setSortField("id");
+                    setSortOrder("asc"); // Booking ID ascending
+                  } else {
+                    setSortField(val);
+                    setSortOrder("asc"); // fallback
+                  }
+                }}
+              >
+                <option value="">Sort By</option>
+
+                <option value="booking_id_desc">Booking ID Desc</option>
+                <option value="booking_id_asc">Booking ID Asc</option>
+              </select>
+            </div>
             <button
               onClick={downloadReschedPDF}
               title="Download PDF for Current Month"
@@ -257,7 +336,11 @@ function AdminBookingReschedLogFh() {
             }
           />
         </div>
-
+        {loading && (
+          <div className="flex justify-center items-center py-10">
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
         {!loading && totalPages > 1 && (
           <Pagination
             currentPage={currentPage}

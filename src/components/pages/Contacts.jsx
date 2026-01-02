@@ -15,8 +15,8 @@ function Contacts() {
 
   if (loading)
     return (
-      <div className="text-center py-20 text-gray-500 dark:text-gray-400">
-        Loading...
+      <div className="flex justify-center items-center py-10 mt-11">
+        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
 

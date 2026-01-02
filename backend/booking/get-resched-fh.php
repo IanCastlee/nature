@@ -1,68 +1,37 @@
 <?php
 include("../header.php");
 include("../dbConn.php");
-require_once("../auth/auth_middleware.php"); 
+require_once("../auth/auth_middleware.php");
 
 header('Content-Type: application/json');
 
-// Authenticate user
-$user = require_auth($conn); 
-
-$method = $_SERVER['REQUEST_METHOD'];
-
-if ($method === "GET") {
-
-    // ===============================
-    // Fetch all reschedule logs
-    // ===============================
-    $stmt = $conn->prepare("
-        SELECT 
-            id, 
-            fullname, 
-            phone, 
-            prev_facility, 
-            new_facility, 
-            sched_date, 
-            resched_date, 
-            sched_time, 
-            resched_time,
-            sched_total_price, 
-            resched_total_price, 
-            sched_paid_payment, 
-            resched_paid_payment, 
-            refund_charge, 
-            rescheduled_booking_id,
-            created_at,
-            updated_at
-        FROM resched_log_fh
-        ORDER BY updated_at DESC
-    ");
-    
-    if ($stmt->execute()) {
-        $result = $stmt->get_result();
-        $logs = [];
-        while ($row = $result->fetch_assoc()) {
-            $logs[] = $row;
-        }
-        echo json_encode([
-            "success" => true,
-            "data" => $logs
-        ]);
-    } else {
-        http_response_code(500);
-        echo json_encode([
-            "success" => false,
-            "error" => $stmt->error
-        ]);
-    }
-
-} else {
-    http_response_code(405);
-    echo json_encode([
-        "success" => false,
-        "error" => "Only GET method is allowed"
-    ]);
+// Check DB connection
+if (!isset($conn) || !$conn instanceof mysqli) {
+    http_response_code(500);
+    echo json_encode(["error" => "Database connection error"]);
+    exit;
 }
 
-exit;
-?>
+try {
+    $sql = "SELECT * FROM reschedule_log_fh ORDER BY inserted_at DESC";
+    $result = $conn->query($sql);
+
+    if (!$result) {
+        throw new Exception($conn->error);
+    }
+
+    $logs = [];
+    while ($row = $result->fetch_assoc()) {
+        $logs[] = $row;
+    }
+
+    echo json_encode([
+        "success" => true,
+        "data" => $logs
+    ]);
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode([
+        "error" => "Failed to fetch reschedule logs: " . $e->getMessage()
+    ]);
+}

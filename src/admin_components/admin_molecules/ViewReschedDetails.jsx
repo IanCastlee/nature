@@ -1,147 +1,132 @@
 import React from "react";
 import { icons } from "../../constant/icon";
+
 function ViewReschedDetails({ data, onClose }) {
+  console.log(data);
   if (!data) return null;
 
   const formatCurrency = (value) =>
     `₱${Number(value).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`;
 
   const refundColor =
-    Number(data.refund_charge) >= 0 ? "text-green-600" : "text-red-600";
+    Number(data.refund_charge) >= 0 ? "text-green-500" : "text-red-500";
 
   return (
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        className="fixed inset-0 bg-black bg-opacity-50 z-40 backdrop-blur-sm"
         onClick={onClose}
       ></div>
 
       {/* Modal */}
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-        <div className="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-2xl w-full max-w-3xl relative text-xs">
-          <div className="w-full flex flex-row justify-between items-center mb-4 border-b pb-1">
-            {/* text-xs for smaller font */}
-
-            {/* Header */}
-            <h2 className="text-lg font-bold mb-2 dark:text-gray-100 ">
-              {" "}
-              {/* smaller heading */}
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-3xl relative overflow-hidden">
+          {/* Header */}
+          <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 p-4">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
               Rescheduled Booking Details
             </h2>
-
             <icons.MdOutlineClose
               onClick={onClose}
-              className="cursor-pointer text-2xl text-gray-800 dark:text-gray-50 hover:text-red-500"
+              className="cursor-pointer text-2xl text-gray-700 dark:text-gray-50 hover:text-red-500"
             />
           </div>
 
-          {/* Details */}
-          <div className="space-y-2 text-gray-700 dark:text-gray-200">
-            {/* Name & Phone */}
-            <div className="flex justify-between space-x-3 bg-gray-100 dark:bg-gray-800 p-1.5 rounded">
+          {/* Body */}
+          <div className="p-6 space-y-6 text-sm text-gray-700 dark:text-gray-200">
+            {/* Guest Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
-                  Full Name:
+                  Full Name
                 </span>
-                <div className="font-medium">{data.fullname}</div>
+                <div className="mt-1 font-medium">{data.guest}</div>
               </div>
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
-                  Phone:
+                  Phone
                 </span>
-                <div className="font-medium">{data.phone}</div>
+                <div className="mt-1 font-medium">{data.phone}</div>
               </div>
             </div>
 
             {/* Room Info */}
-            <div className="flex justify-between space-x-3 bg-gray-50 dark:bg-gray-700 p-1.5 rounded">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
-                  Previous Room:
+                  Previous Room
                 </span>
-                <div className="font-medium">{data.prev_room}</div>
+                <div className="mt-1 font-medium">{data.previous_room}</div>
               </div>
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
-                  New Room:
+                  New Room
                 </span>
-                <div className="font-medium">{data.new_room}</div>
+                <div className="mt-1 font-medium">{data.new_room}</div>
               </div>
             </div>
 
             {/* Stay Dates */}
-            <div className="flex justify-between space-x-3 bg-gray-100 dark:bg-gray-800 p-1.5 rounded">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
-                  Original Stay:
+                  Original Stay
                 </span>
-                <div className="font-medium">{data.sched_date}</div>
+                <div className="mt-1 font-medium">{data.prev_check_in_out}</div>
               </div>
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
-                  Rescheduled Stay:
+                  Rescheduled Stay
                 </span>
-                <div className="font-medium">{data.resched_to}</div>
-              </div>
-            </div>
-
-            {/* Prices */}
-            <div className="flex justify-between space-x-3 bg-gray-50 dark:bg-gray-700 p-1.5 rounded">
-              <div>
-                <span className="font-semibold text-gray-600 dark:text-gray-300">
-                  Original Price:
-                </span>
-                <div className="font-medium">
-                  {formatCurrency(data.sched_total_price)}
-                </div>
-              </div>
-              <div>
-                <span className="font-semibold text-gray-600 dark:text-gray-300">
-                  Rescheduled Price:
-                </span>
-                <div className="font-medium">
-                  {formatCurrency(data.resched_total_price)}
-                </div>
+                <div className="mt-1 font-medium">{data.new_check_in_out}</div>
               </div>
             </div>
 
             {/* Payments */}
-            <div className="flex justify-between space-x-3 bg-gray-100 dark:bg-gray-800 p-1.5 rounded">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
-                  Paid (Original):
+                  Paid (Original)
                 </span>
-                <div className="font-medium">
-                  {formatCurrency(data.sched_paid_payment)}
+                <div className="mt-1 font-medium">
+                  {formatCurrency(data.previous_paid)}
                 </div>
               </div>
               <div>
                 <span className="font-semibold text-gray-600 dark:text-gray-300">
-                  Paid (Rescheduled):
+                  Paid (Rescheduled)
                 </span>
-                <div className="font-medium">
-                  {formatCurrency(data.resched_paid_payment)}
+                <div className="mt-1 font-medium">
+                  {formatCurrency(data.new_paid)}
                 </div>
               </div>
             </div>
 
             {/* Refund / Charge */}
-            <div className="flex justify-between bg-gray-50 dark:bg-gray-700 p-1.5 rounded">
+            <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
               <span className="font-semibold text-gray-600 dark:text-gray-300">
-                Refund / Charge:
+                Refund / Charge
               </span>
-              <span className={`font-medium ${refundColor}`}>
-                {formatCurrency(data.refund_charge)}
+              <span
+                className={`font-medium ${
+                  Number(data.refund_recharge) < 0
+                    ? "text-red-600 dark:text-red-400"
+                    : Number(data.refund_recharge) > 0
+                    ? "text-blue-600 dark:text-blue-400"
+                    : "text-gray-500 dark:text-gray-400"
+                }`}
+              >
+                {formatCurrency(data.refund_recharge)}
               </span>
             </div>
 
             {/* Created At */}
-            <div className="flex justify-between bg-gray-100 dark:bg-gray-800 p-1.5 rounded">
+            <div className="flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
               <span className="font-semibold text-gray-600 dark:text-gray-300">
-                Created At:
+                Created At
               </span>
-              <span className="font-medium">{data.created_at}</span>
+              <span className="font-medium">{data.inserted_at}</span>
             </div>
           </div>
         </div>

@@ -20,7 +20,7 @@ if ($method === "GET") {
 
     $baseSql = "
         SELECT 
-            rb.booking_id, rb.user_id, rb.facility_id, rb.fullname, rb.phone, rb.start_date, rb.end_date,  rb.bookedDate, rb.updated_at,
+            rb.booking_id, rb.user_id, rb.facility_id, rb.updated_at, rb.fullname, rb.phone, rb.start_date, rb.end_date,  rb.bookedDate, rb.updated_at,
             rb.nights, rb.status, rb.price AS booking_price, rb.down_payment, rb.paid AS booking_paid, 
 
             u.firstname, u.lastname, u.email,
@@ -104,7 +104,7 @@ if ($method === "GET") {
         'bookedDate' => $row['bookedDate'],
         'nights' => $row['nights'],
         'status' => $row['status'],
-
+         'updated_at' => $row['updated_at'],
         //  raw numbers only
         'price' => $price,
         'paid' => $row['booking_paid'],

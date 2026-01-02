@@ -115,7 +115,11 @@ function AdminTerms() {
       <h1 className="text-lg font-bold mb-6 dark:text-gray-100">
         Terms & Conditions
       </h1>
-
+      {loading && (
+        <div className="flex justify-center items-center py-10">
+          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
       <div className="w-full flex justify-between items-center mb-2">
         <span className="dark:text-gray-100 text-xs font-medium">
           Showing {filteredData.length} record{filteredData.length > 1 && "s"}

@@ -18,8 +18,6 @@ import { uploadUrl } from "../../utils/fileURL";
 import MessageUs from "../molecules/MessageUs";
 import Activities from "../organisms/Activities";
 
-const About = lazy(() => import("../organisms/About"));
-const ChatBot = lazy(() => import("../molecules/ChatBot"));
 const RoomCategoryCard = lazy(() => import("../molecules/RoomCategoryCard"));
 const CattageCard = lazy(() => import("../molecules/CattageCard"));
 const FunctionHallCard = lazy(() => import("../molecules/FunctionHallCard"));

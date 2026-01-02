@@ -41,8 +41,8 @@ $availableCottages = $conn->query("SELECT COUNT(*) AS count FROM cottages WHERE 
 $notAvailableCottages = $conn->query("SELECT COUNT(*) AS count FROM cottages WHERE status = 'inactive'")->fetch_assoc()['count'];
 
 // Under Maintenance
-$roomsUnderMaintenance = $conn->query("SELECT COUNT(*) AS count FROM rooms WHERE status='under maintenance'")->fetch_assoc()['count'];
-$hallsUnderMaintenance = $conn->query("SELECT COUNT(*) AS count FROM function_hall WHERE status='under maintenance'")->fetch_assoc()['count'];
+$roomsUnderMaintenance = $conn->query("SELECT COUNT(*) AS count FROM rooms WHERE status='under_maintenance'")->fetch_assoc()['count'];
+$hallsUnderMaintenance = $conn->query("SELECT COUNT(*) AS count FROM function_hall WHERE status='under_maintenance'")->fetch_assoc()['count'];
 
 // Top 3 Most Booked Rooms (status = 'arrived')
 $mostBookedRooms = [];
