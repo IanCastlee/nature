@@ -17,6 +17,9 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
   const [showComputationModal, setShowComputationModal] = useState(false);
   const [newBooking, setNewBooking] = useState(null);
 
+  const [paymentType, setPaymentType] = useState("half");
+  const [customAmount, setCustomAmount] = useState("");
+
   const itemsPerPage = 10;
 
   // Fetch pending FH bookings
@@ -25,7 +28,7 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
   );
 
   const { setInactive, loading: approveLoading } = useSetInactive(
-    "/booking/resched_fh.php",
+    "/booking/reschedule_fh.php",
     () => {
       setToast({ message: "Booking updated successfully!", type: "success" });
       setShowComputationModal(false);
@@ -36,7 +39,7 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
   );
 
   const toNumber = (value) => {
-    if (value == null) return 0;
+    if (value == null || value === "") return 0;
     return Number(value.toString().replace(/[₱,]/g, ""));
   };
 
@@ -78,36 +81,50 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
     if (!newBooking) return;
 
     const prevPaid = toNumber(booking.paid);
-    const newHalf = toNumber(newBooking.half_price);
-    const difference = prevPaid - newHalf;
+    const newPrice = toNumber(newBooking.price);
+
+    const paymentAmount =
+      paymentType === "half"
+        ? toNumber(newBooking.half_price)
+        : Number(customAmount) || 0;
+
+    // Validate payment amount
+    if (paymentAmount <= 0 || paymentAmount > newPrice) {
+      setToast({
+        message:
+          "Please enter a valid payment amount not exceeding the new price.",
+        type: "error",
+      });
+      return;
+    }
+
+    const difference = prevPaid - paymentAmount;
+
+    // Explicit statuses to prevent PHP conflicts
+    const oldStatus = "resched";
+    const newStatus = "rescheduled";
+
+    console.log("Reschedule Data:", {
+      booking_id: booking.id,
+      new_booking_id: newBooking.id,
+      paid: paymentAmount,
+      difference,
+      old_status: oldStatus,
+      new_status: newStatus,
+    });
 
     try {
-      // OLD booking
       await setInactive({
         booking_id: booking.id,
-        status: "resched",
+        new_booking_id: newBooking.id,
+        paid: paymentAmount,
         difference,
+        old_status: oldStatus,
+        new_status: newStatus,
       });
-
-      // NEW booking — pass the real previous booking id
-      await setInactive({
-        booking_id: newBooking.id,
-        prev_booking_id: booking.id, // 🔥 IMPORTANT
-        status: "rescheduled",
-        difference,
-      });
-
-      setToast({
-        message: "Booking rescheduled successfully!",
-        type: "success",
-      });
-
-      setShowComputationModal(false);
-      refetch();
-      refetchApproved();
-      setShowForm(null);
-    } catch (err) {
-      console.error(err);
+      // Callback in useSetInactive handles success UI updates
+    } catch (error) {
+      console.error(error);
       setToast({
         message: "Failed to reschedule booking.",
         type: "error",
@@ -203,22 +220,18 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
               const prevPaid = toNumber(booking.paid);
               const newHalf = toNumber(newBooking.half_price);
               const newPrice = toNumber(newBooking.price);
-              const difference = prevPaid - newHalf;
+
+              const paymentAmount =
+                paymentType === "half" ? newHalf : toNumber(customAmount);
+              const difference = prevPaid - paymentAmount;
 
               return (
                 <div className="space-y-5 text-sm text-gray-700">
+                  {/* Previous Booking */}
                   <div className="border border-gray-200 p-4 rounded-lg bg-gray-50 shadow-sm">
                     <h3 className="font-semibold text-gray-800 mb-3 text-sm tracking-tight">
                       Previous Booking
                     </h3>
-                    <p>
-                      <span className="text-gray-600">Date:</span>{" "}
-                      <b>{booking.date}</b>
-                    </p>
-                    <p>
-                      <span className="text-gray-600">Room:</span>{" "}
-                      <b>{booking.name}</b>
-                    </p>
                     <p>
                       <span className="text-gray-600">Price:</span>{" "}
                       <b>{booking.price}</b>
@@ -229,18 +242,11 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
                     </p>
                   </div>
 
+                  {/* Rescheduled Booking */}
                   <div className="border border-gray-200 p-4 rounded-lg bg-gray-50 shadow-sm">
                     <h3 className="font-semibold text-gray-800 mb-3 text-sm tracking-tight">
                       Rescheduled Booking
                     </h3>
-                    <p>
-                      <span className="text-gray-600">Date:</span>{" "}
-                      <b>{newBooking.date}</b>
-                    </p>
-                    <p>
-                      <span className="text-gray-600">Room:</span>{" "}
-                      <b>{newBooking.name}</b>
-                    </p>
                     <p>
                       <span className="text-gray-600">Price:</span>{" "}
                       <b>
@@ -261,6 +267,62 @@ function ReSchedBookingFh({ booking, refetchApproved }) {
                     </p>
                   </div>
 
+                  {/* Payment Amount Selector */}
+                  <div className="border border-gray-100 p-4 rounded-lg bg-white shadow-sm mt-5">
+                    <h3 className="font-semibold text-gray-800 mb-3 text-sm tracking-tight">
+                      Payment Amount
+                    </h3>
+                    <div className="flex flex-col gap-3">
+                      <label className="inline-flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="paymentType"
+                          value="half"
+                          checked={paymentType === "half"}
+                          onChange={() => setPaymentType("half")}
+                          className="form-radio text-blue-600"
+                        />
+                        <span className="ml-2 select-none">
+                          50% (Half Price) — ₱
+                          {newHalf.toLocaleString("en-PH", {
+                            minimumFractionDigits: 2,
+                          })}
+                        </span>
+                      </label>
+
+                      <label className="inline-flex items-center cursor-pointer">
+                        <input
+                          type="radio"
+                          name="paymentType"
+                          value="custom"
+                          checked={paymentType === "custom"}
+                          onChange={() => setPaymentType("custom")}
+                          className="form-radio text-blue-600"
+                        />
+                        <span className="ml-2 select-none">Custom Amount</span>
+                      </label>
+
+                      {paymentType === "custom" && (
+                        <input
+                          type="number"
+                          min="0"
+                          max={newPrice}
+                          value={customAmount}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === "" || Number(val) <= newPrice) {
+                              setCustomAmount(val);
+                            }
+                          }}
+                          placeholder="Enter custom payment amount"
+                          className="mt-2 w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          aria-label="Custom payment amount"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Summary & Computation */}
                   <div className="border border-gray-100 p-4 rounded-lg bg-white shadow-sm">
                     <h3 className="font-semibold text-gray-800 mb-3 text-sm tracking-tight">
                       Summary & Computation

@@ -2,8 +2,9 @@ import { useState } from "react";
 import { icons } from "../../constant/icon";
 import { useForm } from "../../store/useRoomStore";
 import useSetInactive from "../../hooks/useSetInactive";
+import Toaster from "../../components/molecules/Toaster";
 
-export default function ApproveBooking({ data, refetch }) {
+export default function ApproveBooking({ data, refetch, setToast }) {
   const setShowForm = useForm((state) => state.setShowForm);
 
   const [paymentType, setPaymentType] = useState("half");
@@ -14,8 +15,18 @@ export default function ApproveBooking({ data, refetch }) {
     loading,
     error,
   } = useSetInactive("/booking/booking.php", () => {
+    setToast({
+      message:
+        paymentType === "half"
+          ? "Booking set as approved with 50% payment"
+          : paymentType === "full"
+          ? "Booking set as approved with full payment"
+          : "Booking approved with custom payment",
+      type: "success",
+    });
+
     refetch?.();
-    setShowForm(null);
+    setShowForm(null); // modal closes, toast stays
   });
 
   if (!data) return null;

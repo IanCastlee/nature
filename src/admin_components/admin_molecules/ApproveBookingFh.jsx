@@ -3,7 +3,7 @@ import { icons } from "../../constant/icon";
 import { useForm } from "../../store/useRoomStore";
 import useSetInactive from "../../hooks/useSetInactive";
 
-export default function ApproveBookingFh({ data, refetch }) {
+export default function ApproveBookingFh({ data, refetch, setToast }) {
   const setShowForm = useForm((state) => state.setShowForm);
 
   const [paymentType, setPaymentType] = useState("half");
@@ -14,6 +14,17 @@ export default function ApproveBookingFh({ data, refetch }) {
     loading,
     error,
   } = useSetInactive("/booking/fh-booking.php", () => {
+    // Call setToast on success here:
+    setToast({
+      message:
+        paymentType === "half"
+          ? "Booking set as approved with 50% payment"
+          : paymentType === "full"
+          ? "Booking set as approved with full payment"
+          : "Booking approved with custom payment",
+      type: "success",
+    });
+
     refetch?.();
     setShowForm(null);
   });

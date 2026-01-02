@@ -19,22 +19,10 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
   const [showComputationModal, setShowComputationModal] = useState(false);
   const [newBooking, setNewBooking] = useState(null);
 
-  const itemsPerPage = 10;
+  const [paymentType, setPaymentType] = useState("half");
+  const [customAmount, setCustomAmount] = useState("");
 
-  const {
-    setInactive,
-    loading: approveLoading,
-    error: subError,
-  } = useSetInactive("/booking/resched.php", () => {
-    setToast({
-      message: "Booking updated successfully!",
-      type: "success",
-    });
-    refetchBooking();
-    onClose();
-    setShowComputationModal(false);
-    refetch();
-  });
+  const itemsPerPage = 10;
 
   // Fetch pending booking data
   const { data, loading, error, refetch } = useGetData(
@@ -118,37 +106,66 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
     })}`,
   }));
 
-  // Handle Reschedule
+  const {
+    setInactive,
+    loading: approveLoading,
+    error: subError,
+  } = useSetInactive("/booking/reschedule.php", () => {
+    setToast({
+      message: "Booking updated successfully!",
+      type: "success",
+    });
+    refetchBooking();
+    onClose();
+    setShowComputationModal(false);
+    refetch();
+  });
+
   const handleReschedule = async () => {
     if (!newBooking) return;
 
     const prevPaid = toNumber(booking.down_payment);
-    const newHalf = toNumber(newBooking.half_price);
-    const difference = prevPaid - newHalf;
+    const newPrice = toNumber(newBooking.price);
+
+    const paymentAmount =
+      paymentType === "half"
+        ? toNumber(newBooking.half_price)
+        : Number(customAmount) || 0;
+
+    if (paymentAmount <= 0 || paymentAmount > newPrice) {
+      setToast({
+        message:
+          "Please enter a valid payment amount not exceeding the new price.",
+        type: "error",
+      });
+      return;
+    }
+
+    const difference = prevPaid - paymentAmount;
+
+    // Explicitly add statuses
+    const oldStatus = "resched";
+    const newStatus = "rescheduled";
+
+    console.log("Reschedule Data:", {
+      booking_id: booking.booking_id,
+      new_booking_id: newBooking.booking_id,
+      paid: paymentAmount,
+      difference,
+      old_status: oldStatus,
+      new_status: newStatus,
+    });
 
     try {
-      // STEP 1: mark OLD booking as resched
       await setInactive({
         booking_id: booking.booking_id,
-        status: "resched",
+        new_booking_id: newBooking.booking_id,
+        paid: paymentAmount,
         difference,
+        old_status: oldStatus,
+        new_status: newStatus,
       });
-
-      // STEP 2: mark NEW booking as rescheduled
-      await setInactive({
-        booking_id: newBooking.booking_id,
-        prev_booking_id: booking.booking_id,
-        new_half: newHalf,
-        status: "rescheduled",
-        difference,
-      });
-
-      setToast({
-        message: "Booking rescheduled successfully!",
-        type: "success",
-      });
-
-      setShowComputationModal(false);
+      // Success handling in useSetInactive callback
     } catch (error) {
       console.error(error);
       setToast({
@@ -183,7 +200,11 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
             />
           </div>
 
-          {loading && <p className="text-blue-500">Loading...</p>}
+          {loading && (
+            <div className="flex justify-center items-center py-10">
+              <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
           {error && <p className="text-red-500">{error.message}</p>}
 
           <div className="flex justify-between mb-2">
@@ -246,7 +267,30 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
               const prevPaid = toNumber(booking.down_payment);
               const newHalf = toNumber(newBooking.half_price);
               const newPrice = toNumber(newBooking.price);
-              const difference = prevPaid - newHalf;
+
+              // State for payment option and custom amount
+              // (Make sure these are declared in your component function)
+              // const [paymentType, setPaymentType] = useState("half");
+              // const [customAmount, setCustomAmount] = useState("");
+
+              // Handle validation for custom amount input
+              const handleCustomAmountChange = (e) => {
+                let val = e.target.value;
+
+                // Clamp to max of newPrice
+                if (Number(val) > newPrice) {
+                  val = newPrice.toString();
+                } else if (Number(val) < 0) {
+                  val = "0";
+                }
+
+                setCustomAmount(val);
+              };
+
+              // Compute payment amount based on selection
+              const paymentAmount =
+                paymentType === "half" ? newHalf : Number(customAmount) || 0;
+              const difference = prevPaid - paymentAmount;
 
               return (
                 <div className="space-y-5 text-sm text-gray-700">
@@ -257,14 +301,14 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
                     </h3>
 
                     <div className="space-y-1.5">
-                      <p>
+                      {/* <p>
                         <span className="text-gray-600">Date:</span>{" "}
                         <b>{booking.start_date}</b> to <b>{booking.end_date}</b>
                       </p>
                       <p>
                         <span className="text-gray-600">Room:</span>{" "}
                         <b>{booking.room_name}</b>
-                      </p>
+                      </p> */}
                       <p>
                         <span className="text-gray-600">Price:</span>{" "}
                         <b>{booking.price}</b>
@@ -283,7 +327,7 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
                     </h3>
 
                     <div className="space-y-1.5">
-                      <p>
+                      {/* <p>
                         <span className="text-gray-600">Date:</span>{" "}
                         <b>{newBooking.start_date}</b> to{" "}
                         <b>{newBooking.end_date}</b>
@@ -291,8 +335,7 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
                       <p>
                         <span className="text-gray-600">Room:</span>{" "}
                         <b>{newBooking.room?.room_name}</b>
-                      </p>
-
+                      </p> */}
                       <p>
                         <span className="text-gray-600">Price:</span>{" "}
                         <b>
@@ -302,7 +345,6 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
                           })}
                         </b>
                       </p>
-
                       <p>
                         <span className="text-gray-600">Half Price:</span>{" "}
                         <b>
@@ -315,9 +357,57 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
                     </div>
                   </div>
 
-                  {/* Computation */}
-                  <div className="border border-gray-100 p-4 rounded-lg bg-white shadow-sm">
-                    <h3 className="font-semibold text-gray-800 mb-3 text-sm tracking-tight">
+                  {/* Payment Option Selector */}
+                  <div className="mt-4 border border-gray-300 p-4 rounded-md bg-gray-50">
+                    <h3 className="font-semibold mb-2">
+                      Select Payment Option
+                    </h3>
+                    <label className="inline-flex items-center mr-6 cursor-pointer">
+                      <input
+                        type="radio"
+                        className="form-radio"
+                        name="paymentOption"
+                        value="half"
+                        checked={paymentType === "half"}
+                        onChange={() => setPaymentType("half")}
+                      />
+                      <span className="ml-2">
+                        50% Payment (₱
+                        {newHalf.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                        })}
+                        )
+                      </span>
+                    </label>
+
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        className="form-radio"
+                        name="paymentOption"
+                        value="custom"
+                        checked={paymentType === "custom"}
+                        onChange={() => setPaymentType("custom")}
+                      />
+                      <span className="ml-2">Custom Amount</span>
+                    </label>
+
+                    {paymentType === "custom" && (
+                      <input
+                        type="number"
+                        min="0"
+                        max={newPrice}
+                        value={customAmount}
+                        onChange={handleCustomAmountChange}
+                        placeholder="Enter custom amount"
+                        className="mt-2 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    )}
+                  </div>
+
+                  {/* Summary & Computation */}
+                  <div className="border border-gray-100 p-4 rounded-lg bg-white shadow-sm mt-4">
+                    <h3 className="font-semibold mb-3 text-sm tracking-tight">
                       Summary & Computation
                     </h3>
 
@@ -326,9 +416,9 @@ function ReSchedBooking({ booking, onClose, refetchBooking }) {
                         Previous Booking Paid:{" "}
                         <b>₱{prevPaid.toLocaleString()}</b>
                       </p>
+
                       <p>
-                        New Booking Half Price:{" "}
-                        <b>₱{newHalf.toLocaleString()}</b>
+                        Amount to Pay: <b>₱{paymentAmount.toLocaleString()}</b>
                       </p>
 
                       <hr className="my-3 border-gray-300" />

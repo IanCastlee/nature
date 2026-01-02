@@ -7,7 +7,6 @@ import SearchInput from "../admin_atoms/SearchInput";
 import GenericTable from "../admin_molecules/GenericTable";
 import { renderActionsBooking } from "../admin_molecules/RenderActions";
 import useSetInactive from "../../hooks/useSetInactive";
-import DeleteModal from "../../components/molecules/DeleteModal";
 import { bookingPending } from "../../constant/tableColumns";
 import Toaster from "../../components/molecules/Toaster";
 import ViewDetails from "../admin_molecules/ViewDetails";
@@ -88,39 +87,6 @@ function AdminBookingPage() {
   const indexOfFirstData = indexOfLastData - itemsPerPage;
   const currentData = filteredData.slice(indexOfFirstData, indexOfLastData);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-  //==========================//
-  //   HANDLE APPROVE/ACTIONS //
-  //==========================//
-
-  const {
-    setInactive,
-    loading: approveLoading,
-    error: approveError,
-  } = useSetInactive("/booking/booking.php", () => {
-    refetch();
-    setApproveItem(null);
-    setToast({
-      message: "Booking set as approved with 50% payment",
-      type: "success",
-    });
-  });
-
-  //==========================//
-  //   HANDLE APPROVE/ACTIONS (FULL PAYMENT) //
-  //==========================//
-  const {
-    setInactive: setInactiveFP,
-    loading: approveFPLoading,
-    error: approveFPError,
-  } = useSetInactive("/booking/booking.php", () => {
-    refetch();
-    setApproveItemFullpayment(null);
-    setToast({
-      message: "Booking set as approved with full payment",
-      type: "success",
-    });
-  });
 
   //==========================//
   //   HANDLE DECLINE         //
@@ -302,8 +268,6 @@ function AdminBookingPage() {
     doc.save(`Pending_Bookings_ALL_${currentYear}.pdf`);
   };
 
-  // -------------------------------------------
-
   return (
     <>
       {toast && (
@@ -319,7 +283,11 @@ function AdminBookingPage() {
           Pending Booking
         </h1>
 
-        {loading && <p className="text-blue-500 text-sm mb-4">Loading...</p>}
+        {loading && (
+          <div className="flex justify-center items-center py-10">
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
         {error && (
           <p className="text-red-500 text-sm mb-4">
             {error.message || "Something went wrong."}
@@ -411,7 +379,11 @@ function AdminBookingPage() {
       )}
 
       {showForm === "approved_options" && (
-        <ApproveBooking refetch={refetch} data={approveItem} />
+        <ApproveBooking
+          refetch={refetch}
+          data={approveItem}
+          setToast={setToast}
+        />
       )}
     </>
   );

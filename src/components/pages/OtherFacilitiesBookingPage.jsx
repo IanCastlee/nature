@@ -52,6 +52,8 @@ function OtherFacilitiesBookingPage() {
   const [disabledDates, setDisabledDates] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  console.log(selectedDate);
+
   // Form state
   const [form, setForm] = useState({
     firstname: localStorage.getItem("firstname") || "",
@@ -75,7 +77,6 @@ function OtherFacilitiesBookingPage() {
     error: formError,
   } = useFormSubmit("/booking/fh-booking.php", (response) => {
     if (!response?.success) return;
-    console.log("DATA : ", response);
     setToast({
       message: "Reservation submitted successfully!",
       type: "success",
@@ -198,9 +199,15 @@ function OtherFacilitiesBookingPage() {
       const endDateTime = new Date(startDateTime);
       endDateTime.setHours(endDateTime.getHours() + slotHours);
 
-      if (startDateTime.getHours() < 4 || endDateTime.getHours() > 22) {
+      const startMinutes =
+        startDateTime.getHours() * 60 + startDateTime.getMinutes();
+
+      const endMinutes = startMinutes + 8 * 60;
+
+      if (startMinutes < 4 * 60 || endMinutes > 22 * 60) {
         setToast({
-          message: "Booking must be between 4:00 AM and 10:00 PM.",
+          message:
+            "Booking must start between 4:00 AM and 2:00 PM (8-hour limit).",
           type: "error",
         });
         return;
@@ -216,11 +223,11 @@ function OtherFacilitiesBookingPage() {
       });
     } catch (err) {
       setToast({
-        message: err.message, // ✅ backend message
+        message: err.message,
         type: "error",
       });
     } finally {
-      setIsSubmitting(false); // ✅ ALWAYS unlock
+      setIsSubmitting(false);
     }
   };
 
@@ -262,6 +269,20 @@ function OtherFacilitiesBookingPage() {
     setStartTime("");
     setShowForm(null);
   };
+
+  const BOOKING_DURATION_HOURS = 8;
+  const CLOSING_HOUR = 22;
+
+  const isInvalidTime =
+    startTime &&
+    (() => {
+      const [h, m] = startTime.split(":").map(Number);
+
+      const startMinutes = h * 60 + m;
+      const latestStartMinutes = (CLOSING_HOUR - BOOKING_DURATION_HOURS) * 60;
+
+      return startMinutes > latestStartMinutes;
+    })();
 
   return (
     <>
@@ -343,14 +364,14 @@ function OtherFacilitiesBookingPage() {
             {/* BOOKING SECTION */}
             <div className="mt-8">
               {/* DATE + TIME ROW */}
-              <div className="w-full flex flex-col sm:flex-row gap-6">
-                {/* DATE PICKER */}
-                <div className="flex-1">
+              <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* LEFT — DATE PICKER */}
+                <div className="w-full">
                   <label className="block mb-1 text-sm text-gray-600 dark:text-gray-300">
                     Select Date:
                   </label>
 
-                  <div className="border rounded-lg p-2 bg-white dark:bg-gray-800 shadow-sm dark:text-white text-black">
+                  <div className="border dark:border-gray-700 rounded-lg p-2 bg-white dark:bg-gray-800 shadow-sm dark:text-white text-black">
                     <DayPicker
                       mode="single"
                       selected={selectedDate}
@@ -369,44 +390,93 @@ function OtherFacilitiesBookingPage() {
                   </div>
                 </div>
 
-                {/* TIME INPUT */}
-                <div className="sm:w-[40%] w-full">
-                  <label className="block mb-1 text-sm text-gray-600 dark:text-gray-300">
-                    Start Time:
-                  </label>
-                  <input
-                    type="time"
-                    value={startTime}
-                    min="05:00"
-                    max="21:59"
-                    onChange={(e) => setStartTime(e.target.value)}
+                {/* RIGHT — TIME + SUMMARY */}
+                <div className="w-full flex flex-col gap-4">
+                  {/* TIME INPUT */}
+                  <div className="w-full">
+                    <label className="block mb-1 text-sm text-gray-600 dark:text-gray-300">
+                      Start Time:
+                    </label>
+                    <input
+                      type="time"
+                      value={startTime}
+                      min="05:00"
+                      max="21:59"
+                      onChange={(e) => setStartTime(e.target.value)}
+                      className="
+          w-full p-3 
+          border dark:border-gray-700 
+          rounded-md 
+          dark:bg-gray-800 
+          dark:text-white 
+          shadow-sm
+        "
+                    />
+                  </div>
+
+                  {/* SUMMARY */}
+                  <div
                     className="
-                w-full p-3 
-                border dark:border-gray-700 
-                rounded-md 
-                dark:bg-gray-800 
-                dark:text-white 
-                shadow-sm
-              "
-                  />
+    flex flex-col items-center justify-center p-4
+    bg-white dark:bg-gray-900
+    text-gray-900 dark:text-gray-400
+    min-h-[100px] rounded-md
+    shadow-sm border dark:border-gray-700
+  "
+                  >
+                    <span className="text-xs font-medium mb-2 uppercase text-center">
+                      Selected Date
+                    </span>
+
+                    <span className="text-xs md:text-base font-medium mb-4 text-center dark:text-gray-100">
+                      {selectedDate
+                        ? selectedDate.toDateString()
+                        : "No date selected"}
+                    </span>
+
+                    <span className="text-xs font-medium mb-2 uppercase text-center">
+                      Selected Time
+                    </span>
+
+                    <span className="text-xs md:text-base font-medium text-center dark:text-gray-100">
+                      {!selectedDate
+                        ? "—"
+                        : !startTime
+                        ? "Select time"
+                        : `${startTime} AM`}
+                    </span>
+
+                    {/* REALTIME NOTE */}
+                    {selectedDate && isInvalidTime && (
+                      <span className="mt-3 text-xs text-red-600 dark:text-red-400 text-center">
+                        Booking must start between 4:00 AM and 2:00 PM (8-hour
+                        limit).
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* BOOK NOW BUTTON */}
               <button
                 onClick={() => setShowForm("add_user_details")}
-                disabled={formLoading || startTime === "" || !selectedDate}
+                disabled={
+                  formLoading ||
+                  startTime === "" ||
+                  !selectedDate ||
+                  isInvalidTime
+                }
                 className="
-            mt-6 
-            bg-blue-600 hover:bg-blue-700 
-            text-white font-semibold 
-            w-full sm:w-auto 
-            px-6 py-3 rounded-lg 
-            shadow-md disabled:opacity-50 
-            transition-all
-          "
+    mt-6 
+    bg-blue-600 hover:bg-blue-700 
+    text-white font-semibold 
+    w-full sm:w-auto 
+    px-6 py-3 rounded-lg 
+    shadow-md disabled:opacity-50 
+    transition-all
+  "
               >
-                {formLoading ? "Booking..." : "Reserve Now"}
+                {formLoading ? "Please wait..." : "Reserve Now"}
               </button>
             </div>
           </div>
