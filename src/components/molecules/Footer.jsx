@@ -120,7 +120,7 @@ function Footer() {
             to="/terms"
             className="dark:text-white text-sm hover:text-blue-400 transition"
           >
-            Terms & Conditions
+            Terms & Privacy Policy
           </Link>
         </div>
 

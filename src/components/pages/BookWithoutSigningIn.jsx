@@ -809,16 +809,21 @@ function BookWithoutSigningIn() {
       {showForm === "add_user_details" && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
           {/* MODAL BOX */}
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-xl w-[95%] max-w-5xl sm:max-h-[98vh] md:max-h-[98vh] lg:max-h-[97vh] overflow-y-auto relative text-gray-900 dark:text-gray-100">
+          <div
+            className="
+    bg-white dark:bg-gray-800
+    p-4 rounded-2xl shadow-xl
+    w-full max-w-5xl
+    max-h-[100vh] md:max-h-[98vh] lg:max-h-[97vh]
+    overflow-y-auto
+    relative
+    text-gray-900 dark:text-gray-100
+  "
+          >
             {/* HEADER */}
-            <h2 className="text-lg md:text-2xl font-bold text-center mb-8">
-              Reservation Details & Your Information
+            <h2 className="text-lg md:text-2xl font-bold text-center mb-10">
+              Reservation Details & Your Information Lorem100
             </h2>
-
-            <icons.MdOutlineClose
-              onClick={handleCloseFormModal}
-              className="absolute top-2 right-2 text-2xl cursor-pointer text-gray-900 dark:text-gray-100"
-            />
 
             {/* FLEX CONTAINER: summary (left) + form (right) */}
             <div className="flex flex-col md:flex-row md:gap-12">
@@ -980,7 +985,7 @@ function BookWithoutSigningIn() {
                     />
                     <label
                       htmlFor="remember"
-                      className="ml-2 select-none cursor-pointer text-gray-700 dark:text-gray-300"
+                      className="ml-5 select-none cursor-pointer text-gray-700 dark:text-gray-300"
                     >
                       Remember my info for next time
                     </label>
@@ -1004,7 +1009,7 @@ function BookWithoutSigningIn() {
                     />
                     <label
                       htmlFor="terms"
-                      className="ml-2 select-none cursor-pointer text-gray-700 dark:text-gray-300"
+                      className="ml-5 select-none cursor-pointer text-gray-700 dark:text-gray-300"
                     >
                       I have read and agree to the{" "}
                       <a
@@ -1018,19 +1023,31 @@ function BookWithoutSigningIn() {
                   </div>
 
                   {/* SUBMIT BUTTON */}
-                  <Button
-                    type="submit"
-                    onClick={handleSubmitBooking}
-                    disabled={isSubmitting}
-                    style={`w-full h-12 bg-blue-600 text-white font-semibold rounded-lg transition duration-300 ${
-                      isSubmitting
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:bg-blue-700"
-                    }`}
-                    label={
-                      isSubmitting ? "Submitting..." : "Submit Reservation"
-                    }
-                  />
+
+                  <div className="flex gap-3 mt-10">
+                    <Button
+                      label="Cancel"
+                      onClick={handleCloseFormModal}
+                      style="h-10 px-6 text-sm border border-gray-300 dark:border-gray-600 
+           bg-white dark:bg-gray-800 
+           text-gray-700 dark:text-gray-200 
+           rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                    />
+
+                    <Button
+                      type="submit"
+                      onClick={handleSubmitBooking}
+                      disabled={isSubmitting}
+                      style={`flex-1 h-10 text-sm bg-blue-600 text-white font-semibold rounded-lg transition duration-300 ${
+                        isSubmitting
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:bg-blue-700"
+                      }`}
+                      label={
+                        isSubmitting ? "Submitting..." : "Submit Reservation"
+                      }
+                    />
+                  </div>
                 </form>
               </div>
             </div>
