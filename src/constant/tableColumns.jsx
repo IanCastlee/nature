@@ -286,11 +286,13 @@ export const bookingRescheduled = [
   { title: "Phone", key: "phone" },
 
   { title: "Previous Room", key: "previous_room" },
+  { title: "New Room", key: "new_room" },
+
   { title: "Previous DP", key: "previous_paid" },
+  { title: "New DP", key: "new_paid" },
+
   { title: "Previous Check-in / Out", key: "prev_check_in_out" },
 
-  { title: "New Room", key: "new_room" },
-  { title: "New DP", key: "new_paid" },
   { title: "New Check-in / Out", key: "new_check_in_out" },
 
   { title: "Refund / Charge", key: "refund_recharge" },

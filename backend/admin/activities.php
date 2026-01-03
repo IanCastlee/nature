@@ -4,6 +4,18 @@ include("../dbConn.php");
 
 header('Content-Type: application/json');
 
+/**
+ * ==========================
+ * HANDLE JSON BODY
+ * ==========================
+ */
+$rawInput = file_get_contents("php://input");
+$jsonData = json_decode($rawInput, true);
+
+if (is_array($jsonData)) {
+    $_POST = array_merge($_POST, $jsonData);
+}
+
 $action = $_POST['action'] ?? "";
 
 /**
@@ -38,16 +50,10 @@ if ($action === "create") {
         exit;
     }
 
-    // ✅ SAVE ONLY FILENAME
     $stmt = $conn->prepare(
         "INSERT INTO activities (title, subtitle, image) VALUES (?, ?, ?)"
     );
-    $stmt->bind_param(
-        "sss",
-        $_POST['title'],
-        $_POST['subtitle'],
-        $fileName
-    );
+    $stmt->bind_param("sss", $_POST['title'], $_POST['subtitle'], $fileName);
     $stmt->execute();
 
     echo json_encode(["success" => true]);
@@ -73,7 +79,6 @@ if ($action === "update") {
 
     $id = $_POST['id'];
 
-    // Get old image
     $stmt = $conn->prepare("SELECT image FROM activities WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -87,12 +92,10 @@ if ($action === "update") {
 
     $fileName = $oldData['image'];
 
-    // If new image uploaded
     if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
 
         $uploadDir = "../uploads/activities/";
 
-        // Delete old image
         if ($fileName && file_exists($uploadDir . $fileName)) {
             unlink($uploadDir . $fileName);
         }
@@ -108,17 +111,10 @@ if ($action === "update") {
         }
     }
 
-    // ✅ UPDATE WITH FILENAME ONLY
     $stmt = $conn->prepare(
         "UPDATE activities SET title = ?, subtitle = ?, image = ? WHERE id = ?"
     );
-    $stmt->bind_param(
-        "sssi",
-        $_POST['title'],
-        $_POST['subtitle'],
-        $fileName,
-        $id
-    );
+    $stmt->bind_param("sssi", $_POST['title'], $_POST['subtitle'], $fileName, $id);
     $stmt->execute();
 
     echo json_encode(["success" => true]);
@@ -127,7 +123,7 @@ if ($action === "update") {
 
 /**
  * ==========================
- * DELETE ACTIVITY
+ * DELETE ACTIVITY ✅ FIXED
  * ==========================
  */
 if ($action === "delete") {
@@ -140,22 +136,19 @@ if ($action === "delete") {
 
     $id = $_POST['id'];
 
-    // Get image path from DB
+    // Get image
     $stmt = $conn->prepare("SELECT image FROM activities WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $data = $stmt->get_result()->fetch_assoc();
 
-    // Delete the file if exists
-   if ($data && !empty($data['image'])) {
-    $filePath = "../uploads/activities/" . $data['image']; // correct folder and slash
-    if (file_exists($filePath)) {
-        unlink($filePath);
+    if ($data && !empty($data['image'])) {
+        $filePath = "../uploads/activities/" . $data['image'];
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
     }
-}
 
-
-    // Delete DB record
     $stmt = $conn->prepare("DELETE FROM activities WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -163,8 +156,6 @@ if ($action === "delete") {
     echo json_encode(["success" => true]);
     exit;
 }
-
-
 
 /**
  * ==========================
@@ -174,14 +165,14 @@ if ($action === "delete") {
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $result = $conn->query("SELECT * FROM activities ORDER BY id DESC");
     $activities = [];
+
     while ($row = $result->fetch_assoc()) {
         $activities[] = $row;
     }
 
     echo json_encode([
         "success" => true,
-        "data" => $activities,
-        "message" => ""
+        "data" => $activities
     ]);
     exit;
 }

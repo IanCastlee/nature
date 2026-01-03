@@ -42,6 +42,7 @@ import { IoEyeOffOutline } from "react-icons/io5";
 import { FiUpload } from "react-icons/fi";
 import { GiDuration } from "react-icons/gi";
 import { IoIosCalendar } from "react-icons/io";
+import { LuJoystick } from "react-icons/lu";
 
 //admin sidebar
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -78,6 +79,7 @@ export const icons = {
   RiCustomerService2Fill,
   TbBookmarkQuestion,
   IoIosCloseCircleOutline,
+  LuJoystick,
   RiShakeHandsLine,
   MdOutlineFileDownload,
   IoMailSharp,

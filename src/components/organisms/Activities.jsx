@@ -6,15 +6,8 @@ import SubtTitle from "../molecules/SubtTitle";
 import Title from "../molecules/Title";
 import { uploadUrl } from "../../utils/fileURL";
 
-export default function Activities() {
+export default function Activities({ activities, loading, error }) {
   const [active, setActive] = useState(0);
-
-  // Fetch activities from backend
-  const {
-    data: activities,
-    loading,
-    error,
-  } = useGetData("/admin/activities.php");
 
   // Auto-slide every 4 seconds
   useEffect(() => {
@@ -42,7 +35,9 @@ export default function Activities() {
 
       {/* Error / Loading */}
       {loading && (
-        <p className="text-center mt-4 text-gray-500">Loading activities...</p>
+        <div className="flex justify-center items-center py-10">
+          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
       )}
       {error && (
         <p className="text-center mt-4 text-red-500">{error.message}</p>
@@ -171,10 +166,12 @@ function ImageFill({ src }) {
 ===================================================== */
 function Overlay({ activity, showDesc }) {
   return (
-    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5 flex flex-col justify-end">
-      <h3 className="text-white text-lg font-semibold">{activity.title}</h3>
+    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5 flex flex-col justify-end pr-10">
+      <h3 className="text-white lg:text-lg text-sm font-semibold">
+        {activity.title}
+      </h3>
       {showDesc && (
-        <p className="text-gray-200 text-sm mt-1">
+        <p className="text-gray-200 lg:text-sm text-xs mt-1">
           {activity.subtitle || activity.short}
         </p>
       )}

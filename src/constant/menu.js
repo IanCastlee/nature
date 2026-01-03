@@ -122,7 +122,7 @@ export const menuItems = [
   {
     name: "Activities",
     to: "/admin/activities",
-    icon: icons.GoImage,
+    icon: icons.LuJoystick,
   },
   {
     name: "Gallery",

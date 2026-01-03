@@ -77,6 +77,13 @@ function HomePage() {
   // Only enable loop if there are at least 2 slides
   const swiperLoop = heroImages.length > 1;
 
+  // Fetch activities from backend
+  const {
+    data: activities,
+    loading: loadingAct,
+    error: errorAct,
+  } = useGetData("/admin/activities.php");
+
   return (
     <>
       <main className="w-full min-h-screen bg-white dark:bg-black scroll-smooth pb-20">
@@ -180,17 +187,21 @@ function HomePage() {
           <SearchBox />
         </section>
 
-        <Suspense
-          fallback={
-            <div className="flex justify-center items-center py-10">
-              <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          }
-        >
-          {/* <About /> */}
-
-          <Activities />
-        </Suspense>
+        {activities?.length > 0 && (
+          <Suspense
+            fallback={
+              <div className="flex justify-center items-center py-10">
+                <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            }
+          >
+            <Activities
+              activities={activities}
+              loading={loadingAct}
+              error={errorAct}
+            />
+          </Suspense>
+        )}
 
         {/* Room Categories Section */}
         <section id="room-categories" className="w-full dark:bg-black mt-10">
